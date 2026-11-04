@@ -27,11 +27,15 @@ export type AggregateRateCard = {
 }
 
 export type RateCardAvgAggregateOutputType = {
+  minWeightKg: runtime.Decimal | null
+  maxWeightKg: runtime.Decimal | null
   baseCharge: runtime.Decimal | null
   perKgCharge: runtime.Decimal | null
 }
 
 export type RateCardSumAggregateOutputType = {
+  minWeightKg: runtime.Decimal | null
+  maxWeightKg: runtime.Decimal | null
   baseCharge: runtime.Decimal | null
   perKgCharge: runtime.Decimal | null
 }
@@ -40,6 +44,8 @@ export type RateCardMinAggregateOutputType = {
   id: string | null
   channel: string | null
   courierName: string | null
+  minWeightKg: runtime.Decimal | null
+  maxWeightKg: runtime.Decimal | null
   baseCharge: runtime.Decimal | null
   perKgCharge: runtime.Decimal | null
   effectiveFrom: Date | null
@@ -51,6 +57,8 @@ export type RateCardMaxAggregateOutputType = {
   id: string | null
   channel: string | null
   courierName: string | null
+  minWeightKg: runtime.Decimal | null
+  maxWeightKg: runtime.Decimal | null
   baseCharge: runtime.Decimal | null
   perKgCharge: runtime.Decimal | null
   effectiveFrom: Date | null
@@ -62,6 +70,8 @@ export type RateCardCountAggregateOutputType = {
   id: number
   channel: number
   courierName: number
+  minWeightKg: number
+  maxWeightKg: number
   baseCharge: number
   perKgCharge: number
   effectiveFrom: number
@@ -72,11 +82,15 @@ export type RateCardCountAggregateOutputType = {
 
 
 export type RateCardAvgAggregateInputType = {
+  minWeightKg?: true
+  maxWeightKg?: true
   baseCharge?: true
   perKgCharge?: true
 }
 
 export type RateCardSumAggregateInputType = {
+  minWeightKg?: true
+  maxWeightKg?: true
   baseCharge?: true
   perKgCharge?: true
 }
@@ -85,6 +99,8 @@ export type RateCardMinAggregateInputType = {
   id?: true
   channel?: true
   courierName?: true
+  minWeightKg?: true
+  maxWeightKg?: true
   baseCharge?: true
   perKgCharge?: true
   effectiveFrom?: true
@@ -96,6 +112,8 @@ export type RateCardMaxAggregateInputType = {
   id?: true
   channel?: true
   courierName?: true
+  minWeightKg?: true
+  maxWeightKg?: true
   baseCharge?: true
   perKgCharge?: true
   effectiveFrom?: true
@@ -107,6 +125,8 @@ export type RateCardCountAggregateInputType = {
   id?: true
   channel?: true
   courierName?: true
+  minWeightKg?: true
+  maxWeightKg?: true
   baseCharge?: true
   perKgCharge?: true
   effectiveFrom?: true
@@ -204,7 +224,9 @@ export type RateCardGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type RateCardGroupByOutputType = {
   id: string
   channel: string
-  courierName: string | null
+  courierName: string
+  minWeightKg: runtime.Decimal
+  maxWeightKg: runtime.Decimal | null
   baseCharge: runtime.Decimal
   perKgCharge: runtime.Decimal
   effectiveFrom: Date
@@ -238,7 +260,9 @@ export type RateCardWhereInput = {
   NOT?: Prisma.RateCardWhereInput | Prisma.RateCardWhereInput[]
   id?: Prisma.StringFilter<"RateCard"> | string
   channel?: Prisma.StringFilter<"RateCard"> | string
-  courierName?: Prisma.StringNullableFilter<"RateCard"> | string | null
+  courierName?: Prisma.StringFilter<"RateCard"> | string
+  minWeightKg?: Prisma.DecimalFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.DecimalNullableFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFilter<"RateCard"> | Date | string
@@ -250,7 +274,9 @@ export type RateCardWhereInput = {
 export type RateCardOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   channel?: Prisma.SortOrder
-  courierName?: Prisma.SortOrderInput | Prisma.SortOrder
+  courierName?: Prisma.SortOrder
+  minWeightKg?: Prisma.SortOrder
+  maxWeightKg?: Prisma.SortOrderInput | Prisma.SortOrder
   baseCharge?: Prisma.SortOrder
   perKgCharge?: Prisma.SortOrder
   effectiveFrom?: Prisma.SortOrder
@@ -265,7 +291,9 @@ export type RateCardWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.RateCardWhereInput[]
   NOT?: Prisma.RateCardWhereInput | Prisma.RateCardWhereInput[]
   channel?: Prisma.StringFilter<"RateCard"> | string
-  courierName?: Prisma.StringNullableFilter<"RateCard"> | string | null
+  courierName?: Prisma.StringFilter<"RateCard"> | string
+  minWeightKg?: Prisma.DecimalFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.DecimalNullableFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFilter<"RateCard"> | Date | string
@@ -277,7 +305,9 @@ export type RateCardWhereUniqueInput = Prisma.AtLeast<{
 export type RateCardOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   channel?: Prisma.SortOrder
-  courierName?: Prisma.SortOrderInput | Prisma.SortOrder
+  courierName?: Prisma.SortOrder
+  minWeightKg?: Prisma.SortOrder
+  maxWeightKg?: Prisma.SortOrderInput | Prisma.SortOrder
   baseCharge?: Prisma.SortOrder
   perKgCharge?: Prisma.SortOrder
   effectiveFrom?: Prisma.SortOrder
@@ -296,7 +326,9 @@ export type RateCardScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RateCardScalarWhereWithAggregatesInput | Prisma.RateCardScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"RateCard"> | string
   channel?: Prisma.StringWithAggregatesFilter<"RateCard"> | string
-  courierName?: Prisma.StringNullableWithAggregatesFilter<"RateCard"> | string | null
+  courierName?: Prisma.StringWithAggregatesFilter<"RateCard"> | string
+  minWeightKg?: Prisma.DecimalWithAggregatesFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.DecimalNullableWithAggregatesFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalWithAggregatesFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalWithAggregatesFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeWithAggregatesFilter<"RateCard"> | Date | string
@@ -307,7 +339,9 @@ export type RateCardScalarWhereWithAggregatesInput = {
 export type RateCardCreateInput = {
   id?: string
   channel: string
-  courierName?: string | null
+  courierName: string
+  minWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge: runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom: Date | string
@@ -318,7 +352,9 @@ export type RateCardCreateInput = {
 export type RateCardUncheckedCreateInput = {
   id?: string
   channel: string
-  courierName?: string | null
+  courierName: string
+  minWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge: runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom: Date | string
@@ -329,7 +365,9 @@ export type RateCardUncheckedCreateInput = {
 export type RateCardUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
-  courierName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  minWeightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -340,7 +378,9 @@ export type RateCardUpdateInput = {
 export type RateCardUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
-  courierName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  minWeightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -351,7 +391,9 @@ export type RateCardUncheckedUpdateInput = {
 export type RateCardCreateManyInput = {
   id?: string
   channel: string
-  courierName?: string | null
+  courierName: string
+  minWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge: runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom: Date | string
@@ -362,7 +404,9 @@ export type RateCardCreateManyInput = {
 export type RateCardUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
-  courierName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  minWeightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -372,7 +416,9 @@ export type RateCardUpdateManyMutationInput = {
 export type RateCardUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
-  courierName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  minWeightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -394,6 +440,8 @@ export type RateCardCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   channel?: Prisma.SortOrder
   courierName?: Prisma.SortOrder
+  minWeightKg?: Prisma.SortOrder
+  maxWeightKg?: Prisma.SortOrder
   baseCharge?: Prisma.SortOrder
   perKgCharge?: Prisma.SortOrder
   effectiveFrom?: Prisma.SortOrder
@@ -402,6 +450,8 @@ export type RateCardCountOrderByAggregateInput = {
 }
 
 export type RateCardAvgOrderByAggregateInput = {
+  minWeightKg?: Prisma.SortOrder
+  maxWeightKg?: Prisma.SortOrder
   baseCharge?: Prisma.SortOrder
   perKgCharge?: Prisma.SortOrder
 }
@@ -410,6 +460,8 @@ export type RateCardMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   channel?: Prisma.SortOrder
   courierName?: Prisma.SortOrder
+  minWeightKg?: Prisma.SortOrder
+  maxWeightKg?: Prisma.SortOrder
   baseCharge?: Prisma.SortOrder
   perKgCharge?: Prisma.SortOrder
   effectiveFrom?: Prisma.SortOrder
@@ -421,6 +473,8 @@ export type RateCardMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   channel?: Prisma.SortOrder
   courierName?: Prisma.SortOrder
+  minWeightKg?: Prisma.SortOrder
+  maxWeightKg?: Prisma.SortOrder
   baseCharge?: Prisma.SortOrder
   perKgCharge?: Prisma.SortOrder
   effectiveFrom?: Prisma.SortOrder
@@ -429,6 +483,8 @@ export type RateCardMinOrderByAggregateInput = {
 }
 
 export type RateCardSumOrderByAggregateInput = {
+  minWeightKg?: Prisma.SortOrder
+  maxWeightKg?: Prisma.SortOrder
   baseCharge?: Prisma.SortOrder
   perKgCharge?: Prisma.SortOrder
 }
@@ -475,14 +531,12 @@ export type RateCardUncheckedUpdateManyWithoutPartnerNestedInput = {
   deleteMany?: Prisma.RateCardScalarWhereInput | Prisma.RateCardScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type RateCardCreateWithoutPartnerInput = {
   id?: string
   channel: string
-  courierName?: string | null
+  courierName: string
+  minWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge: runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom: Date | string
@@ -492,7 +546,9 @@ export type RateCardCreateWithoutPartnerInput = {
 export type RateCardUncheckedCreateWithoutPartnerInput = {
   id?: string
   channel: string
-  courierName?: string | null
+  courierName: string
+  minWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge: runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom: Date | string
@@ -531,7 +587,9 @@ export type RateCardScalarWhereInput = {
   NOT?: Prisma.RateCardScalarWhereInput | Prisma.RateCardScalarWhereInput[]
   id?: Prisma.StringFilter<"RateCard"> | string
   channel?: Prisma.StringFilter<"RateCard"> | string
-  courierName?: Prisma.StringNullableFilter<"RateCard"> | string | null
+  courierName?: Prisma.StringFilter<"RateCard"> | string
+  minWeightKg?: Prisma.DecimalFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.DecimalNullableFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFilter<"RateCard"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFilter<"RateCard"> | Date | string
@@ -542,7 +600,9 @@ export type RateCardScalarWhereInput = {
 export type RateCardCreateManyPartnerInput = {
   id?: string
   channel: string
-  courierName?: string | null
+  courierName: string
+  minWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge: runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom: Date | string
@@ -552,7 +612,9 @@ export type RateCardCreateManyPartnerInput = {
 export type RateCardUpdateWithoutPartnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
-  courierName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  minWeightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -562,7 +624,9 @@ export type RateCardUpdateWithoutPartnerInput = {
 export type RateCardUncheckedUpdateWithoutPartnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
-  courierName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  minWeightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -572,7 +636,9 @@ export type RateCardUncheckedUpdateWithoutPartnerInput = {
 export type RateCardUncheckedUpdateManyWithoutPartnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
-  courierName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  minWeightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxWeightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   baseCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   perKgCharge?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -585,6 +651,8 @@ export type RateCardSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   channel?: boolean
   courierName?: boolean
+  minWeightKg?: boolean
+  maxWeightKg?: boolean
   baseCharge?: boolean
   perKgCharge?: boolean
   effectiveFrom?: boolean
@@ -597,6 +665,8 @@ export type RateCardSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   channel?: boolean
   courierName?: boolean
+  minWeightKg?: boolean
+  maxWeightKg?: boolean
   baseCharge?: boolean
   perKgCharge?: boolean
   effectiveFrom?: boolean
@@ -609,6 +679,8 @@ export type RateCardSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   channel?: boolean
   courierName?: boolean
+  minWeightKg?: boolean
+  maxWeightKg?: boolean
   baseCharge?: boolean
   perKgCharge?: boolean
   effectiveFrom?: boolean
@@ -621,6 +693,8 @@ export type RateCardSelectScalar = {
   id?: boolean
   channel?: boolean
   courierName?: boolean
+  minWeightKg?: boolean
+  maxWeightKg?: boolean
   baseCharge?: boolean
   perKgCharge?: boolean
   effectiveFrom?: boolean
@@ -628,7 +702,7 @@ export type RateCardSelectScalar = {
   partnerId?: boolean
 }
 
-export type RateCardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "channel" | "courierName" | "baseCharge" | "perKgCharge" | "effectiveFrom" | "effectiveTo" | "partnerId", ExtArgs["result"]["rateCard"]>
+export type RateCardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "channel" | "courierName" | "minWeightKg" | "maxWeightKg" | "baseCharge" | "perKgCharge" | "effectiveFrom" | "effectiveTo" | "partnerId", ExtArgs["result"]["rateCard"]>
 export type RateCardInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   partner?: boolean | Prisma.PartnerDefaultArgs<ExtArgs>
 }
@@ -647,7 +721,9 @@ export type $RateCardPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     channel: string
-    courierName: string | null
+    courierName: string
+    minWeightKg: runtime.Decimal
+    maxWeightKg: runtime.Decimal | null
     baseCharge: runtime.Decimal
     perKgCharge: runtime.Decimal
     effectiveFrom: Date
@@ -1080,6 +1156,8 @@ export interface RateCardFieldRefs {
   readonly id: Prisma.FieldRef<"RateCard", 'String'>
   readonly channel: Prisma.FieldRef<"RateCard", 'String'>
   readonly courierName: Prisma.FieldRef<"RateCard", 'String'>
+  readonly minWeightKg: Prisma.FieldRef<"RateCard", 'Decimal'>
+  readonly maxWeightKg: Prisma.FieldRef<"RateCard", 'Decimal'>
   readonly baseCharge: Prisma.FieldRef<"RateCard", 'Decimal'>
   readonly perKgCharge: Prisma.FieldRef<"RateCard", 'Decimal'>
   readonly effectiveFrom: Prisma.FieldRef<"RateCard", 'DateTime'>

@@ -405,10 +405,12 @@ export const ModelName = {
   Order: 'Order',
   Settlement: 'Settlement',
   RateCard: 'RateCard',
+  ChannelRateCard: 'ChannelRateCard',
   FreightCharge: 'FreightCharge',
   ReturnRecord: 'ReturnRecord',
   ReconciliationRun: 'ReconciliationRun',
   ReconciliationMatch: 'ReconciliationMatch',
+  MatchSettlement: 'MatchSettlement',
   Claim: 'Claim',
   AuditLog: 'AuditLog'
 } as const
@@ -426,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "partner" | "importBatch" | "sourceRecord" | "columnMapping" | "order" | "settlement" | "rateCard" | "freightCharge" | "returnRecord" | "reconciliationRun" | "reconciliationMatch" | "claim" | "auditLog"
+    modelProps: "user" | "partner" | "importBatch" | "sourceRecord" | "columnMapping" | "order" | "settlement" | "rateCard" | "channelRateCard" | "freightCharge" | "returnRecord" | "reconciliationRun" | "reconciliationMatch" | "matchSettlement" | "claim" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1022,6 +1024,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ChannelRateCard: {
+      payload: Prisma.$ChannelRateCardPayload<ExtArgs>
+      fields: Prisma.ChannelRateCardFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChannelRateCardFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChannelRateCardFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload>
+        }
+        findFirst: {
+          args: Prisma.ChannelRateCardFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChannelRateCardFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload>
+        }
+        findMany: {
+          args: Prisma.ChannelRateCardFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload>[]
+        }
+        create: {
+          args: Prisma.ChannelRateCardCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload>
+        }
+        createMany: {
+          args: Prisma.ChannelRateCardCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChannelRateCardCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload>[]
+        }
+        delete: {
+          args: Prisma.ChannelRateCardDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload>
+        }
+        update: {
+          args: Prisma.ChannelRateCardUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChannelRateCardDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChannelRateCardUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChannelRateCardUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChannelRateCardUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRateCardPayload>
+        }
+        aggregate: {
+          args: Prisma.ChannelRateCardAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChannelRateCard>
+        }
+        groupBy: {
+          args: Prisma.ChannelRateCardGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChannelRateCardGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChannelRateCardCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChannelRateCardCountAggregateOutputType> | number
+        }
+      }
+    }
     FreightCharge: {
       payload: Prisma.$FreightChargePayload<ExtArgs>
       fields: Prisma.FreightChargeFieldRefs
@@ -1318,6 +1394,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MatchSettlement: {
+      payload: Prisma.$MatchSettlementPayload<ExtArgs>
+      fields: Prisma.MatchSettlementFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MatchSettlementFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MatchSettlementFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload>
+        }
+        findFirst: {
+          args: Prisma.MatchSettlementFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MatchSettlementFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload>
+        }
+        findMany: {
+          args: Prisma.MatchSettlementFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload>[]
+        }
+        create: {
+          args: Prisma.MatchSettlementCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload>
+        }
+        createMany: {
+          args: Prisma.MatchSettlementCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MatchSettlementCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload>[]
+        }
+        delete: {
+          args: Prisma.MatchSettlementDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload>
+        }
+        update: {
+          args: Prisma.MatchSettlementUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload>
+        }
+        deleteMany: {
+          args: Prisma.MatchSettlementDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MatchSettlementUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MatchSettlementUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload>[]
+        }
+        upsert: {
+          args: Prisma.MatchSettlementUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MatchSettlementPayload>
+        }
+        aggregate: {
+          args: Prisma.MatchSettlementAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMatchSettlement>
+        }
+        groupBy: {
+          args: Prisma.MatchSettlementGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchSettlementGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MatchSettlementCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MatchSettlementCountAggregateOutputType> | number
+        }
+      }
+    }
     Claim: {
       payload: Prisma.$ClaimPayload<ExtArgs>
       fields: Prisma.ClaimFieldRefs
@@ -1570,11 +1720,16 @@ export const OrderScalarFieldEnum = {
   id: 'id',
   orderNumber: 'orderNumber',
   channel: 'channel',
+  partnerId: 'partnerId',
   orderDate: 'orderDate',
   paymentMode: 'paymentMode',
   deliveryStatus: 'deliveryStatus',
-  expectedAmount: 'expectedAmount',
-  createdAt: 'createdAt'
+  orderValue: 'orderValue',
+  expectedSettlementAmount: 'expectedSettlementAmount',
+  settlementDueAt: 'settlementDueAt',
+  weightKg: 'weightKg',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -1584,10 +1739,14 @@ export const SettlementScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
   partnerId: 'partnerId',
+  grossAmount: 'grossAmount',
   amountReceived: 'amountReceived',
+  commissionAmount: 'commissionAmount',
+  otherFeeAmount: 'otherFeeAmount',
   tcsAmount: 'tcsAmount',
   tdsAmount: 'tdsAmount',
-  settlementDate: 'settlementDate'
+  settlementDate: 'settlementDate',
+  referenceNumber: 'referenceNumber'
 } as const
 
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
@@ -1597,6 +1756,8 @@ export const RateCardScalarFieldEnum = {
   id: 'id',
   channel: 'channel',
   courierName: 'courierName',
+  minWeightKg: 'minWeightKg',
+  maxWeightKg: 'maxWeightKg',
   baseCharge: 'baseCharge',
   perKgCharge: 'perKgCharge',
   effectiveFrom: 'effectiveFrom',
@@ -1607,13 +1768,28 @@ export const RateCardScalarFieldEnum = {
 export type RateCardScalarFieldEnum = (typeof RateCardScalarFieldEnum)[keyof typeof RateCardScalarFieldEnum]
 
 
+export const ChannelRateCardScalarFieldEnum = {
+  id: 'id',
+  channel: 'channel',
+  commissionPercent: 'commissionPercent',
+  fixedFee: 'fixedFee',
+  otherFee: 'otherFee',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo',
+  partnerId: 'partnerId'
+} as const
+
+export type ChannelRateCardScalarFieldEnum = (typeof ChannelRateCardScalarFieldEnum)[keyof typeof ChannelRateCardScalarFieldEnum]
+
+
 export const FreightChargeScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
   courierName: 'courierName',
   chargedAmount: 'chargedAmount',
   actualWeight: 'actualWeight',
-  createdAt: 'createdAt'
+  invoiceNumber: 'invoiceNumber',
+  chargedAt: 'chargedAt'
 } as const
 
 export type FreightChargeScalarFieldEnum = (typeof FreightChargeScalarFieldEnum)[keyof typeof FreightChargeScalarFieldEnum]
@@ -1644,7 +1820,6 @@ export const ReconciliationMatchScalarFieldEnum = {
   id: 'id',
   runId: 'runId',
   orderId: 'orderId',
-  settlementId: 'settlementId',
   freightChargeId: 'freightChargeId',
   returnRecordId: 'returnRecordId',
   status: 'status',
@@ -1657,6 +1832,15 @@ export const ReconciliationMatchScalarFieldEnum = {
 export type ReconciliationMatchScalarFieldEnum = (typeof ReconciliationMatchScalarFieldEnum)[keyof typeof ReconciliationMatchScalarFieldEnum]
 
 
+export const MatchSettlementScalarFieldEnum = {
+  id: 'id',
+  reconciliationMatchId: 'reconciliationMatchId',
+  settlementId: 'settlementId'
+} as const
+
+export type MatchSettlementScalarFieldEnum = (typeof MatchSettlementScalarFieldEnum)[keyof typeof MatchSettlementScalarFieldEnum]
+
+
 export const ClaimScalarFieldEnum = {
   id: 'id',
   claimNumber: 'claimNumber',
@@ -1667,7 +1851,8 @@ export const ClaimScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   partnerId: 'partnerId',
-  ownerId: 'ownerId'
+  ownerId: 'ownerId',
+  matchId: 'matchId'
 } as const
 
 export type ClaimScalarFieldEnum = (typeof ClaimScalarFieldEnum)[keyof typeof ClaimScalarFieldEnum]
@@ -2059,10 +2244,12 @@ export type GlobalOmitConfig = {
   order?: Prisma.OrderOmit
   settlement?: Prisma.SettlementOmit
   rateCard?: Prisma.RateCardOmit
+  channelRateCard?: Prisma.ChannelRateCardOmit
   freightCharge?: Prisma.FreightChargeOmit
   returnRecord?: Prisma.ReturnRecordOmit
   reconciliationRun?: Prisma.ReconciliationRunOmit
   reconciliationMatch?: Prisma.ReconciliationMatchOmit
+  matchSettlement?: Prisma.MatchSettlementOmit
   claim?: Prisma.ClaimOmit
   auditLog?: Prisma.AuditLogOmit
 }

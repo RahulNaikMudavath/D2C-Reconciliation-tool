@@ -59,10 +59,12 @@ export const ModelName = {
   Order: 'Order',
   Settlement: 'Settlement',
   RateCard: 'RateCard',
+  ChannelRateCard: 'ChannelRateCard',
   FreightCharge: 'FreightCharge',
   ReturnRecord: 'ReturnRecord',
   ReconciliationRun: 'ReconciliationRun',
   ReconciliationMatch: 'ReconciliationMatch',
+  MatchSettlement: 'MatchSettlement',
   Claim: 'Claim',
   AuditLog: 'AuditLog'
 } as const
@@ -148,11 +150,16 @@ export const OrderScalarFieldEnum = {
   id: 'id',
   orderNumber: 'orderNumber',
   channel: 'channel',
+  partnerId: 'partnerId',
   orderDate: 'orderDate',
   paymentMode: 'paymentMode',
   deliveryStatus: 'deliveryStatus',
-  expectedAmount: 'expectedAmount',
-  createdAt: 'createdAt'
+  orderValue: 'orderValue',
+  expectedSettlementAmount: 'expectedSettlementAmount',
+  settlementDueAt: 'settlementDueAt',
+  weightKg: 'weightKg',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -162,10 +169,14 @@ export const SettlementScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
   partnerId: 'partnerId',
+  grossAmount: 'grossAmount',
   amountReceived: 'amountReceived',
+  commissionAmount: 'commissionAmount',
+  otherFeeAmount: 'otherFeeAmount',
   tcsAmount: 'tcsAmount',
   tdsAmount: 'tdsAmount',
-  settlementDate: 'settlementDate'
+  settlementDate: 'settlementDate',
+  referenceNumber: 'referenceNumber'
 } as const
 
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
@@ -175,6 +186,8 @@ export const RateCardScalarFieldEnum = {
   id: 'id',
   channel: 'channel',
   courierName: 'courierName',
+  minWeightKg: 'minWeightKg',
+  maxWeightKg: 'maxWeightKg',
   baseCharge: 'baseCharge',
   perKgCharge: 'perKgCharge',
   effectiveFrom: 'effectiveFrom',
@@ -185,13 +198,28 @@ export const RateCardScalarFieldEnum = {
 export type RateCardScalarFieldEnum = (typeof RateCardScalarFieldEnum)[keyof typeof RateCardScalarFieldEnum]
 
 
+export const ChannelRateCardScalarFieldEnum = {
+  id: 'id',
+  channel: 'channel',
+  commissionPercent: 'commissionPercent',
+  fixedFee: 'fixedFee',
+  otherFee: 'otherFee',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo',
+  partnerId: 'partnerId'
+} as const
+
+export type ChannelRateCardScalarFieldEnum = (typeof ChannelRateCardScalarFieldEnum)[keyof typeof ChannelRateCardScalarFieldEnum]
+
+
 export const FreightChargeScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
   courierName: 'courierName',
   chargedAmount: 'chargedAmount',
   actualWeight: 'actualWeight',
-  createdAt: 'createdAt'
+  invoiceNumber: 'invoiceNumber',
+  chargedAt: 'chargedAt'
 } as const
 
 export type FreightChargeScalarFieldEnum = (typeof FreightChargeScalarFieldEnum)[keyof typeof FreightChargeScalarFieldEnum]
@@ -222,7 +250,6 @@ export const ReconciliationMatchScalarFieldEnum = {
   id: 'id',
   runId: 'runId',
   orderId: 'orderId',
-  settlementId: 'settlementId',
   freightChargeId: 'freightChargeId',
   returnRecordId: 'returnRecordId',
   status: 'status',
@@ -235,6 +262,15 @@ export const ReconciliationMatchScalarFieldEnum = {
 export type ReconciliationMatchScalarFieldEnum = (typeof ReconciliationMatchScalarFieldEnum)[keyof typeof ReconciliationMatchScalarFieldEnum]
 
 
+export const MatchSettlementScalarFieldEnum = {
+  id: 'id',
+  reconciliationMatchId: 'reconciliationMatchId',
+  settlementId: 'settlementId'
+} as const
+
+export type MatchSettlementScalarFieldEnum = (typeof MatchSettlementScalarFieldEnum)[keyof typeof MatchSettlementScalarFieldEnum]
+
+
 export const ClaimScalarFieldEnum = {
   id: 'id',
   claimNumber: 'claimNumber',
@@ -245,7 +281,8 @@ export const ClaimScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   partnerId: 'partnerId',
-  ownerId: 'ownerId'
+  ownerId: 'ownerId',
+  matchId: 'matchId'
 } as const
 
 export type ClaimScalarFieldEnum = (typeof ClaimScalarFieldEnum)[keyof typeof ClaimScalarFieldEnum]

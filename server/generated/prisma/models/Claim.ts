@@ -44,6 +44,7 @@ export type ClaimMinAggregateOutputType = {
   updatedAt: Date | null
   partnerId: string | null
   ownerId: string | null
+  matchId: string | null
 }
 
 export type ClaimMaxAggregateOutputType = {
@@ -56,6 +57,7 @@ export type ClaimMaxAggregateOutputType = {
   updatedAt: Date | null
   partnerId: string | null
   ownerId: string | null
+  matchId: string | null
 }
 
 export type ClaimCountAggregateOutputType = {
@@ -69,6 +71,7 @@ export type ClaimCountAggregateOutputType = {
   updatedAt: number
   partnerId: number
   ownerId: number
+  matchId: number
   _all: number
 }
 
@@ -91,6 +94,7 @@ export type ClaimMinAggregateInputType = {
   updatedAt?: true
   partnerId?: true
   ownerId?: true
+  matchId?: true
 }
 
 export type ClaimMaxAggregateInputType = {
@@ -103,6 +107,7 @@ export type ClaimMaxAggregateInputType = {
   updatedAt?: true
   partnerId?: true
   ownerId?: true
+  matchId?: true
 }
 
 export type ClaimCountAggregateInputType = {
@@ -116,6 +121,7 @@ export type ClaimCountAggregateInputType = {
   updatedAt?: true
   partnerId?: true
   ownerId?: true
+  matchId?: true
   _all?: true
 }
 
@@ -216,6 +222,7 @@ export type ClaimGroupByOutputType = {
   updatedAt: Date
   partnerId: string
   ownerId: string | null
+  matchId: string | null
   _count: ClaimCountAggregateOutputType | null
   _avg: ClaimAvgAggregateOutputType | null
   _sum: ClaimSumAggregateOutputType | null
@@ -252,8 +259,10 @@ export type ClaimWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Claim"> | Date | string
   partnerId?: Prisma.StringFilter<"Claim"> | string
   ownerId?: Prisma.StringNullableFilter<"Claim"> | string | null
+  matchId?: Prisma.StringNullableFilter<"Claim"> | string | null
   partner?: Prisma.XOR<Prisma.PartnerScalarRelationFilter, Prisma.PartnerWhereInput>
   owner?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  match?: Prisma.XOR<Prisma.ReconciliationMatchNullableScalarRelationFilter, Prisma.ReconciliationMatchWhereInput> | null
 }
 
 export type ClaimOrderByWithRelationInput = {
@@ -267,13 +276,16 @@ export type ClaimOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   partnerId?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  matchId?: Prisma.SortOrderInput | Prisma.SortOrder
   partner?: Prisma.PartnerOrderByWithRelationInput
   owner?: Prisma.UserOrderByWithRelationInput
+  match?: Prisma.ReconciliationMatchOrderByWithRelationInput
 }
 
 export type ClaimWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   claimNumber?: string
+  matchId?: string
   AND?: Prisma.ClaimWhereInput | Prisma.ClaimWhereInput[]
   OR?: Prisma.ClaimWhereInput[]
   NOT?: Prisma.ClaimWhereInput | Prisma.ClaimWhereInput[]
@@ -287,7 +299,8 @@ export type ClaimWhereUniqueInput = Prisma.AtLeast<{
   ownerId?: Prisma.StringNullableFilter<"Claim"> | string | null
   partner?: Prisma.XOR<Prisma.PartnerScalarRelationFilter, Prisma.PartnerWhereInput>
   owner?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-}, "id" | "claimNumber">
+  match?: Prisma.XOR<Prisma.ReconciliationMatchNullableScalarRelationFilter, Prisma.ReconciliationMatchWhereInput> | null
+}, "id" | "claimNumber" | "matchId">
 
 export type ClaimOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -300,6 +313,7 @@ export type ClaimOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   partnerId?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  matchId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ClaimCountOrderByAggregateInput
   _avg?: Prisma.ClaimAvgOrderByAggregateInput
   _max?: Prisma.ClaimMaxOrderByAggregateInput
@@ -321,6 +335,7 @@ export type ClaimScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Claim"> | Date | string
   partnerId?: Prisma.StringWithAggregatesFilter<"Claim"> | string
   ownerId?: Prisma.StringNullableWithAggregatesFilter<"Claim"> | string | null
+  matchId?: Prisma.StringNullableWithAggregatesFilter<"Claim"> | string | null
 }
 
 export type ClaimCreateInput = {
@@ -334,6 +349,7 @@ export type ClaimCreateInput = {
   updatedAt?: Date | string
   partner: Prisma.PartnerCreateNestedOneWithoutClaimsInput
   owner?: Prisma.UserCreateNestedOneWithoutAssignedClaimsInput
+  match?: Prisma.ReconciliationMatchCreateNestedOneWithoutClaimsInput
 }
 
 export type ClaimUncheckedCreateInput = {
@@ -347,6 +363,7 @@ export type ClaimUncheckedCreateInput = {
   updatedAt?: Date | string
   partnerId: string
   ownerId?: string | null
+  matchId?: string | null
 }
 
 export type ClaimUpdateInput = {
@@ -360,6 +377,7 @@ export type ClaimUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partner?: Prisma.PartnerUpdateOneRequiredWithoutClaimsNestedInput
   owner?: Prisma.UserUpdateOneWithoutAssignedClaimsNestedInput
+  match?: Prisma.ReconciliationMatchUpdateOneWithoutClaimsNestedInput
 }
 
 export type ClaimUncheckedUpdateInput = {
@@ -373,6 +391,7 @@ export type ClaimUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partnerId?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  matchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ClaimCreateManyInput = {
@@ -386,6 +405,7 @@ export type ClaimCreateManyInput = {
   updatedAt?: Date | string
   partnerId: string
   ownerId?: string | null
+  matchId?: string | null
 }
 
 export type ClaimUpdateManyMutationInput = {
@@ -410,6 +430,7 @@ export type ClaimUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partnerId?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  matchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ClaimListRelationFilter = {
@@ -433,6 +454,7 @@ export type ClaimCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   partnerId?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  matchId?: Prisma.SortOrder
 }
 
 export type ClaimAvgOrderByAggregateInput = {
@@ -449,6 +471,7 @@ export type ClaimMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   partnerId?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  matchId?: Prisma.SortOrder
 }
 
 export type ClaimMinOrderByAggregateInput = {
@@ -461,6 +484,7 @@ export type ClaimMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   partnerId?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  matchId?: Prisma.SortOrder
 }
 
 export type ClaimSumOrderByAggregateInput = {
@@ -551,6 +575,48 @@ export type ClaimUncheckedUpdateManyWithoutPartnerNestedInput = {
   deleteMany?: Prisma.ClaimScalarWhereInput | Prisma.ClaimScalarWhereInput[]
 }
 
+export type ClaimCreateNestedManyWithoutMatchInput = {
+  create?: Prisma.XOR<Prisma.ClaimCreateWithoutMatchInput, Prisma.ClaimUncheckedCreateWithoutMatchInput> | Prisma.ClaimCreateWithoutMatchInput[] | Prisma.ClaimUncheckedCreateWithoutMatchInput[]
+  connectOrCreate?: Prisma.ClaimCreateOrConnectWithoutMatchInput | Prisma.ClaimCreateOrConnectWithoutMatchInput[]
+  createMany?: Prisma.ClaimCreateManyMatchInputEnvelope
+  connect?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+}
+
+export type ClaimUncheckedCreateNestedManyWithoutMatchInput = {
+  create?: Prisma.XOR<Prisma.ClaimCreateWithoutMatchInput, Prisma.ClaimUncheckedCreateWithoutMatchInput> | Prisma.ClaimCreateWithoutMatchInput[] | Prisma.ClaimUncheckedCreateWithoutMatchInput[]
+  connectOrCreate?: Prisma.ClaimCreateOrConnectWithoutMatchInput | Prisma.ClaimCreateOrConnectWithoutMatchInput[]
+  createMany?: Prisma.ClaimCreateManyMatchInputEnvelope
+  connect?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+}
+
+export type ClaimUpdateManyWithoutMatchNestedInput = {
+  create?: Prisma.XOR<Prisma.ClaimCreateWithoutMatchInput, Prisma.ClaimUncheckedCreateWithoutMatchInput> | Prisma.ClaimCreateWithoutMatchInput[] | Prisma.ClaimUncheckedCreateWithoutMatchInput[]
+  connectOrCreate?: Prisma.ClaimCreateOrConnectWithoutMatchInput | Prisma.ClaimCreateOrConnectWithoutMatchInput[]
+  upsert?: Prisma.ClaimUpsertWithWhereUniqueWithoutMatchInput | Prisma.ClaimUpsertWithWhereUniqueWithoutMatchInput[]
+  createMany?: Prisma.ClaimCreateManyMatchInputEnvelope
+  set?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+  disconnect?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+  delete?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+  connect?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+  update?: Prisma.ClaimUpdateWithWhereUniqueWithoutMatchInput | Prisma.ClaimUpdateWithWhereUniqueWithoutMatchInput[]
+  updateMany?: Prisma.ClaimUpdateManyWithWhereWithoutMatchInput | Prisma.ClaimUpdateManyWithWhereWithoutMatchInput[]
+  deleteMany?: Prisma.ClaimScalarWhereInput | Prisma.ClaimScalarWhereInput[]
+}
+
+export type ClaimUncheckedUpdateManyWithoutMatchNestedInput = {
+  create?: Prisma.XOR<Prisma.ClaimCreateWithoutMatchInput, Prisma.ClaimUncheckedCreateWithoutMatchInput> | Prisma.ClaimCreateWithoutMatchInput[] | Prisma.ClaimUncheckedCreateWithoutMatchInput[]
+  connectOrCreate?: Prisma.ClaimCreateOrConnectWithoutMatchInput | Prisma.ClaimCreateOrConnectWithoutMatchInput[]
+  upsert?: Prisma.ClaimUpsertWithWhereUniqueWithoutMatchInput | Prisma.ClaimUpsertWithWhereUniqueWithoutMatchInput[]
+  createMany?: Prisma.ClaimCreateManyMatchInputEnvelope
+  set?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+  disconnect?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+  delete?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+  connect?: Prisma.ClaimWhereUniqueInput | Prisma.ClaimWhereUniqueInput[]
+  update?: Prisma.ClaimUpdateWithWhereUniqueWithoutMatchInput | Prisma.ClaimUpdateWithWhereUniqueWithoutMatchInput[]
+  updateMany?: Prisma.ClaimUpdateManyWithWhereWithoutMatchInput | Prisma.ClaimUpdateManyWithWhereWithoutMatchInput[]
+  deleteMany?: Prisma.ClaimScalarWhereInput | Prisma.ClaimScalarWhereInput[]
+}
+
 export type EnumClaimStatusFieldUpdateOperationsInput = {
   set?: $Enums.ClaimStatus
 }
@@ -565,6 +631,7 @@ export type ClaimCreateWithoutOwnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   partner: Prisma.PartnerCreateNestedOneWithoutClaimsInput
+  match?: Prisma.ReconciliationMatchCreateNestedOneWithoutClaimsInput
 }
 
 export type ClaimUncheckedCreateWithoutOwnerInput = {
@@ -577,6 +644,7 @@ export type ClaimUncheckedCreateWithoutOwnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   partnerId: string
+  matchId?: string | null
 }
 
 export type ClaimCreateOrConnectWithoutOwnerInput = {
@@ -619,6 +687,7 @@ export type ClaimScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Claim"> | Date | string
   partnerId?: Prisma.StringFilter<"Claim"> | string
   ownerId?: Prisma.StringNullableFilter<"Claim"> | string | null
+  matchId?: Prisma.StringNullableFilter<"Claim"> | string | null
 }
 
 export type ClaimCreateWithoutPartnerInput = {
@@ -631,6 +700,7 @@ export type ClaimCreateWithoutPartnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutAssignedClaimsInput
+  match?: Prisma.ReconciliationMatchCreateNestedOneWithoutClaimsInput
 }
 
 export type ClaimUncheckedCreateWithoutPartnerInput = {
@@ -643,6 +713,7 @@ export type ClaimUncheckedCreateWithoutPartnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
+  matchId?: string | null
 }
 
 export type ClaimCreateOrConnectWithoutPartnerInput = {
@@ -671,6 +742,58 @@ export type ClaimUpdateManyWithWhereWithoutPartnerInput = {
   data: Prisma.XOR<Prisma.ClaimUpdateManyMutationInput, Prisma.ClaimUncheckedUpdateManyWithoutPartnerInput>
 }
 
+export type ClaimCreateWithoutMatchInput = {
+  id?: string
+  claimNumber: string
+  description: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.ClaimStatus
+  evidence?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  partner: Prisma.PartnerCreateNestedOneWithoutClaimsInput
+  owner?: Prisma.UserCreateNestedOneWithoutAssignedClaimsInput
+}
+
+export type ClaimUncheckedCreateWithoutMatchInput = {
+  id?: string
+  claimNumber: string
+  description: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.ClaimStatus
+  evidence?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  partnerId: string
+  ownerId?: string | null
+}
+
+export type ClaimCreateOrConnectWithoutMatchInput = {
+  where: Prisma.ClaimWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClaimCreateWithoutMatchInput, Prisma.ClaimUncheckedCreateWithoutMatchInput>
+}
+
+export type ClaimCreateManyMatchInputEnvelope = {
+  data: Prisma.ClaimCreateManyMatchInput | Prisma.ClaimCreateManyMatchInput[]
+  skipDuplicates?: boolean
+}
+
+export type ClaimUpsertWithWhereUniqueWithoutMatchInput = {
+  where: Prisma.ClaimWhereUniqueInput
+  update: Prisma.XOR<Prisma.ClaimUpdateWithoutMatchInput, Prisma.ClaimUncheckedUpdateWithoutMatchInput>
+  create: Prisma.XOR<Prisma.ClaimCreateWithoutMatchInput, Prisma.ClaimUncheckedCreateWithoutMatchInput>
+}
+
+export type ClaimUpdateWithWhereUniqueWithoutMatchInput = {
+  where: Prisma.ClaimWhereUniqueInput
+  data: Prisma.XOR<Prisma.ClaimUpdateWithoutMatchInput, Prisma.ClaimUncheckedUpdateWithoutMatchInput>
+}
+
+export type ClaimUpdateManyWithWhereWithoutMatchInput = {
+  where: Prisma.ClaimScalarWhereInput
+  data: Prisma.XOR<Prisma.ClaimUpdateManyMutationInput, Prisma.ClaimUncheckedUpdateManyWithoutMatchInput>
+}
+
 export type ClaimCreateManyOwnerInput = {
   id?: string
   claimNumber: string
@@ -681,6 +804,7 @@ export type ClaimCreateManyOwnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   partnerId: string
+  matchId?: string | null
 }
 
 export type ClaimUpdateWithoutOwnerInput = {
@@ -693,6 +817,7 @@ export type ClaimUpdateWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partner?: Prisma.PartnerUpdateOneRequiredWithoutClaimsNestedInput
+  match?: Prisma.ReconciliationMatchUpdateOneWithoutClaimsNestedInput
 }
 
 export type ClaimUncheckedUpdateWithoutOwnerInput = {
@@ -705,6 +830,7 @@ export type ClaimUncheckedUpdateWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partnerId?: Prisma.StringFieldUpdateOperationsInput | string
+  matchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ClaimUncheckedUpdateManyWithoutOwnerInput = {
@@ -717,6 +843,7 @@ export type ClaimUncheckedUpdateManyWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partnerId?: Prisma.StringFieldUpdateOperationsInput | string
+  matchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ClaimCreateManyPartnerInput = {
@@ -729,6 +856,7 @@ export type ClaimCreateManyPartnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
+  matchId?: string | null
 }
 
 export type ClaimUpdateWithoutPartnerInput = {
@@ -741,6 +869,7 @@ export type ClaimUpdateWithoutPartnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutAssignedClaimsNestedInput
+  match?: Prisma.ReconciliationMatchUpdateOneWithoutClaimsNestedInput
 }
 
 export type ClaimUncheckedUpdateWithoutPartnerInput = {
@@ -753,6 +882,7 @@ export type ClaimUncheckedUpdateWithoutPartnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  matchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ClaimUncheckedUpdateManyWithoutPartnerInput = {
@@ -764,6 +894,59 @@ export type ClaimUncheckedUpdateManyWithoutPartnerInput = {
   evidence?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  matchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type ClaimCreateManyMatchInput = {
+  id?: string
+  claimNumber: string
+  description: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.ClaimStatus
+  evidence?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  partnerId: string
+  ownerId?: string | null
+}
+
+export type ClaimUpdateWithoutMatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  claimNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumClaimStatusFieldUpdateOperationsInput | $Enums.ClaimStatus
+  evidence?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partner?: Prisma.PartnerUpdateOneRequiredWithoutClaimsNestedInput
+  owner?: Prisma.UserUpdateOneWithoutAssignedClaimsNestedInput
+}
+
+export type ClaimUncheckedUpdateWithoutMatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  claimNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumClaimStatusFieldUpdateOperationsInput | $Enums.ClaimStatus
+  evidence?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partnerId?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type ClaimUncheckedUpdateManyWithoutMatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  claimNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumClaimStatusFieldUpdateOperationsInput | $Enums.ClaimStatus
+  evidence?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partnerId?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -780,8 +963,10 @@ export type ClaimSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   updatedAt?: boolean
   partnerId?: boolean
   ownerId?: boolean
+  matchId?: boolean
   partner?: boolean | Prisma.PartnerDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Claim$ownerArgs<ExtArgs>
+  match?: boolean | Prisma.Claim$matchArgs<ExtArgs>
 }, ExtArgs["result"]["claim"]>
 
 export type ClaimSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -795,8 +980,10 @@ export type ClaimSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   updatedAt?: boolean
   partnerId?: boolean
   ownerId?: boolean
+  matchId?: boolean
   partner?: boolean | Prisma.PartnerDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Claim$ownerArgs<ExtArgs>
+  match?: boolean | Prisma.Claim$matchArgs<ExtArgs>
 }, ExtArgs["result"]["claim"]>
 
 export type ClaimSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -810,8 +997,10 @@ export type ClaimSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   updatedAt?: boolean
   partnerId?: boolean
   ownerId?: boolean
+  matchId?: boolean
   partner?: boolean | Prisma.PartnerDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Claim$ownerArgs<ExtArgs>
+  match?: boolean | Prisma.Claim$matchArgs<ExtArgs>
 }, ExtArgs["result"]["claim"]>
 
 export type ClaimSelectScalar = {
@@ -825,20 +1014,24 @@ export type ClaimSelectScalar = {
   updatedAt?: boolean
   partnerId?: boolean
   ownerId?: boolean
+  matchId?: boolean
 }
 
-export type ClaimOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "claimNumber" | "description" | "amount" | "status" | "evidence" | "createdAt" | "updatedAt" | "partnerId" | "ownerId", ExtArgs["result"]["claim"]>
+export type ClaimOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "claimNumber" | "description" | "amount" | "status" | "evidence" | "createdAt" | "updatedAt" | "partnerId" | "ownerId" | "matchId", ExtArgs["result"]["claim"]>
 export type ClaimInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   partner?: boolean | Prisma.PartnerDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Claim$ownerArgs<ExtArgs>
+  match?: boolean | Prisma.Claim$matchArgs<ExtArgs>
 }
 export type ClaimIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   partner?: boolean | Prisma.PartnerDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Claim$ownerArgs<ExtArgs>
+  match?: boolean | Prisma.Claim$matchArgs<ExtArgs>
 }
 export type ClaimIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   partner?: boolean | Prisma.PartnerDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Claim$ownerArgs<ExtArgs>
+  match?: boolean | Prisma.Claim$matchArgs<ExtArgs>
 }
 
 export type $ClaimPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -846,6 +1039,7 @@ export type $ClaimPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     partner: Prisma.$PartnerPayload<ExtArgs>
     owner: Prisma.$UserPayload<ExtArgs> | null
+    match: Prisma.$ReconciliationMatchPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -858,6 +1052,7 @@ export type $ClaimPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     updatedAt: Date
     partnerId: string
     ownerId: string | null
+    matchId: string | null
   }, ExtArgs["result"]["claim"]>
   composites: {}
 }
@@ -1254,6 +1449,7 @@ export interface Prisma__ClaimClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   partner<T extends Prisma.PartnerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerDefaultArgs<ExtArgs>>): Prisma.Prisma__PartnerClient<runtime.Types.Result.GetResult<Prisma.$PartnerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   owner<T extends Prisma.Claim$ownerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Claim$ownerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  match<T extends Prisma.Claim$matchArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Claim$matchArgs<ExtArgs>>): Prisma.Prisma__ReconciliationMatchClient<runtime.Types.Result.GetResult<Prisma.$ReconciliationMatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1293,6 +1489,7 @@ export interface ClaimFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"Claim", 'DateTime'>
   readonly partnerId: Prisma.FieldRef<"Claim", 'String'>
   readonly ownerId: Prisma.FieldRef<"Claim", 'String'>
+  readonly matchId: Prisma.FieldRef<"Claim", 'String'>
 }
     
 
@@ -1710,6 +1907,25 @@ export type Claim$ownerArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   include?: Prisma.UserInclude<ExtArgs> | null
   where?: Prisma.UserWhereInput
+}
+
+/**
+ * Claim.match
+ */
+export type Claim$matchArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReconciliationMatch
+   */
+  select?: Prisma.ReconciliationMatchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReconciliationMatch
+   */
+  omit?: Prisma.ReconciliationMatchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReconciliationMatchInclude<ExtArgs> | null
+  where?: Prisma.ReconciliationMatchWhereInput
 }
 
 /**

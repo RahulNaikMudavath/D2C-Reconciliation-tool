@@ -27,87 +27,125 @@ export type AggregateOrder = {
 }
 
 export type OrderAvgAggregateOutputType = {
-  expectedAmount: runtime.Decimal | null
+  orderValue: runtime.Decimal | null
+  expectedSettlementAmount: runtime.Decimal | null
+  weightKg: runtime.Decimal | null
 }
 
 export type OrderSumAggregateOutputType = {
-  expectedAmount: runtime.Decimal | null
+  orderValue: runtime.Decimal | null
+  expectedSettlementAmount: runtime.Decimal | null
+  weightKg: runtime.Decimal | null
 }
 
 export type OrderMinAggregateOutputType = {
   id: string | null
   orderNumber: string | null
   channel: string | null
+  partnerId: string | null
   orderDate: Date | null
   paymentMode: string | null
   deliveryStatus: string | null
-  expectedAmount: runtime.Decimal | null
+  orderValue: runtime.Decimal | null
+  expectedSettlementAmount: runtime.Decimal | null
+  settlementDueAt: Date | null
+  weightKg: runtime.Decimal | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type OrderMaxAggregateOutputType = {
   id: string | null
   orderNumber: string | null
   channel: string | null
+  partnerId: string | null
   orderDate: Date | null
   paymentMode: string | null
   deliveryStatus: string | null
-  expectedAmount: runtime.Decimal | null
+  orderValue: runtime.Decimal | null
+  expectedSettlementAmount: runtime.Decimal | null
+  settlementDueAt: Date | null
+  weightKg: runtime.Decimal | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type OrderCountAggregateOutputType = {
   id: number
   orderNumber: number
   channel: number
+  partnerId: number
   orderDate: number
   paymentMode: number
   deliveryStatus: number
-  expectedAmount: number
+  orderValue: number
+  expectedSettlementAmount: number
+  settlementDueAt: number
+  weightKg: number
   createdAt: number
+  updatedAt: number
   _all: number
 }
 
 
 export type OrderAvgAggregateInputType = {
-  expectedAmount?: true
+  orderValue?: true
+  expectedSettlementAmount?: true
+  weightKg?: true
 }
 
 export type OrderSumAggregateInputType = {
-  expectedAmount?: true
+  orderValue?: true
+  expectedSettlementAmount?: true
+  weightKg?: true
 }
 
 export type OrderMinAggregateInputType = {
   id?: true
   orderNumber?: true
   channel?: true
+  partnerId?: true
   orderDate?: true
   paymentMode?: true
   deliveryStatus?: true
-  expectedAmount?: true
+  orderValue?: true
+  expectedSettlementAmount?: true
+  settlementDueAt?: true
+  weightKg?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type OrderMaxAggregateInputType = {
   id?: true
   orderNumber?: true
   channel?: true
+  partnerId?: true
   orderDate?: true
   paymentMode?: true
   deliveryStatus?: true
-  expectedAmount?: true
+  orderValue?: true
+  expectedSettlementAmount?: true
+  settlementDueAt?: true
+  weightKg?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type OrderCountAggregateInputType = {
   id?: true
   orderNumber?: true
   channel?: true
+  partnerId?: true
   orderDate?: true
   paymentMode?: true
   deliveryStatus?: true
-  expectedAmount?: true
+  orderValue?: true
+  expectedSettlementAmount?: true
+  settlementDueAt?: true
+  weightKg?: true
   createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -201,11 +239,16 @@ export type OrderGroupByOutputType = {
   id: string
   orderNumber: string
   channel: string
+  partnerId: string | null
   orderDate: Date
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal
+  orderValue: runtime.Decimal
+  expectedSettlementAmount: runtime.Decimal | null
+  settlementDueAt: Date | null
+  weightKg: runtime.Decimal | null
   createdAt: Date
+  updatedAt: Date
   _count: OrderCountAggregateOutputType | null
   _avg: OrderAvgAggregateOutputType | null
   _sum: OrderSumAggregateOutputType | null
@@ -235,11 +278,17 @@ export type OrderWhereInput = {
   id?: Prisma.StringFilter<"Order"> | string
   orderNumber?: Prisma.StringFilter<"Order"> | string
   channel?: Prisma.StringFilter<"Order"> | string
+  partnerId?: Prisma.StringNullableFilter<"Order"> | string | null
   orderDate?: Prisma.DateTimeFilter<"Order"> | Date | string
   paymentMode?: Prisma.StringFilter<"Order"> | string
   deliveryStatus?: Prisma.StringFilter<"Order"> | string
-  expectedAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  weightKg?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
+  partner?: Prisma.XOR<Prisma.PartnerNullableScalarRelationFilter, Prisma.PartnerWhereInput> | null
   settlements?: Prisma.SettlementListRelationFilter
   freightCharges?: Prisma.FreightChargeListRelationFilter
   returns?: Prisma.ReturnRecordListRelationFilter
@@ -250,11 +299,17 @@ export type OrderOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   channel?: Prisma.SortOrder
+  partnerId?: Prisma.SortOrderInput | Prisma.SortOrder
   orderDate?: Prisma.SortOrder
   paymentMode?: Prisma.SortOrder
   deliveryStatus?: Prisma.SortOrder
-  expectedAmount?: Prisma.SortOrder
+  orderValue?: Prisma.SortOrder
+  expectedSettlementAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  settlementDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  weightKg?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  partner?: Prisma.PartnerOrderByWithRelationInput
   settlements?: Prisma.SettlementOrderByRelationAggregateInput
   freightCharges?: Prisma.FreightChargeOrderByRelationAggregateInput
   returns?: Prisma.ReturnRecordOrderByRelationAggregateInput
@@ -268,11 +323,17 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.OrderWhereInput[]
   NOT?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[]
   channel?: Prisma.StringFilter<"Order"> | string
+  partnerId?: Prisma.StringNullableFilter<"Order"> | string | null
   orderDate?: Prisma.DateTimeFilter<"Order"> | Date | string
   paymentMode?: Prisma.StringFilter<"Order"> | string
   deliveryStatus?: Prisma.StringFilter<"Order"> | string
-  expectedAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  weightKg?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
+  partner?: Prisma.XOR<Prisma.PartnerNullableScalarRelationFilter, Prisma.PartnerWhereInput> | null
   settlements?: Prisma.SettlementListRelationFilter
   freightCharges?: Prisma.FreightChargeListRelationFilter
   returns?: Prisma.ReturnRecordListRelationFilter
@@ -283,11 +344,16 @@ export type OrderOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   channel?: Prisma.SortOrder
+  partnerId?: Prisma.SortOrderInput | Prisma.SortOrder
   orderDate?: Prisma.SortOrder
   paymentMode?: Prisma.SortOrder
   deliveryStatus?: Prisma.SortOrder
-  expectedAmount?: Prisma.SortOrder
+  orderValue?: Prisma.SortOrder
+  expectedSettlementAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  settlementDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  weightKg?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.OrderCountOrderByAggregateInput
   _avg?: Prisma.OrderAvgOrderByAggregateInput
   _max?: Prisma.OrderMaxOrderByAggregateInput
@@ -302,11 +368,16 @@ export type OrderScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Order"> | string
   orderNumber?: Prisma.StringWithAggregatesFilter<"Order"> | string
   channel?: Prisma.StringWithAggregatesFilter<"Order"> | string
+  partnerId?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   orderDate?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
   paymentMode?: Prisma.StringWithAggregatesFilter<"Order"> | string
   deliveryStatus?: Prisma.StringWithAggregatesFilter<"Order"> | string
-  expectedAmount?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.DecimalNullableWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
+  weightKg?: Prisma.DecimalNullableWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
 }
 
 export type OrderCreateInput = {
@@ -316,8 +387,13 @@ export type OrderCreateInput = {
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
+  partner?: Prisma.PartnerCreateNestedOneWithoutOrdersInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutOrderInput
   freightCharges?: Prisma.FreightChargeCreateNestedManyWithoutOrderInput
   returns?: Prisma.ReturnRecordCreateNestedManyWithoutOrderInput
@@ -328,11 +404,16 @@ export type OrderUncheckedCreateInput = {
   id?: string
   orderNumber: string
   channel: string
+  partnerId?: string | null
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutOrderInput
   freightCharges?: Prisma.FreightChargeUncheckedCreateNestedManyWithoutOrderInput
   returns?: Prisma.ReturnRecordUncheckedCreateNestedManyWithoutOrderInput
@@ -346,8 +427,13 @@ export type OrderUpdateInput = {
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partner?: Prisma.PartnerUpdateOneWithoutOrdersNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutOrderNestedInput
   freightCharges?: Prisma.FreightChargeUpdateManyWithoutOrderNestedInput
   returns?: Prisma.ReturnRecordUpdateManyWithoutOrderNestedInput
@@ -358,11 +444,16 @@ export type OrderUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutOrderNestedInput
   freightCharges?: Prisma.FreightChargeUncheckedUpdateManyWithoutOrderNestedInput
   returns?: Prisma.ReturnRecordUncheckedUpdateManyWithoutOrderNestedInput
@@ -373,11 +464,16 @@ export type OrderCreateManyInput = {
   id?: string
   orderNumber: string
   channel: string
+  partnerId?: string | null
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type OrderUpdateManyMutationInput = {
@@ -387,65 +483,145 @@ export type OrderUpdateManyMutationInput = {
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type OrderUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type OrderListRelationFilter = {
+  every?: Prisma.OrderWhereInput
+  some?: Prisma.OrderWhereInput
+  none?: Prisma.OrderWhereInput
+}
+
+export type OrderOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type OrderCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   channel?: Prisma.SortOrder
+  partnerId?: Prisma.SortOrder
   orderDate?: Prisma.SortOrder
   paymentMode?: Prisma.SortOrder
   deliveryStatus?: Prisma.SortOrder
-  expectedAmount?: Prisma.SortOrder
+  orderValue?: Prisma.SortOrder
+  expectedSettlementAmount?: Prisma.SortOrder
+  settlementDueAt?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type OrderAvgOrderByAggregateInput = {
-  expectedAmount?: Prisma.SortOrder
+  orderValue?: Prisma.SortOrder
+  expectedSettlementAmount?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
 }
 
 export type OrderMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   channel?: Prisma.SortOrder
+  partnerId?: Prisma.SortOrder
   orderDate?: Prisma.SortOrder
   paymentMode?: Prisma.SortOrder
   deliveryStatus?: Prisma.SortOrder
-  expectedAmount?: Prisma.SortOrder
+  orderValue?: Prisma.SortOrder
+  expectedSettlementAmount?: Prisma.SortOrder
+  settlementDueAt?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type OrderMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   channel?: Prisma.SortOrder
+  partnerId?: Prisma.SortOrder
   orderDate?: Prisma.SortOrder
   paymentMode?: Prisma.SortOrder
   deliveryStatus?: Prisma.SortOrder
-  expectedAmount?: Prisma.SortOrder
+  orderValue?: Prisma.SortOrder
+  expectedSettlementAmount?: Prisma.SortOrder
+  settlementDueAt?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type OrderSumOrderByAggregateInput = {
-  expectedAmount?: Prisma.SortOrder
+  orderValue?: Prisma.SortOrder
+  expectedSettlementAmount?: Prisma.SortOrder
+  weightKg?: Prisma.SortOrder
 }
 
 export type OrderScalarRelationFilter = {
   is?: Prisma.OrderWhereInput
   isNot?: Prisma.OrderWhereInput
+}
+
+export type OrderCreateNestedManyWithoutPartnerInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutPartnerInput, Prisma.OrderUncheckedCreateWithoutPartnerInput> | Prisma.OrderCreateWithoutPartnerInput[] | Prisma.OrderUncheckedCreateWithoutPartnerInput[]
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutPartnerInput | Prisma.OrderCreateOrConnectWithoutPartnerInput[]
+  createMany?: Prisma.OrderCreateManyPartnerInputEnvelope
+  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+}
+
+export type OrderUncheckedCreateNestedManyWithoutPartnerInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutPartnerInput, Prisma.OrderUncheckedCreateWithoutPartnerInput> | Prisma.OrderCreateWithoutPartnerInput[] | Prisma.OrderUncheckedCreateWithoutPartnerInput[]
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutPartnerInput | Prisma.OrderCreateOrConnectWithoutPartnerInput[]
+  createMany?: Prisma.OrderCreateManyPartnerInputEnvelope
+  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+}
+
+export type OrderUpdateManyWithoutPartnerNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutPartnerInput, Prisma.OrderUncheckedCreateWithoutPartnerInput> | Prisma.OrderCreateWithoutPartnerInput[] | Prisma.OrderUncheckedCreateWithoutPartnerInput[]
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutPartnerInput | Prisma.OrderCreateOrConnectWithoutPartnerInput[]
+  upsert?: Prisma.OrderUpsertWithWhereUniqueWithoutPartnerInput | Prisma.OrderUpsertWithWhereUniqueWithoutPartnerInput[]
+  createMany?: Prisma.OrderCreateManyPartnerInputEnvelope
+  set?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+  disconnect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+  delete?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+  update?: Prisma.OrderUpdateWithWhereUniqueWithoutPartnerInput | Prisma.OrderUpdateWithWhereUniqueWithoutPartnerInput[]
+  updateMany?: Prisma.OrderUpdateManyWithWhereWithoutPartnerInput | Prisma.OrderUpdateManyWithWhereWithoutPartnerInput[]
+  deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
+}
+
+export type OrderUncheckedUpdateManyWithoutPartnerNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutPartnerInput, Prisma.OrderUncheckedCreateWithoutPartnerInput> | Prisma.OrderCreateWithoutPartnerInput[] | Prisma.OrderUncheckedCreateWithoutPartnerInput[]
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutPartnerInput | Prisma.OrderCreateOrConnectWithoutPartnerInput[]
+  upsert?: Prisma.OrderUpsertWithWhereUniqueWithoutPartnerInput | Prisma.OrderUpsertWithWhereUniqueWithoutPartnerInput[]
+  createMany?: Prisma.OrderCreateManyPartnerInputEnvelope
+  set?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+  disconnect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+  delete?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
+  update?: Prisma.OrderUpdateWithWhereUniqueWithoutPartnerInput | Prisma.OrderUpdateWithWhereUniqueWithoutPartnerInput[]
+  updateMany?: Prisma.OrderUpdateManyWithWhereWithoutPartnerInput | Prisma.OrderUpdateManyWithWhereWithoutPartnerInput[]
+  deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
 }
 
 export type DecimalFieldUpdateOperationsInput = {
@@ -454,6 +630,22 @@ export type DecimalFieldUpdateOperationsInput = {
   decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
   multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type OrderCreateNestedOneWithoutSettlementsInput = {
@@ -512,6 +704,89 @@ export type OrderUpdateOneRequiredWithoutMatchesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutMatchesInput, Prisma.OrderUpdateWithoutMatchesInput>, Prisma.OrderUncheckedUpdateWithoutMatchesInput>
 }
 
+export type OrderCreateWithoutPartnerInput = {
+  id?: string
+  orderNumber: string
+  channel: string
+  orderDate: Date | string
+  paymentMode: string
+  deliveryStatus: string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  settlements?: Prisma.SettlementCreateNestedManyWithoutOrderInput
+  freightCharges?: Prisma.FreightChargeCreateNestedManyWithoutOrderInput
+  returns?: Prisma.ReturnRecordCreateNestedManyWithoutOrderInput
+  matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutPartnerInput = {
+  id?: string
+  orderNumber: string
+  channel: string
+  orderDate: Date | string
+  paymentMode: string
+  deliveryStatus: string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutOrderInput
+  freightCharges?: Prisma.FreightChargeUncheckedCreateNestedManyWithoutOrderInput
+  returns?: Prisma.ReturnRecordUncheckedCreateNestedManyWithoutOrderInput
+  matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutPartnerInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutPartnerInput, Prisma.OrderUncheckedCreateWithoutPartnerInput>
+}
+
+export type OrderCreateManyPartnerInputEnvelope = {
+  data: Prisma.OrderCreateManyPartnerInput | Prisma.OrderCreateManyPartnerInput[]
+  skipDuplicates?: boolean
+}
+
+export type OrderUpsertWithWhereUniqueWithoutPartnerInput = {
+  where: Prisma.OrderWhereUniqueInput
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutPartnerInput, Prisma.OrderUncheckedUpdateWithoutPartnerInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutPartnerInput, Prisma.OrderUncheckedCreateWithoutPartnerInput>
+}
+
+export type OrderUpdateWithWhereUniqueWithoutPartnerInput = {
+  where: Prisma.OrderWhereUniqueInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutPartnerInput, Prisma.OrderUncheckedUpdateWithoutPartnerInput>
+}
+
+export type OrderUpdateManyWithWhereWithoutPartnerInput = {
+  where: Prisma.OrderScalarWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateManyMutationInput, Prisma.OrderUncheckedUpdateManyWithoutPartnerInput>
+}
+
+export type OrderScalarWhereInput = {
+  AND?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
+  OR?: Prisma.OrderScalarWhereInput[]
+  NOT?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
+  id?: Prisma.StringFilter<"Order"> | string
+  orderNumber?: Prisma.StringFilter<"Order"> | string
+  channel?: Prisma.StringFilter<"Order"> | string
+  partnerId?: Prisma.StringNullableFilter<"Order"> | string | null
+  orderDate?: Prisma.DateTimeFilter<"Order"> | Date | string
+  paymentMode?: Prisma.StringFilter<"Order"> | string
+  deliveryStatus?: Prisma.StringFilter<"Order"> | string
+  orderValue?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  weightKg?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
+}
+
 export type OrderCreateWithoutSettlementsInput = {
   id?: string
   orderNumber: string
@@ -519,8 +794,13 @@ export type OrderCreateWithoutSettlementsInput = {
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
+  partner?: Prisma.PartnerCreateNestedOneWithoutOrdersInput
   freightCharges?: Prisma.FreightChargeCreateNestedManyWithoutOrderInput
   returns?: Prisma.ReturnRecordCreateNestedManyWithoutOrderInput
   matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutOrderInput
@@ -530,11 +810,16 @@ export type OrderUncheckedCreateWithoutSettlementsInput = {
   id?: string
   orderNumber: string
   channel: string
+  partnerId?: string | null
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   freightCharges?: Prisma.FreightChargeUncheckedCreateNestedManyWithoutOrderInput
   returns?: Prisma.ReturnRecordUncheckedCreateNestedManyWithoutOrderInput
   matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutOrderInput
@@ -563,8 +848,13 @@ export type OrderUpdateWithoutSettlementsInput = {
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partner?: Prisma.PartnerUpdateOneWithoutOrdersNestedInput
   freightCharges?: Prisma.FreightChargeUpdateManyWithoutOrderNestedInput
   returns?: Prisma.ReturnRecordUpdateManyWithoutOrderNestedInput
   matches?: Prisma.ReconciliationMatchUpdateManyWithoutOrderNestedInput
@@ -574,11 +864,16 @@ export type OrderUncheckedUpdateWithoutSettlementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   freightCharges?: Prisma.FreightChargeUncheckedUpdateManyWithoutOrderNestedInput
   returns?: Prisma.ReturnRecordUncheckedUpdateManyWithoutOrderNestedInput
   matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutOrderNestedInput
@@ -591,8 +886,13 @@ export type OrderCreateWithoutFreightChargesInput = {
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
+  partner?: Prisma.PartnerCreateNestedOneWithoutOrdersInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutOrderInput
   returns?: Prisma.ReturnRecordCreateNestedManyWithoutOrderInput
   matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutOrderInput
@@ -602,11 +902,16 @@ export type OrderUncheckedCreateWithoutFreightChargesInput = {
   id?: string
   orderNumber: string
   channel: string
+  partnerId?: string | null
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutOrderInput
   returns?: Prisma.ReturnRecordUncheckedCreateNestedManyWithoutOrderInput
   matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutOrderInput
@@ -635,8 +940,13 @@ export type OrderUpdateWithoutFreightChargesInput = {
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partner?: Prisma.PartnerUpdateOneWithoutOrdersNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutOrderNestedInput
   returns?: Prisma.ReturnRecordUpdateManyWithoutOrderNestedInput
   matches?: Prisma.ReconciliationMatchUpdateManyWithoutOrderNestedInput
@@ -646,11 +956,16 @@ export type OrderUncheckedUpdateWithoutFreightChargesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutOrderNestedInput
   returns?: Prisma.ReturnRecordUncheckedUpdateManyWithoutOrderNestedInput
   matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutOrderNestedInput
@@ -663,8 +978,13 @@ export type OrderCreateWithoutReturnsInput = {
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
+  partner?: Prisma.PartnerCreateNestedOneWithoutOrdersInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutOrderInput
   freightCharges?: Prisma.FreightChargeCreateNestedManyWithoutOrderInput
   matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutOrderInput
@@ -674,11 +994,16 @@ export type OrderUncheckedCreateWithoutReturnsInput = {
   id?: string
   orderNumber: string
   channel: string
+  partnerId?: string | null
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutOrderInput
   freightCharges?: Prisma.FreightChargeUncheckedCreateNestedManyWithoutOrderInput
   matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutOrderInput
@@ -707,8 +1032,13 @@ export type OrderUpdateWithoutReturnsInput = {
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partner?: Prisma.PartnerUpdateOneWithoutOrdersNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutOrderNestedInput
   freightCharges?: Prisma.FreightChargeUpdateManyWithoutOrderNestedInput
   matches?: Prisma.ReconciliationMatchUpdateManyWithoutOrderNestedInput
@@ -718,11 +1048,16 @@ export type OrderUncheckedUpdateWithoutReturnsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutOrderNestedInput
   freightCharges?: Prisma.FreightChargeUncheckedUpdateManyWithoutOrderNestedInput
   matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutOrderNestedInput
@@ -735,8 +1070,13 @@ export type OrderCreateWithoutMatchesInput = {
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
+  partner?: Prisma.PartnerCreateNestedOneWithoutOrdersInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutOrderInput
   freightCharges?: Prisma.FreightChargeCreateNestedManyWithoutOrderInput
   returns?: Prisma.ReturnRecordCreateNestedManyWithoutOrderInput
@@ -746,11 +1086,16 @@ export type OrderUncheckedCreateWithoutMatchesInput = {
   id?: string
   orderNumber: string
   channel: string
+  partnerId?: string | null
   orderDate: Date | string
   paymentMode: string
   deliveryStatus: string
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutOrderInput
   freightCharges?: Prisma.FreightChargeUncheckedCreateNestedManyWithoutOrderInput
   returns?: Prisma.ReturnRecordUncheckedCreateNestedManyWithoutOrderInput
@@ -779,8 +1124,13 @@ export type OrderUpdateWithoutMatchesInput = {
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partner?: Prisma.PartnerUpdateOneWithoutOrdersNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutOrderNestedInput
   freightCharges?: Prisma.FreightChargeUpdateManyWithoutOrderNestedInput
   returns?: Prisma.ReturnRecordUpdateManyWithoutOrderNestedInput
@@ -790,14 +1140,87 @@ export type OrderUncheckedUpdateWithoutMatchesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   channel?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutOrderNestedInput
   freightCharges?: Prisma.FreightChargeUncheckedUpdateManyWithoutOrderNestedInput
   returns?: Prisma.ReturnRecordUncheckedUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderCreateManyPartnerInput = {
+  id?: string
+  orderNumber: string
+  channel: string
+  orderDate: Date | string
+  paymentMode: string
+  deliveryStatus: string
+  orderValue: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Date | string | null
+  weightKg?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type OrderUpdateWithoutPartnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.StringFieldUpdateOperationsInput | string
+  orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
+  deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  settlements?: Prisma.SettlementUpdateManyWithoutOrderNestedInput
+  freightCharges?: Prisma.FreightChargeUpdateManyWithoutOrderNestedInput
+  returns?: Prisma.ReturnRecordUpdateManyWithoutOrderNestedInput
+  matches?: Prisma.ReconciliationMatchUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutPartnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.StringFieldUpdateOperationsInput | string
+  orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
+  deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutOrderNestedInput
+  freightCharges?: Prisma.FreightChargeUncheckedUpdateManyWithoutOrderNestedInput
+  returns?: Prisma.ReturnRecordUncheckedUpdateManyWithoutOrderNestedInput
+  matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateManyWithoutPartnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.StringFieldUpdateOperationsInput | string
+  orderDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentMode?: Prisma.StringFieldUpdateOperationsInput | string
+  deliveryStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  orderValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedSettlementAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  settlementDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weightKg?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -862,11 +1285,17 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   orderNumber?: boolean
   channel?: boolean
+  partnerId?: boolean
   orderDate?: boolean
   paymentMode?: boolean
   deliveryStatus?: boolean
-  expectedAmount?: boolean
+  orderValue?: boolean
+  expectedSettlementAmount?: boolean
+  settlementDueAt?: boolean
+  weightKg?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
+  partner?: boolean | Prisma.Order$partnerArgs<ExtArgs>
   settlements?: boolean | Prisma.Order$settlementsArgs<ExtArgs>
   freightCharges?: boolean | Prisma.Order$freightChargesArgs<ExtArgs>
   returns?: boolean | Prisma.Order$returnsArgs<ExtArgs>
@@ -878,49 +1307,72 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   orderNumber?: boolean
   channel?: boolean
+  partnerId?: boolean
   orderDate?: boolean
   paymentMode?: boolean
   deliveryStatus?: boolean
-  expectedAmount?: boolean
+  orderValue?: boolean
+  expectedSettlementAmount?: boolean
+  settlementDueAt?: boolean
+  weightKg?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
+  partner?: boolean | Prisma.Order$partnerArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
 export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderNumber?: boolean
   channel?: boolean
+  partnerId?: boolean
   orderDate?: boolean
   paymentMode?: boolean
   deliveryStatus?: boolean
-  expectedAmount?: boolean
+  orderValue?: boolean
+  expectedSettlementAmount?: boolean
+  settlementDueAt?: boolean
+  weightKg?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
+  partner?: boolean | Prisma.Order$partnerArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
 export type OrderSelectScalar = {
   id?: boolean
   orderNumber?: boolean
   channel?: boolean
+  partnerId?: boolean
   orderDate?: boolean
   paymentMode?: boolean
   deliveryStatus?: boolean
-  expectedAmount?: boolean
+  orderValue?: boolean
+  expectedSettlementAmount?: boolean
+  settlementDueAt?: boolean
+  weightKg?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "channel" | "orderDate" | "paymentMode" | "deliveryStatus" | "expectedAmount" | "createdAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "channel" | "partnerId" | "orderDate" | "paymentMode" | "deliveryStatus" | "orderValue" | "expectedSettlementAmount" | "settlementDueAt" | "weightKg" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  partner?: boolean | Prisma.Order$partnerArgs<ExtArgs>
   settlements?: boolean | Prisma.Order$settlementsArgs<ExtArgs>
   freightCharges?: boolean | Prisma.Order$freightChargesArgs<ExtArgs>
   returns?: boolean | Prisma.Order$returnsArgs<ExtArgs>
   matches?: boolean | Prisma.Order$matchesArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type OrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  partner?: boolean | Prisma.Order$partnerArgs<ExtArgs>
+}
+export type OrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  partner?: boolean | Prisma.Order$partnerArgs<ExtArgs>
+}
 
 export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Order"
   objects: {
+    partner: Prisma.$PartnerPayload<ExtArgs> | null
     settlements: Prisma.$SettlementPayload<ExtArgs>[]
     freightCharges: Prisma.$FreightChargePayload<ExtArgs>[]
     returns: Prisma.$ReturnRecordPayload<ExtArgs>[]
@@ -930,11 +1382,16 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id: string
     orderNumber: string
     channel: string
+    partnerId: string | null
     orderDate: Date
     paymentMode: string
     deliveryStatus: string
-    expectedAmount: runtime.Decimal
+    orderValue: runtime.Decimal
+    expectedSettlementAmount: runtime.Decimal | null
+    settlementDueAt: Date | null
+    weightKg: runtime.Decimal | null
     createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["order"]>
   composites: {}
 }
@@ -1329,6 +1786,7 @@ readonly fields: OrderFieldRefs;
  */
 export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  partner<T extends Prisma.Order$partnerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$partnerArgs<ExtArgs>>): Prisma.Prisma__PartnerClient<runtime.Types.Result.GetResult<Prisma.$PartnerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   settlements<T extends Prisma.Order$settlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   freightCharges<T extends Prisma.Order$freightChargesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$freightChargesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FreightChargePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   returns<T extends Prisma.Order$returnsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$returnsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReturnRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1365,11 +1823,16 @@ export interface OrderFieldRefs {
   readonly id: Prisma.FieldRef<"Order", 'String'>
   readonly orderNumber: Prisma.FieldRef<"Order", 'String'>
   readonly channel: Prisma.FieldRef<"Order", 'String'>
+  readonly partnerId: Prisma.FieldRef<"Order", 'String'>
   readonly orderDate: Prisma.FieldRef<"Order", 'DateTime'>
   readonly paymentMode: Prisma.FieldRef<"Order", 'String'>
   readonly deliveryStatus: Prisma.FieldRef<"Order", 'String'>
-  readonly expectedAmount: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly orderValue: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly expectedSettlementAmount: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly settlementDueAt: Prisma.FieldRef<"Order", 'DateTime'>
+  readonly weightKg: Prisma.FieldRef<"Order", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"Order", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Order", 'DateTime'>
 }
     
 
@@ -1624,6 +2087,10 @@ export type OrderCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    */
   data: Prisma.OrderCreateManyInput | Prisma.OrderCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1694,6 +2161,10 @@ export type OrderUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many Orders to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1760,6 +2231,25 @@ export type OrderDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many Orders to delete.
    */
   limit?: number
+}
+
+/**
+ * Order.partner
+ */
+export type Order$partnerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Partner
+   */
+  select?: Prisma.PartnerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Partner
+   */
+  omit?: Prisma.PartnerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartnerInclude<ExtArgs> | null
+  where?: Prisma.PartnerWhereInput
 }
 
 /**

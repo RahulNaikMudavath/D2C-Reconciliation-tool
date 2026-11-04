@@ -58,6 +58,11 @@ export type Settlement = Prisma.SettlementModel
  */
 export type RateCard = Prisma.RateCardModel
 /**
+ * Model ChannelRateCard
+ * 
+ */
+export type ChannelRateCard = Prisma.ChannelRateCardModel
+/**
  * Model FreightCharge
  * 
  */
@@ -77,6 +82,11 @@ export type ReconciliationRun = Prisma.ReconciliationRunModel
  * 
  */
 export type ReconciliationMatch = Prisma.ReconciliationMatchModel
+/**
+ * Model MatchSettlement
+ * 
+ */
+export type MatchSettlement = Prisma.MatchSettlementModel
 /**
  * Model Claim
  * 

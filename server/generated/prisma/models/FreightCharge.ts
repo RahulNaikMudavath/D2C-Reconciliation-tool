@@ -42,7 +42,8 @@ export type FreightChargeMinAggregateOutputType = {
   courierName: string | null
   chargedAmount: runtime.Decimal | null
   actualWeight: runtime.Decimal | null
-  createdAt: Date | null
+  invoiceNumber: string | null
+  chargedAt: Date | null
 }
 
 export type FreightChargeMaxAggregateOutputType = {
@@ -51,7 +52,8 @@ export type FreightChargeMaxAggregateOutputType = {
   courierName: string | null
   chargedAmount: runtime.Decimal | null
   actualWeight: runtime.Decimal | null
-  createdAt: Date | null
+  invoiceNumber: string | null
+  chargedAt: Date | null
 }
 
 export type FreightChargeCountAggregateOutputType = {
@@ -60,7 +62,8 @@ export type FreightChargeCountAggregateOutputType = {
   courierName: number
   chargedAmount: number
   actualWeight: number
-  createdAt: number
+  invoiceNumber: number
+  chargedAt: number
   _all: number
 }
 
@@ -81,7 +84,8 @@ export type FreightChargeMinAggregateInputType = {
   courierName?: true
   chargedAmount?: true
   actualWeight?: true
-  createdAt?: true
+  invoiceNumber?: true
+  chargedAt?: true
 }
 
 export type FreightChargeMaxAggregateInputType = {
@@ -90,7 +94,8 @@ export type FreightChargeMaxAggregateInputType = {
   courierName?: true
   chargedAmount?: true
   actualWeight?: true
-  createdAt?: true
+  invoiceNumber?: true
+  chargedAt?: true
 }
 
 export type FreightChargeCountAggregateInputType = {
@@ -99,7 +104,8 @@ export type FreightChargeCountAggregateInputType = {
   courierName?: true
   chargedAmount?: true
   actualWeight?: true
-  createdAt?: true
+  invoiceNumber?: true
+  chargedAt?: true
   _all?: true
 }
 
@@ -195,7 +201,8 @@ export type FreightChargeGroupByOutputType = {
   courierName: string
   chargedAmount: runtime.Decimal
   actualWeight: runtime.Decimal | null
-  createdAt: Date
+  invoiceNumber: string | null
+  chargedAt: Date
   _count: FreightChargeCountAggregateOutputType | null
   _avg: FreightChargeAvgAggregateOutputType | null
   _sum: FreightChargeSumAggregateOutputType | null
@@ -227,7 +234,8 @@ export type FreightChargeWhereInput = {
   courierName?: Prisma.StringFilter<"FreightCharge"> | string
   chargedAmount?: Prisma.DecimalFilter<"FreightCharge"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.DecimalNullableFilter<"FreightCharge"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFilter<"FreightCharge"> | Date | string
+  invoiceNumber?: Prisma.StringNullableFilter<"FreightCharge"> | string | null
+  chargedAt?: Prisma.DateTimeFilter<"FreightCharge"> | Date | string
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
   matches?: Prisma.ReconciliationMatchListRelationFilter
 }
@@ -238,7 +246,8 @@ export type FreightChargeOrderByWithRelationInput = {
   courierName?: Prisma.SortOrder
   chargedAmount?: Prisma.SortOrder
   actualWeight?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  chargedAt?: Prisma.SortOrder
   order?: Prisma.OrderOrderByWithRelationInput
   matches?: Prisma.ReconciliationMatchOrderByRelationAggregateInput
 }
@@ -252,7 +261,8 @@ export type FreightChargeWhereUniqueInput = Prisma.AtLeast<{
   courierName?: Prisma.StringFilter<"FreightCharge"> | string
   chargedAmount?: Prisma.DecimalFilter<"FreightCharge"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.DecimalNullableFilter<"FreightCharge"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFilter<"FreightCharge"> | Date | string
+  invoiceNumber?: Prisma.StringNullableFilter<"FreightCharge"> | string | null
+  chargedAt?: Prisma.DateTimeFilter<"FreightCharge"> | Date | string
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
   matches?: Prisma.ReconciliationMatchListRelationFilter
 }, "id">
@@ -263,7 +273,8 @@ export type FreightChargeOrderByWithAggregationInput = {
   courierName?: Prisma.SortOrder
   chargedAmount?: Prisma.SortOrder
   actualWeight?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  chargedAt?: Prisma.SortOrder
   _count?: Prisma.FreightChargeCountOrderByAggregateInput
   _avg?: Prisma.FreightChargeAvgOrderByAggregateInput
   _max?: Prisma.FreightChargeMaxOrderByAggregateInput
@@ -280,7 +291,8 @@ export type FreightChargeScalarWhereWithAggregatesInput = {
   courierName?: Prisma.StringWithAggregatesFilter<"FreightCharge"> | string
   chargedAmount?: Prisma.DecimalWithAggregatesFilter<"FreightCharge"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.DecimalNullableWithAggregatesFilter<"FreightCharge"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"FreightCharge"> | Date | string
+  invoiceNumber?: Prisma.StringNullableWithAggregatesFilter<"FreightCharge"> | string | null
+  chargedAt?: Prisma.DateTimeWithAggregatesFilter<"FreightCharge"> | Date | string
 }
 
 export type FreightChargeCreateInput = {
@@ -288,7 +300,8 @@ export type FreightChargeCreateInput = {
   courierName: string
   chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
+  invoiceNumber?: string | null
+  chargedAt?: Date | string
   order: Prisma.OrderCreateNestedOneWithoutFreightChargesInput
   matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutFreightChargeInput
 }
@@ -299,7 +312,8 @@ export type FreightChargeUncheckedCreateInput = {
   courierName: string
   chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
+  invoiceNumber?: string | null
+  chargedAt?: Date | string
   matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutFreightChargeInput
 }
 
@@ -308,7 +322,8 @@ export type FreightChargeUpdateInput = {
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneRequiredWithoutFreightChargesNestedInput
   matches?: Prisma.ReconciliationMatchUpdateManyWithoutFreightChargeNestedInput
 }
@@ -319,7 +334,8 @@ export type FreightChargeUncheckedUpdateInput = {
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutFreightChargeNestedInput
 }
 
@@ -329,7 +345,8 @@ export type FreightChargeCreateManyInput = {
   courierName: string
   chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
+  invoiceNumber?: string | null
+  chargedAt?: Date | string
 }
 
 export type FreightChargeUpdateManyMutationInput = {
@@ -337,7 +354,8 @@ export type FreightChargeUpdateManyMutationInput = {
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FreightChargeUncheckedUpdateManyInput = {
@@ -346,7 +364,8 @@ export type FreightChargeUncheckedUpdateManyInput = {
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FreightChargeListRelationFilter = {
@@ -365,7 +384,8 @@ export type FreightChargeCountOrderByAggregateInput = {
   courierName?: Prisma.SortOrder
   chargedAmount?: Prisma.SortOrder
   actualWeight?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrder
+  chargedAt?: Prisma.SortOrder
 }
 
 export type FreightChargeAvgOrderByAggregateInput = {
@@ -379,7 +399,8 @@ export type FreightChargeMaxOrderByAggregateInput = {
   courierName?: Prisma.SortOrder
   chargedAmount?: Prisma.SortOrder
   actualWeight?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrder
+  chargedAt?: Prisma.SortOrder
 }
 
 export type FreightChargeMinOrderByAggregateInput = {
@@ -388,7 +409,8 @@ export type FreightChargeMinOrderByAggregateInput = {
   courierName?: Prisma.SortOrder
   chargedAmount?: Prisma.SortOrder
   actualWeight?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrder
+  chargedAt?: Prisma.SortOrder
 }
 
 export type FreightChargeSumOrderByAggregateInput = {
@@ -443,14 +465,6 @@ export type FreightChargeUncheckedUpdateManyWithoutOrderNestedInput = {
   deleteMany?: Prisma.FreightChargeScalarWhereInput | Prisma.FreightChargeScalarWhereInput[]
 }
 
-export type NullableDecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type FreightChargeCreateNestedOneWithoutMatchesInput = {
   create?: Prisma.XOR<Prisma.FreightChargeCreateWithoutMatchesInput, Prisma.FreightChargeUncheckedCreateWithoutMatchesInput>
   connectOrCreate?: Prisma.FreightChargeCreateOrConnectWithoutMatchesInput
@@ -472,7 +486,8 @@ export type FreightChargeCreateWithoutOrderInput = {
   courierName: string
   chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
+  invoiceNumber?: string | null
+  chargedAt?: Date | string
   matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutFreightChargeInput
 }
 
@@ -481,7 +496,8 @@ export type FreightChargeUncheckedCreateWithoutOrderInput = {
   courierName: string
   chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
+  invoiceNumber?: string | null
+  chargedAt?: Date | string
   matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutFreightChargeInput
 }
 
@@ -520,7 +536,8 @@ export type FreightChargeScalarWhereInput = {
   courierName?: Prisma.StringFilter<"FreightCharge"> | string
   chargedAmount?: Prisma.DecimalFilter<"FreightCharge"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.DecimalNullableFilter<"FreightCharge"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFilter<"FreightCharge"> | Date | string
+  invoiceNumber?: Prisma.StringNullableFilter<"FreightCharge"> | string | null
+  chargedAt?: Prisma.DateTimeFilter<"FreightCharge"> | Date | string
 }
 
 export type FreightChargeCreateWithoutMatchesInput = {
@@ -528,7 +545,8 @@ export type FreightChargeCreateWithoutMatchesInput = {
   courierName: string
   chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
+  invoiceNumber?: string | null
+  chargedAt?: Date | string
   order: Prisma.OrderCreateNestedOneWithoutFreightChargesInput
 }
 
@@ -538,7 +556,8 @@ export type FreightChargeUncheckedCreateWithoutMatchesInput = {
   courierName: string
   chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
+  invoiceNumber?: string | null
+  chargedAt?: Date | string
 }
 
 export type FreightChargeCreateOrConnectWithoutMatchesInput = {
@@ -562,7 +581,8 @@ export type FreightChargeUpdateWithoutMatchesInput = {
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneRequiredWithoutFreightChargesNestedInput
 }
 
@@ -572,7 +592,8 @@ export type FreightChargeUncheckedUpdateWithoutMatchesInput = {
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FreightChargeCreateManyOrderInput = {
@@ -580,7 +601,8 @@ export type FreightChargeCreateManyOrderInput = {
   courierName: string
   chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
+  invoiceNumber?: string | null
+  chargedAt?: Date | string
 }
 
 export type FreightChargeUpdateWithoutOrderInput = {
@@ -588,7 +610,8 @@ export type FreightChargeUpdateWithoutOrderInput = {
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   matches?: Prisma.ReconciliationMatchUpdateManyWithoutFreightChargeNestedInput
 }
 
@@ -597,7 +620,8 @@ export type FreightChargeUncheckedUpdateWithoutOrderInput = {
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutFreightChargeNestedInput
 }
 
@@ -606,7 +630,8 @@ export type FreightChargeUncheckedUpdateManyWithoutOrderInput = {
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -646,7 +671,8 @@ export type FreightChargeSelect<ExtArgs extends runtime.Types.Extensions.Interna
   courierName?: boolean
   chargedAmount?: boolean
   actualWeight?: boolean
-  createdAt?: boolean
+  invoiceNumber?: boolean
+  chargedAt?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   matches?: boolean | Prisma.FreightCharge$matchesArgs<ExtArgs>
   _count?: boolean | Prisma.FreightChargeCountOutputTypeDefaultArgs<ExtArgs>
@@ -658,7 +684,8 @@ export type FreightChargeSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   courierName?: boolean
   chargedAmount?: boolean
   actualWeight?: boolean
-  createdAt?: boolean
+  invoiceNumber?: boolean
+  chargedAt?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["freightCharge"]>
 
@@ -668,7 +695,8 @@ export type FreightChargeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   courierName?: boolean
   chargedAmount?: boolean
   actualWeight?: boolean
-  createdAt?: boolean
+  invoiceNumber?: boolean
+  chargedAt?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["freightCharge"]>
 
@@ -678,10 +706,11 @@ export type FreightChargeSelectScalar = {
   courierName?: boolean
   chargedAmount?: boolean
   actualWeight?: boolean
-  createdAt?: boolean
+  invoiceNumber?: boolean
+  chargedAt?: boolean
 }
 
-export type FreightChargeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "courierName" | "chargedAmount" | "actualWeight" | "createdAt", ExtArgs["result"]["freightCharge"]>
+export type FreightChargeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "courierName" | "chargedAmount" | "actualWeight" | "invoiceNumber" | "chargedAt", ExtArgs["result"]["freightCharge"]>
 export type FreightChargeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   matches?: boolean | Prisma.FreightCharge$matchesArgs<ExtArgs>
@@ -706,7 +735,8 @@ export type $FreightChargePayload<ExtArgs extends runtime.Types.Extensions.Inter
     courierName: string
     chargedAmount: runtime.Decimal
     actualWeight: runtime.Decimal | null
-    createdAt: Date
+    invoiceNumber: string | null
+    chargedAt: Date
   }, ExtArgs["result"]["freightCharge"]>
   composites: {}
 }
@@ -1137,7 +1167,8 @@ export interface FreightChargeFieldRefs {
   readonly courierName: Prisma.FieldRef<"FreightCharge", 'String'>
   readonly chargedAmount: Prisma.FieldRef<"FreightCharge", 'Decimal'>
   readonly actualWeight: Prisma.FieldRef<"FreightCharge", 'Decimal'>
-  readonly createdAt: Prisma.FieldRef<"FreightCharge", 'DateTime'>
+  readonly invoiceNumber: Prisma.FieldRef<"FreightCharge", 'String'>
+  readonly chargedAt: Prisma.FieldRef<"FreightCharge", 'DateTime'>
 }
     
 
