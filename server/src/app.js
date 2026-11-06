@@ -7,6 +7,8 @@ import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/authRoutes.js";
 import reconciliationRoutes from "./routes/reconciliationRoutes.js";
 import claimRoutes from "./routes/claimRoutes.js";
+import auditRoutes from "./routes/auditRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 
 const app = express();
 
@@ -46,6 +48,8 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/reconciliation", reconciliationRoutes);
 app.use("/api/claims", claimRoutes);
+app.use("/api/audit-logs", auditRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Handle unknown routes
 app.use((req, res) => {
