@@ -1,4 +1,3 @@
-
 import prisma from "../config/database.js";
 import { randomUUID } from "node:crypto";
 
@@ -80,5 +79,137 @@ export async function getAllClaims() {
     orderBy: {
       createdAt: "desc",
     },
+  });
+}
+
+export async function updateClaimStatus(claimId, status, userId) {
+  return prisma.$transaction(async (tx) => {
+    // Get the existing claim before updating it.
+    const existingClaim = await tx.claim.findUnique({
+      where: {
+        id: claimId,
+      },
+    });
+
+    if (!existingClaim) {
+      const error = new Error("Claim not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    // Update the claim status.
+    const updatedClaim = await tx.claim.update({
+      where: {
+        id: claimId,
+      },
+      data: {
+        status,
+      },
+      include: {
+        partner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    // Record the status change in the audit log.
+    await tx.auditLog.create({
+      data: {
+        action: "CLAIM_STATUS_UPDATED",
+        entity: "Claim",
+        entityId: claimId,
+        userId,
+        details: {
+          claimNumber: existingClaim.claimNumber,
+          previousStatus: existingClaim.status,
+          newStatus: status,
+        },
+      },
+    });
+
+    return updatedClaim;
+  });
+}
+
+export async function assignClaimOwner(claimId, ownerId, assignedByUserId) {
+  return prisma.$transaction(async (tx) => {
+    // Check whether the claim exists.
+    const existingClaim = await tx.claim.findUnique({
+      where: {
+        id: claimId,
+      },
+    });
+
+    if (!existingClaim) {
+      const error = new Error("Claim not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    // Verify that the new owner exists.
+    const user = await tx.user.findUnique({
+      where: {
+        id: ownerId,
+      },
+    });
+
+    if (!user) {
+      const error = new Error("Owner not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    // Only Finance Executives can own claims.
+    if (user.role !== "FINANCE_EXECUTIVE") {
+      const error = new Error(
+        "Claims can only be assigned to Finance Executives."
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // Update the claim assignment.
+    const updatedClaim = await tx.claim.update({
+      where: {
+        id: claimId,
+      },
+      data: {
+        ownerId,
+      },
+      include: {
+        partner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    // Record the assignment in the audit log.
+    await tx.auditLog.create({
+      data: {
+        action: "CLAIM_ASSIGNED",
+        entity: "Claim",
+        entityId: claimId,
+        userId: assignedByUserId,
+        details: {
+          claimNumber: existingClaim.claimNumber,
+          previousOwnerId: existingClaim.ownerId,
+          newOwnerId: ownerId,
+        },
+      },
+    });
+
+    return updatedClaim;
   });
 }
