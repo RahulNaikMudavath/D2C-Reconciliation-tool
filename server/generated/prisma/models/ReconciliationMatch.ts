@@ -48,6 +48,7 @@ export type ReconciliationMatchMinAggregateOutputType = {
   expectedAmount: runtime.Decimal | null
   actualAmount: runtime.Decimal | null
   difference: runtime.Decimal | null
+  reviewReason: string | null
   createdAt: Date | null
 }
 
@@ -61,6 +62,7 @@ export type ReconciliationMatchMaxAggregateOutputType = {
   expectedAmount: runtime.Decimal | null
   actualAmount: runtime.Decimal | null
   difference: runtime.Decimal | null
+  reviewReason: string | null
   createdAt: Date | null
 }
 
@@ -74,6 +76,7 @@ export type ReconciliationMatchCountAggregateOutputType = {
   expectedAmount: number
   actualAmount: number
   difference: number
+  reviewReason: number
   createdAt: number
   _all: number
 }
@@ -101,6 +104,7 @@ export type ReconciliationMatchMinAggregateInputType = {
   expectedAmount?: true
   actualAmount?: true
   difference?: true
+  reviewReason?: true
   createdAt?: true
 }
 
@@ -114,6 +118,7 @@ export type ReconciliationMatchMaxAggregateInputType = {
   expectedAmount?: true
   actualAmount?: true
   difference?: true
+  reviewReason?: true
   createdAt?: true
 }
 
@@ -127,6 +132,7 @@ export type ReconciliationMatchCountAggregateInputType = {
   expectedAmount?: true
   actualAmount?: true
   difference?: true
+  reviewReason?: true
   createdAt?: true
   _all?: true
 }
@@ -224,9 +230,10 @@ export type ReconciliationMatchGroupByOutputType = {
   freightChargeId: string | null
   returnRecordId: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal
+  expectedAmount: runtime.Decimal | null
   actualAmount: runtime.Decimal | null
-  difference: runtime.Decimal
+  difference: runtime.Decimal | null
+  reviewReason: string | null
   createdAt: Date
   _count: ReconciliationMatchCountAggregateOutputType | null
   _avg: ReconciliationMatchAvgAggregateOutputType | null
@@ -260,9 +267,10 @@ export type ReconciliationMatchWhereInput = {
   freightChargeId?: Prisma.StringNullableFilter<"ReconciliationMatch"> | string | null
   returnRecordId?: Prisma.StringNullableFilter<"ReconciliationMatch"> | string | null
   status?: Prisma.EnumReconciliationStatusFilter<"ReconciliationMatch"> | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.DecimalNullableFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.DecimalNullableFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.DecimalNullableFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.StringNullableFilter<"ReconciliationMatch"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ReconciliationMatch"> | Date | string
   run?: Prisma.XOR<Prisma.ReconciliationRunScalarRelationFilter, Prisma.ReconciliationRunWhereInput>
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
@@ -279,9 +287,10 @@ export type ReconciliationMatchOrderByWithRelationInput = {
   freightChargeId?: Prisma.SortOrderInput | Prisma.SortOrder
   returnRecordId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
-  expectedAmount?: Prisma.SortOrder
+  expectedAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   actualAmount?: Prisma.SortOrderInput | Prisma.SortOrder
-  difference?: Prisma.SortOrder
+  difference?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewReason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   run?: Prisma.ReconciliationRunOrderByWithRelationInput
   order?: Prisma.OrderOrderByWithRelationInput
@@ -302,9 +311,10 @@ export type ReconciliationMatchWhereUniqueInput = Prisma.AtLeast<{
   freightChargeId?: Prisma.StringNullableFilter<"ReconciliationMatch"> | string | null
   returnRecordId?: Prisma.StringNullableFilter<"ReconciliationMatch"> | string | null
   status?: Prisma.EnumReconciliationStatusFilter<"ReconciliationMatch"> | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.DecimalNullableFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.DecimalNullableFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.DecimalNullableFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.StringNullableFilter<"ReconciliationMatch"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ReconciliationMatch"> | Date | string
   run?: Prisma.XOR<Prisma.ReconciliationRunScalarRelationFilter, Prisma.ReconciliationRunWhereInput>
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
@@ -321,9 +331,10 @@ export type ReconciliationMatchOrderByWithAggregationInput = {
   freightChargeId?: Prisma.SortOrderInput | Prisma.SortOrder
   returnRecordId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
-  expectedAmount?: Prisma.SortOrder
+  expectedAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   actualAmount?: Prisma.SortOrderInput | Prisma.SortOrder
-  difference?: Prisma.SortOrder
+  difference?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewReason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ReconciliationMatchCountOrderByAggregateInput
   _avg?: Prisma.ReconciliationMatchAvgOrderByAggregateInput
@@ -342,18 +353,20 @@ export type ReconciliationMatchScalarWhereWithAggregatesInput = {
   freightChargeId?: Prisma.StringNullableWithAggregatesFilter<"ReconciliationMatch"> | string | null
   returnRecordId?: Prisma.StringNullableWithAggregatesFilter<"ReconciliationMatch"> | string | null
   status?: Prisma.EnumReconciliationStatusWithAggregatesFilter<"ReconciliationMatch"> | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalWithAggregatesFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.DecimalNullableWithAggregatesFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.DecimalNullableWithAggregatesFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalWithAggregatesFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.DecimalNullableWithAggregatesFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.StringNullableWithAggregatesFilter<"ReconciliationMatch"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ReconciliationMatch"> | Date | string
 }
 
 export type ReconciliationMatchCreateInput = {
   id?: string
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   run: Prisma.ReconciliationRunCreateNestedOneWithoutMatchesInput
   order: Prisma.OrderCreateNestedOneWithoutMatchesInput
@@ -370,9 +383,10 @@ export type ReconciliationMatchUncheckedCreateInput = {
   freightChargeId?: string | null
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   settlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutReconciliationMatchInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutMatchInput
@@ -381,9 +395,10 @@ export type ReconciliationMatchUncheckedCreateInput = {
 export type ReconciliationMatchUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   run?: Prisma.ReconciliationRunUpdateOneRequiredWithoutMatchesNestedInput
   order?: Prisma.OrderUpdateOneRequiredWithoutMatchesNestedInput
@@ -400,9 +415,10 @@ export type ReconciliationMatchUncheckedUpdateInput = {
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutReconciliationMatchNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutMatchNestedInput
@@ -415,18 +431,20 @@ export type ReconciliationMatchCreateManyInput = {
   freightChargeId?: string | null
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
 }
 
 export type ReconciliationMatchUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -437,9 +455,10 @@ export type ReconciliationMatchUncheckedUpdateManyInput = {
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -468,6 +487,7 @@ export type ReconciliationMatchCountOrderByAggregateInput = {
   expectedAmount?: Prisma.SortOrder
   actualAmount?: Prisma.SortOrder
   difference?: Prisma.SortOrder
+  reviewReason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -487,6 +507,7 @@ export type ReconciliationMatchMaxOrderByAggregateInput = {
   expectedAmount?: Prisma.SortOrder
   actualAmount?: Prisma.SortOrder
   difference?: Prisma.SortOrder
+  reviewReason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -500,6 +521,7 @@ export type ReconciliationMatchMinOrderByAggregateInput = {
   expectedAmount?: Prisma.SortOrder
   actualAmount?: Prisma.SortOrder
   difference?: Prisma.SortOrder
+  reviewReason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -724,9 +746,10 @@ export type ReconciliationMatchUpdateOneWithoutClaimsNestedInput = {
 export type ReconciliationMatchCreateWithoutOrderInput = {
   id?: string
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   run: Prisma.ReconciliationRunCreateNestedOneWithoutMatchesInput
   settlements?: Prisma.MatchSettlementCreateNestedManyWithoutReconciliationMatchInput
@@ -741,9 +764,10 @@ export type ReconciliationMatchUncheckedCreateWithoutOrderInput = {
   freightChargeId?: string | null
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   settlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutReconciliationMatchInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutMatchInput
@@ -785,18 +809,20 @@ export type ReconciliationMatchScalarWhereInput = {
   freightChargeId?: Prisma.StringNullableFilter<"ReconciliationMatch"> | string | null
   returnRecordId?: Prisma.StringNullableFilter<"ReconciliationMatch"> | string | null
   status?: Prisma.EnumReconciliationStatusFilter<"ReconciliationMatch"> | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.DecimalNullableFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.DecimalNullableFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.DecimalNullableFilter<"ReconciliationMatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.StringNullableFilter<"ReconciliationMatch"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ReconciliationMatch"> | Date | string
 }
 
 export type ReconciliationMatchCreateWithoutFreightChargeInput = {
   id?: string
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   run: Prisma.ReconciliationRunCreateNestedOneWithoutMatchesInput
   order: Prisma.OrderCreateNestedOneWithoutMatchesInput
@@ -811,9 +837,10 @@ export type ReconciliationMatchUncheckedCreateWithoutFreightChargeInput = {
   orderId: string
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   settlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutReconciliationMatchInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutMatchInput
@@ -848,9 +875,10 @@ export type ReconciliationMatchUpdateManyWithWhereWithoutFreightChargeInput = {
 export type ReconciliationMatchCreateWithoutReturnRecordInput = {
   id?: string
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   run: Prisma.ReconciliationRunCreateNestedOneWithoutMatchesInput
   order: Prisma.OrderCreateNestedOneWithoutMatchesInput
@@ -865,9 +893,10 @@ export type ReconciliationMatchUncheckedCreateWithoutReturnRecordInput = {
   orderId: string
   freightChargeId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   settlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutReconciliationMatchInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutMatchInput
@@ -902,9 +931,10 @@ export type ReconciliationMatchUpdateManyWithWhereWithoutReturnRecordInput = {
 export type ReconciliationMatchCreateWithoutRunInput = {
   id?: string
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   order: Prisma.OrderCreateNestedOneWithoutMatchesInput
   settlements?: Prisma.MatchSettlementCreateNestedManyWithoutReconciliationMatchInput
@@ -919,9 +949,10 @@ export type ReconciliationMatchUncheckedCreateWithoutRunInput = {
   freightChargeId?: string | null
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   settlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutReconciliationMatchInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutMatchInput
@@ -956,9 +987,10 @@ export type ReconciliationMatchUpdateManyWithWhereWithoutRunInput = {
 export type ReconciliationMatchCreateWithoutSettlementsInput = {
   id?: string
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   run: Prisma.ReconciliationRunCreateNestedOneWithoutMatchesInput
   order: Prisma.OrderCreateNestedOneWithoutMatchesInput
@@ -974,9 +1006,10 @@ export type ReconciliationMatchUncheckedCreateWithoutSettlementsInput = {
   freightChargeId?: string | null
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutMatchInput
 }
@@ -1000,9 +1033,10 @@ export type ReconciliationMatchUpdateToOneWithWhereWithoutSettlementsInput = {
 export type ReconciliationMatchUpdateWithoutSettlementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   run?: Prisma.ReconciliationRunUpdateOneRequiredWithoutMatchesNestedInput
   order?: Prisma.OrderUpdateOneRequiredWithoutMatchesNestedInput
@@ -1018,9 +1052,10 @@ export type ReconciliationMatchUncheckedUpdateWithoutSettlementsInput = {
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutMatchNestedInput
 }
@@ -1028,9 +1063,10 @@ export type ReconciliationMatchUncheckedUpdateWithoutSettlementsInput = {
 export type ReconciliationMatchCreateWithoutClaimsInput = {
   id?: string
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   run: Prisma.ReconciliationRunCreateNestedOneWithoutMatchesInput
   order: Prisma.OrderCreateNestedOneWithoutMatchesInput
@@ -1046,9 +1082,10 @@ export type ReconciliationMatchUncheckedCreateWithoutClaimsInput = {
   freightChargeId?: string | null
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
   settlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutReconciliationMatchInput
 }
@@ -1072,9 +1109,10 @@ export type ReconciliationMatchUpdateToOneWithWhereWithoutClaimsInput = {
 export type ReconciliationMatchUpdateWithoutClaimsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   run?: Prisma.ReconciliationRunUpdateOneRequiredWithoutMatchesNestedInput
   order?: Prisma.OrderUpdateOneRequiredWithoutMatchesNestedInput
@@ -1090,9 +1128,10 @@ export type ReconciliationMatchUncheckedUpdateWithoutClaimsInput = {
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutReconciliationMatchNestedInput
 }
@@ -1103,18 +1142,20 @@ export type ReconciliationMatchCreateManyOrderInput = {
   freightChargeId?: string | null
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
 }
 
 export type ReconciliationMatchUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   run?: Prisma.ReconciliationRunUpdateOneRequiredWithoutMatchesNestedInput
   settlements?: Prisma.MatchSettlementUpdateManyWithoutReconciliationMatchNestedInput
@@ -1129,9 +1170,10 @@ export type ReconciliationMatchUncheckedUpdateWithoutOrderInput = {
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutReconciliationMatchNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutMatchNestedInput
@@ -1143,9 +1185,10 @@ export type ReconciliationMatchUncheckedUpdateManyWithoutOrderInput = {
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1155,18 +1198,20 @@ export type ReconciliationMatchCreateManyFreightChargeInput = {
   orderId: string
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
 }
 
 export type ReconciliationMatchUpdateWithoutFreightChargeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   run?: Prisma.ReconciliationRunUpdateOneRequiredWithoutMatchesNestedInput
   order?: Prisma.OrderUpdateOneRequiredWithoutMatchesNestedInput
@@ -1181,9 +1226,10 @@ export type ReconciliationMatchUncheckedUpdateWithoutFreightChargeInput = {
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutReconciliationMatchNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutMatchNestedInput
@@ -1195,9 +1241,10 @@ export type ReconciliationMatchUncheckedUpdateManyWithoutFreightChargeInput = {
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1207,18 +1254,20 @@ export type ReconciliationMatchCreateManyReturnRecordInput = {
   orderId: string
   freightChargeId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
 }
 
 export type ReconciliationMatchUpdateWithoutReturnRecordInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   run?: Prisma.ReconciliationRunUpdateOneRequiredWithoutMatchesNestedInput
   order?: Prisma.OrderUpdateOneRequiredWithoutMatchesNestedInput
@@ -1233,9 +1282,10 @@ export type ReconciliationMatchUncheckedUpdateWithoutReturnRecordInput = {
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutReconciliationMatchNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutMatchNestedInput
@@ -1247,9 +1297,10 @@ export type ReconciliationMatchUncheckedUpdateManyWithoutReturnRecordInput = {
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1259,18 +1310,20 @@ export type ReconciliationMatchCreateManyRunInput = {
   freightChargeId?: string | null
   returnRecordId?: string | null
   status: $Enums.ReconciliationStatus
-  expectedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference: runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: string | null
   createdAt?: Date | string
 }
 
 export type ReconciliationMatchUpdateWithoutRunInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneRequiredWithoutMatchesNestedInput
   settlements?: Prisma.MatchSettlementUpdateManyWithoutReconciliationMatchNestedInput
@@ -1285,9 +1338,10 @@ export type ReconciliationMatchUncheckedUpdateWithoutRunInput = {
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutReconciliationMatchNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutMatchNestedInput
@@ -1299,9 +1353,10 @@ export type ReconciliationMatchUncheckedUpdateManyWithoutRunInput = {
   freightChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   returnRecordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReconciliationStatusFieldUpdateOperationsInput | $Enums.ReconciliationStatus
-  expectedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expectedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   actualAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  difference?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  difference?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reviewReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1355,6 +1410,7 @@ export type ReconciliationMatchSelect<ExtArgs extends runtime.Types.Extensions.I
   expectedAmount?: boolean
   actualAmount?: boolean
   difference?: boolean
+  reviewReason?: boolean
   createdAt?: boolean
   run?: boolean | Prisma.ReconciliationRunDefaultArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
@@ -1375,6 +1431,7 @@ export type ReconciliationMatchSelectCreateManyAndReturn<ExtArgs extends runtime
   expectedAmount?: boolean
   actualAmount?: boolean
   difference?: boolean
+  reviewReason?: boolean
   createdAt?: boolean
   run?: boolean | Prisma.ReconciliationRunDefaultArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
@@ -1392,6 +1449,7 @@ export type ReconciliationMatchSelectUpdateManyAndReturn<ExtArgs extends runtime
   expectedAmount?: boolean
   actualAmount?: boolean
   difference?: boolean
+  reviewReason?: boolean
   createdAt?: boolean
   run?: boolean | Prisma.ReconciliationRunDefaultArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
@@ -1409,10 +1467,11 @@ export type ReconciliationMatchSelectScalar = {
   expectedAmount?: boolean
   actualAmount?: boolean
   difference?: boolean
+  reviewReason?: boolean
   createdAt?: boolean
 }
 
-export type ReconciliationMatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "runId" | "orderId" | "freightChargeId" | "returnRecordId" | "status" | "expectedAmount" | "actualAmount" | "difference" | "createdAt", ExtArgs["result"]["reconciliationMatch"]>
+export type ReconciliationMatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "runId" | "orderId" | "freightChargeId" | "returnRecordId" | "status" | "expectedAmount" | "actualAmount" | "difference" | "reviewReason" | "createdAt", ExtArgs["result"]["reconciliationMatch"]>
 export type ReconciliationMatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   run?: boolean | Prisma.ReconciliationRunDefaultArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
@@ -1452,9 +1511,10 @@ export type $ReconciliationMatchPayload<ExtArgs extends runtime.Types.Extensions
     freightChargeId: string | null
     returnRecordId: string | null
     status: $Enums.ReconciliationStatus
-    expectedAmount: runtime.Decimal
+    expectedAmount: runtime.Decimal | null
     actualAmount: runtime.Decimal | null
-    difference: runtime.Decimal
+    difference: runtime.Decimal | null
+    reviewReason: string | null
     createdAt: Date
   }, ExtArgs["result"]["reconciliationMatch"]>
   composites: {}
@@ -1894,6 +1954,7 @@ export interface ReconciliationMatchFieldRefs {
   readonly expectedAmount: Prisma.FieldRef<"ReconciliationMatch", 'Decimal'>
   readonly actualAmount: Prisma.FieldRef<"ReconciliationMatch", 'Decimal'>
   readonly difference: Prisma.FieldRef<"ReconciliationMatch", 'Decimal'>
+  readonly reviewReason: Prisma.FieldRef<"ReconciliationMatch", 'String'>
   readonly createdAt: Prisma.FieldRef<"ReconciliationMatch", 'DateTime'>
 }
     

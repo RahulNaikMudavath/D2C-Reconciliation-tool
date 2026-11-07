@@ -56,6 +56,7 @@ export type SettlementMinAggregateOutputType = {
   tdsAmount: runtime.Decimal | null
   settlementDate: Date | null
   referenceNumber: string | null
+  importBatchId: string | null
 }
 
 export type SettlementMaxAggregateOutputType = {
@@ -70,6 +71,7 @@ export type SettlementMaxAggregateOutputType = {
   tdsAmount: runtime.Decimal | null
   settlementDate: Date | null
   referenceNumber: string | null
+  importBatchId: string | null
 }
 
 export type SettlementCountAggregateOutputType = {
@@ -84,6 +86,7 @@ export type SettlementCountAggregateOutputType = {
   tdsAmount: number
   settlementDate: number
   referenceNumber: number
+  importBatchId: number
   _all: number
 }
 
@@ -118,6 +121,7 @@ export type SettlementMinAggregateInputType = {
   tdsAmount?: true
   settlementDate?: true
   referenceNumber?: true
+  importBatchId?: true
 }
 
 export type SettlementMaxAggregateInputType = {
@@ -132,6 +136,7 @@ export type SettlementMaxAggregateInputType = {
   tdsAmount?: true
   settlementDate?: true
   referenceNumber?: true
+  importBatchId?: true
 }
 
 export type SettlementCountAggregateInputType = {
@@ -146,6 +151,7 @@ export type SettlementCountAggregateInputType = {
   tdsAmount?: true
   settlementDate?: true
   referenceNumber?: true
+  importBatchId?: true
   _all?: true
 }
 
@@ -247,6 +253,7 @@ export type SettlementGroupByOutputType = {
   tdsAmount: runtime.Decimal
   settlementDate: Date
   referenceNumber: string | null
+  importBatchId: string | null
   _count: SettlementCountAggregateOutputType | null
   _avg: SettlementAvgAggregateOutputType | null
   _sum: SettlementSumAggregateOutputType | null
@@ -284,8 +291,11 @@ export type SettlementWhereInput = {
   tdsAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate?: Prisma.DateTimeFilter<"Settlement"> | Date | string
   referenceNumber?: Prisma.StringNullableFilter<"Settlement"> | string | null
+  importBatchId?: Prisma.StringNullableFilter<"Settlement"> | string | null
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
+  partner?: Prisma.XOR<Prisma.PartnerNullableScalarRelationFilter, Prisma.PartnerWhereInput> | null
   matchSettlements?: Prisma.MatchSettlementListRelationFilter
+  importBatch?: Prisma.XOR<Prisma.ImportBatchNullableScalarRelationFilter, Prisma.ImportBatchWhereInput> | null
 }
 
 export type SettlementOrderByWithRelationInput = {
@@ -300,12 +310,16 @@ export type SettlementOrderByWithRelationInput = {
   tdsAmount?: Prisma.SortOrder
   settlementDate?: Prisma.SortOrder
   referenceNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  importBatchId?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.OrderOrderByWithRelationInput
+  partner?: Prisma.PartnerOrderByWithRelationInput
   matchSettlements?: Prisma.MatchSettlementOrderByRelationAggregateInput
+  importBatch?: Prisma.ImportBatchOrderByWithRelationInput
 }
 
 export type SettlementWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  partnerId_referenceNumber?: Prisma.SettlementPartnerIdReferenceNumberCompoundUniqueInput
   AND?: Prisma.SettlementWhereInput | Prisma.SettlementWhereInput[]
   OR?: Prisma.SettlementWhereInput[]
   NOT?: Prisma.SettlementWhereInput | Prisma.SettlementWhereInput[]
@@ -319,9 +333,12 @@ export type SettlementWhereUniqueInput = Prisma.AtLeast<{
   tdsAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate?: Prisma.DateTimeFilter<"Settlement"> | Date | string
   referenceNumber?: Prisma.StringNullableFilter<"Settlement"> | string | null
+  importBatchId?: Prisma.StringNullableFilter<"Settlement"> | string | null
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
+  partner?: Prisma.XOR<Prisma.PartnerNullableScalarRelationFilter, Prisma.PartnerWhereInput> | null
   matchSettlements?: Prisma.MatchSettlementListRelationFilter
-}, "id">
+  importBatch?: Prisma.XOR<Prisma.ImportBatchNullableScalarRelationFilter, Prisma.ImportBatchWhereInput> | null
+}, "id" | "partnerId_referenceNumber">
 
 export type SettlementOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -335,6 +352,7 @@ export type SettlementOrderByWithAggregationInput = {
   tdsAmount?: Prisma.SortOrder
   settlementDate?: Prisma.SortOrder
   referenceNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  importBatchId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.SettlementCountOrderByAggregateInput
   _avg?: Prisma.SettlementAvgOrderByAggregateInput
   _max?: Prisma.SettlementMaxOrderByAggregateInput
@@ -357,11 +375,11 @@ export type SettlementScalarWhereWithAggregatesInput = {
   tdsAmount?: Prisma.DecimalWithAggregatesFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate?: Prisma.DateTimeWithAggregatesFilter<"Settlement"> | Date | string
   referenceNumber?: Prisma.StringNullableWithAggregatesFilter<"Settlement"> | string | null
+  importBatchId?: Prisma.StringNullableWithAggregatesFilter<"Settlement"> | string | null
 }
 
 export type SettlementCreateInput = {
   id?: string
-  partnerId?: string | null
   grossAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   amountReceived: runtime.Decimal | runtime.DecimalJsLike | number | string
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -371,7 +389,9 @@ export type SettlementCreateInput = {
   settlementDate: Date | string
   referenceNumber?: string | null
   order: Prisma.OrderCreateNestedOneWithoutSettlementsInput
+  partner?: Prisma.PartnerCreateNestedOneWithoutSettlementsInput
   matchSettlements?: Prisma.MatchSettlementCreateNestedManyWithoutSettlementInput
+  importBatch?: Prisma.ImportBatchCreateNestedOneWithoutSettlementsInput
 }
 
 export type SettlementUncheckedCreateInput = {
@@ -386,12 +406,12 @@ export type SettlementUncheckedCreateInput = {
   tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate: Date | string
   referenceNumber?: string | null
+  importBatchId?: string | null
   matchSettlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -401,7 +421,9 @@ export type SettlementUpdateInput = {
   settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.OrderUpdateOneRequiredWithoutSettlementsNestedInput
+  partner?: Prisma.PartnerUpdateOneWithoutSettlementsNestedInput
   matchSettlements?: Prisma.MatchSettlementUpdateManyWithoutSettlementNestedInput
+  importBatch?: Prisma.ImportBatchUpdateOneWithoutSettlementsNestedInput
 }
 
 export type SettlementUncheckedUpdateInput = {
@@ -416,6 +438,7 @@ export type SettlementUncheckedUpdateInput = {
   tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  importBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchSettlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
@@ -431,11 +454,11 @@ export type SettlementCreateManyInput = {
   tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate: Date | string
   referenceNumber?: string | null
+  importBatchId?: string | null
 }
 
 export type SettlementUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -458,6 +481,7 @@ export type SettlementUncheckedUpdateManyInput = {
   tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  importBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type SettlementListRelationFilter = {
@@ -468,6 +492,11 @@ export type SettlementListRelationFilter = {
 
 export type SettlementOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type SettlementPartnerIdReferenceNumberCompoundUniqueInput = {
+  partnerId: string
+  referenceNumber: string
 }
 
 export type SettlementCountOrderByAggregateInput = {
@@ -482,6 +511,7 @@ export type SettlementCountOrderByAggregateInput = {
   tdsAmount?: Prisma.SortOrder
   settlementDate?: Prisma.SortOrder
   referenceNumber?: Prisma.SortOrder
+  importBatchId?: Prisma.SortOrder
 }
 
 export type SettlementAvgOrderByAggregateInput = {
@@ -505,6 +535,7 @@ export type SettlementMaxOrderByAggregateInput = {
   tdsAmount?: Prisma.SortOrder
   settlementDate?: Prisma.SortOrder
   referenceNumber?: Prisma.SortOrder
+  importBatchId?: Prisma.SortOrder
 }
 
 export type SettlementMinOrderByAggregateInput = {
@@ -519,6 +550,7 @@ export type SettlementMinOrderByAggregateInput = {
   tdsAmount?: Prisma.SortOrder
   settlementDate?: Prisma.SortOrder
   referenceNumber?: Prisma.SortOrder
+  importBatchId?: Prisma.SortOrder
 }
 
 export type SettlementSumOrderByAggregateInput = {
@@ -533,6 +565,90 @@ export type SettlementSumOrderByAggregateInput = {
 export type SettlementScalarRelationFilter = {
   is?: Prisma.SettlementWhereInput
   isNot?: Prisma.SettlementWhereInput
+}
+
+export type SettlementCreateNestedManyWithoutPartnerInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutPartnerInput, Prisma.SettlementUncheckedCreateWithoutPartnerInput> | Prisma.SettlementCreateWithoutPartnerInput[] | Prisma.SettlementUncheckedCreateWithoutPartnerInput[]
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutPartnerInput | Prisma.SettlementCreateOrConnectWithoutPartnerInput[]
+  createMany?: Prisma.SettlementCreateManyPartnerInputEnvelope
+  connect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+}
+
+export type SettlementUncheckedCreateNestedManyWithoutPartnerInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutPartnerInput, Prisma.SettlementUncheckedCreateWithoutPartnerInput> | Prisma.SettlementCreateWithoutPartnerInput[] | Prisma.SettlementUncheckedCreateWithoutPartnerInput[]
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutPartnerInput | Prisma.SettlementCreateOrConnectWithoutPartnerInput[]
+  createMany?: Prisma.SettlementCreateManyPartnerInputEnvelope
+  connect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+}
+
+export type SettlementUpdateManyWithoutPartnerNestedInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutPartnerInput, Prisma.SettlementUncheckedCreateWithoutPartnerInput> | Prisma.SettlementCreateWithoutPartnerInput[] | Prisma.SettlementUncheckedCreateWithoutPartnerInput[]
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutPartnerInput | Prisma.SettlementCreateOrConnectWithoutPartnerInput[]
+  upsert?: Prisma.SettlementUpsertWithWhereUniqueWithoutPartnerInput | Prisma.SettlementUpsertWithWhereUniqueWithoutPartnerInput[]
+  createMany?: Prisma.SettlementCreateManyPartnerInputEnvelope
+  set?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  disconnect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  delete?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  connect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  update?: Prisma.SettlementUpdateWithWhereUniqueWithoutPartnerInput | Prisma.SettlementUpdateWithWhereUniqueWithoutPartnerInput[]
+  updateMany?: Prisma.SettlementUpdateManyWithWhereWithoutPartnerInput | Prisma.SettlementUpdateManyWithWhereWithoutPartnerInput[]
+  deleteMany?: Prisma.SettlementScalarWhereInput | Prisma.SettlementScalarWhereInput[]
+}
+
+export type SettlementUncheckedUpdateManyWithoutPartnerNestedInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutPartnerInput, Prisma.SettlementUncheckedCreateWithoutPartnerInput> | Prisma.SettlementCreateWithoutPartnerInput[] | Prisma.SettlementUncheckedCreateWithoutPartnerInput[]
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutPartnerInput | Prisma.SettlementCreateOrConnectWithoutPartnerInput[]
+  upsert?: Prisma.SettlementUpsertWithWhereUniqueWithoutPartnerInput | Prisma.SettlementUpsertWithWhereUniqueWithoutPartnerInput[]
+  createMany?: Prisma.SettlementCreateManyPartnerInputEnvelope
+  set?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  disconnect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  delete?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  connect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  update?: Prisma.SettlementUpdateWithWhereUniqueWithoutPartnerInput | Prisma.SettlementUpdateWithWhereUniqueWithoutPartnerInput[]
+  updateMany?: Prisma.SettlementUpdateManyWithWhereWithoutPartnerInput | Prisma.SettlementUpdateManyWithWhereWithoutPartnerInput[]
+  deleteMany?: Prisma.SettlementScalarWhereInput | Prisma.SettlementScalarWhereInput[]
+}
+
+export type SettlementCreateNestedManyWithoutImportBatchInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutImportBatchInput, Prisma.SettlementUncheckedCreateWithoutImportBatchInput> | Prisma.SettlementCreateWithoutImportBatchInput[] | Prisma.SettlementUncheckedCreateWithoutImportBatchInput[]
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutImportBatchInput | Prisma.SettlementCreateOrConnectWithoutImportBatchInput[]
+  createMany?: Prisma.SettlementCreateManyImportBatchInputEnvelope
+  connect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+}
+
+export type SettlementUncheckedCreateNestedManyWithoutImportBatchInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutImportBatchInput, Prisma.SettlementUncheckedCreateWithoutImportBatchInput> | Prisma.SettlementCreateWithoutImportBatchInput[] | Prisma.SettlementUncheckedCreateWithoutImportBatchInput[]
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutImportBatchInput | Prisma.SettlementCreateOrConnectWithoutImportBatchInput[]
+  createMany?: Prisma.SettlementCreateManyImportBatchInputEnvelope
+  connect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+}
+
+export type SettlementUpdateManyWithoutImportBatchNestedInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutImportBatchInput, Prisma.SettlementUncheckedCreateWithoutImportBatchInput> | Prisma.SettlementCreateWithoutImportBatchInput[] | Prisma.SettlementUncheckedCreateWithoutImportBatchInput[]
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutImportBatchInput | Prisma.SettlementCreateOrConnectWithoutImportBatchInput[]
+  upsert?: Prisma.SettlementUpsertWithWhereUniqueWithoutImportBatchInput | Prisma.SettlementUpsertWithWhereUniqueWithoutImportBatchInput[]
+  createMany?: Prisma.SettlementCreateManyImportBatchInputEnvelope
+  set?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  disconnect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  delete?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  connect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  update?: Prisma.SettlementUpdateWithWhereUniqueWithoutImportBatchInput | Prisma.SettlementUpdateWithWhereUniqueWithoutImportBatchInput[]
+  updateMany?: Prisma.SettlementUpdateManyWithWhereWithoutImportBatchInput | Prisma.SettlementUpdateManyWithWhereWithoutImportBatchInput[]
+  deleteMany?: Prisma.SettlementScalarWhereInput | Prisma.SettlementScalarWhereInput[]
+}
+
+export type SettlementUncheckedUpdateManyWithoutImportBatchNestedInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutImportBatchInput, Prisma.SettlementUncheckedCreateWithoutImportBatchInput> | Prisma.SettlementCreateWithoutImportBatchInput[] | Prisma.SettlementUncheckedCreateWithoutImportBatchInput[]
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutImportBatchInput | Prisma.SettlementCreateOrConnectWithoutImportBatchInput[]
+  upsert?: Prisma.SettlementUpsertWithWhereUniqueWithoutImportBatchInput | Prisma.SettlementUpsertWithWhereUniqueWithoutImportBatchInput[]
+  createMany?: Prisma.SettlementCreateManyImportBatchInputEnvelope
+  set?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  disconnect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  delete?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  connect?: Prisma.SettlementWhereUniqueInput | Prisma.SettlementWhereUniqueInput[]
+  update?: Prisma.SettlementUpdateWithWhereUniqueWithoutImportBatchInput | Prisma.SettlementUpdateWithWhereUniqueWithoutImportBatchInput[]
+  updateMany?: Prisma.SettlementUpdateManyWithWhereWithoutImportBatchInput | Prisma.SettlementUpdateManyWithWhereWithoutImportBatchInput[]
+  deleteMany?: Prisma.SettlementScalarWhereInput | Prisma.SettlementScalarWhereInput[]
 }
 
 export type SettlementCreateNestedManyWithoutOrderInput = {
@@ -591,8 +707,98 @@ export type SettlementUpdateOneRequiredWithoutMatchSettlementsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SettlementUpdateToOneWithWhereWithoutMatchSettlementsInput, Prisma.SettlementUpdateWithoutMatchSettlementsInput>, Prisma.SettlementUncheckedUpdateWithoutMatchSettlementsInput>
 }
 
-export type SettlementCreateWithoutOrderInput = {
+export type SettlementCreateWithoutPartnerInput = {
   id?: string
+  grossAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived: runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate: Date | string
+  referenceNumber?: string | null
+  order: Prisma.OrderCreateNestedOneWithoutSettlementsInput
+  matchSettlements?: Prisma.MatchSettlementCreateNestedManyWithoutSettlementInput
+  importBatch?: Prisma.ImportBatchCreateNestedOneWithoutSettlementsInput
+}
+
+export type SettlementUncheckedCreateWithoutPartnerInput = {
+  id?: string
+  orderId: string
+  grossAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived: runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate: Date | string
+  referenceNumber?: string | null
+  importBatchId?: string | null
+  matchSettlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutSettlementInput
+}
+
+export type SettlementCreateOrConnectWithoutPartnerInput = {
+  where: Prisma.SettlementWhereUniqueInput
+  create: Prisma.XOR<Prisma.SettlementCreateWithoutPartnerInput, Prisma.SettlementUncheckedCreateWithoutPartnerInput>
+}
+
+export type SettlementCreateManyPartnerInputEnvelope = {
+  data: Prisma.SettlementCreateManyPartnerInput | Prisma.SettlementCreateManyPartnerInput[]
+  skipDuplicates?: boolean
+}
+
+export type SettlementUpsertWithWhereUniqueWithoutPartnerInput = {
+  where: Prisma.SettlementWhereUniqueInput
+  update: Prisma.XOR<Prisma.SettlementUpdateWithoutPartnerInput, Prisma.SettlementUncheckedUpdateWithoutPartnerInput>
+  create: Prisma.XOR<Prisma.SettlementCreateWithoutPartnerInput, Prisma.SettlementUncheckedCreateWithoutPartnerInput>
+}
+
+export type SettlementUpdateWithWhereUniqueWithoutPartnerInput = {
+  where: Prisma.SettlementWhereUniqueInput
+  data: Prisma.XOR<Prisma.SettlementUpdateWithoutPartnerInput, Prisma.SettlementUncheckedUpdateWithoutPartnerInput>
+}
+
+export type SettlementUpdateManyWithWhereWithoutPartnerInput = {
+  where: Prisma.SettlementScalarWhereInput
+  data: Prisma.XOR<Prisma.SettlementUpdateManyMutationInput, Prisma.SettlementUncheckedUpdateManyWithoutPartnerInput>
+}
+
+export type SettlementScalarWhereInput = {
+  AND?: Prisma.SettlementScalarWhereInput | Prisma.SettlementScalarWhereInput[]
+  OR?: Prisma.SettlementScalarWhereInput[]
+  NOT?: Prisma.SettlementScalarWhereInput | Prisma.SettlementScalarWhereInput[]
+  id?: Prisma.StringFilter<"Settlement"> | string
+  orderId?: Prisma.StringFilter<"Settlement"> | string
+  partnerId?: Prisma.StringNullableFilter<"Settlement"> | string | null
+  grossAmount?: Prisma.DecimalNullableFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate?: Prisma.DateTimeFilter<"Settlement"> | Date | string
+  referenceNumber?: Prisma.StringNullableFilter<"Settlement"> | string | null
+  importBatchId?: Prisma.StringNullableFilter<"Settlement"> | string | null
+}
+
+export type SettlementCreateWithoutImportBatchInput = {
+  id?: string
+  grossAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived: runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate: Date | string
+  referenceNumber?: string | null
+  order: Prisma.OrderCreateNestedOneWithoutSettlementsInput
+  partner?: Prisma.PartnerCreateNestedOneWithoutSettlementsInput
+  matchSettlements?: Prisma.MatchSettlementCreateNestedManyWithoutSettlementInput
+}
+
+export type SettlementUncheckedCreateWithoutImportBatchInput = {
+  id?: string
+  orderId: string
   partnerId?: string | null
   grossAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   amountReceived: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -602,7 +808,48 @@ export type SettlementCreateWithoutOrderInput = {
   tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate: Date | string
   referenceNumber?: string | null
+  matchSettlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutSettlementInput
+}
+
+export type SettlementCreateOrConnectWithoutImportBatchInput = {
+  where: Prisma.SettlementWhereUniqueInput
+  create: Prisma.XOR<Prisma.SettlementCreateWithoutImportBatchInput, Prisma.SettlementUncheckedCreateWithoutImportBatchInput>
+}
+
+export type SettlementCreateManyImportBatchInputEnvelope = {
+  data: Prisma.SettlementCreateManyImportBatchInput | Prisma.SettlementCreateManyImportBatchInput[]
+  skipDuplicates?: boolean
+}
+
+export type SettlementUpsertWithWhereUniqueWithoutImportBatchInput = {
+  where: Prisma.SettlementWhereUniqueInput
+  update: Prisma.XOR<Prisma.SettlementUpdateWithoutImportBatchInput, Prisma.SettlementUncheckedUpdateWithoutImportBatchInput>
+  create: Prisma.XOR<Prisma.SettlementCreateWithoutImportBatchInput, Prisma.SettlementUncheckedCreateWithoutImportBatchInput>
+}
+
+export type SettlementUpdateWithWhereUniqueWithoutImportBatchInput = {
+  where: Prisma.SettlementWhereUniqueInput
+  data: Prisma.XOR<Prisma.SettlementUpdateWithoutImportBatchInput, Prisma.SettlementUncheckedUpdateWithoutImportBatchInput>
+}
+
+export type SettlementUpdateManyWithWhereWithoutImportBatchInput = {
+  where: Prisma.SettlementScalarWhereInput
+  data: Prisma.XOR<Prisma.SettlementUpdateManyMutationInput, Prisma.SettlementUncheckedUpdateManyWithoutImportBatchInput>
+}
+
+export type SettlementCreateWithoutOrderInput = {
+  id?: string
+  grossAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived: runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate: Date | string
+  referenceNumber?: string | null
+  partner?: Prisma.PartnerCreateNestedOneWithoutSettlementsInput
   matchSettlements?: Prisma.MatchSettlementCreateNestedManyWithoutSettlementInput
+  importBatch?: Prisma.ImportBatchCreateNestedOneWithoutSettlementsInput
 }
 
 export type SettlementUncheckedCreateWithoutOrderInput = {
@@ -616,6 +863,7 @@ export type SettlementUncheckedCreateWithoutOrderInput = {
   tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate: Date | string
   referenceNumber?: string | null
+  importBatchId?: string | null
   matchSettlements?: Prisma.MatchSettlementUncheckedCreateNestedManyWithoutSettlementInput
 }
 
@@ -645,26 +893,8 @@ export type SettlementUpdateManyWithWhereWithoutOrderInput = {
   data: Prisma.XOR<Prisma.SettlementUpdateManyMutationInput, Prisma.SettlementUncheckedUpdateManyWithoutOrderInput>
 }
 
-export type SettlementScalarWhereInput = {
-  AND?: Prisma.SettlementScalarWhereInput | Prisma.SettlementScalarWhereInput[]
-  OR?: Prisma.SettlementScalarWhereInput[]
-  NOT?: Prisma.SettlementScalarWhereInput | Prisma.SettlementScalarWhereInput[]
-  id?: Prisma.StringFilter<"Settlement"> | string
-  orderId?: Prisma.StringFilter<"Settlement"> | string
-  partnerId?: Prisma.StringNullableFilter<"Settlement"> | string | null
-  grossAmount?: Prisma.DecimalNullableFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  amountReceived?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  commissionAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  otherFeeAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  tcsAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  tdsAmount?: Prisma.DecimalFilter<"Settlement"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  settlementDate?: Prisma.DateTimeFilter<"Settlement"> | Date | string
-  referenceNumber?: Prisma.StringNullableFilter<"Settlement"> | string | null
-}
-
 export type SettlementCreateWithoutMatchSettlementsInput = {
   id?: string
-  partnerId?: string | null
   grossAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   amountReceived: runtime.Decimal | runtime.DecimalJsLike | number | string
   commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -674,6 +904,8 @@ export type SettlementCreateWithoutMatchSettlementsInput = {
   settlementDate: Date | string
   referenceNumber?: string | null
   order: Prisma.OrderCreateNestedOneWithoutSettlementsInput
+  partner?: Prisma.PartnerCreateNestedOneWithoutSettlementsInput
+  importBatch?: Prisma.ImportBatchCreateNestedOneWithoutSettlementsInput
 }
 
 export type SettlementUncheckedCreateWithoutMatchSettlementsInput = {
@@ -688,6 +920,7 @@ export type SettlementUncheckedCreateWithoutMatchSettlementsInput = {
   tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate: Date | string
   referenceNumber?: string | null
+  importBatchId?: string | null
 }
 
 export type SettlementCreateOrConnectWithoutMatchSettlementsInput = {
@@ -708,7 +941,6 @@ export type SettlementUpdateToOneWithWhereWithoutMatchSettlementsInput = {
 
 export type SettlementUpdateWithoutMatchSettlementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -718,9 +950,128 @@ export type SettlementUpdateWithoutMatchSettlementsInput = {
   settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.OrderUpdateOneRequiredWithoutSettlementsNestedInput
+  partner?: Prisma.PartnerUpdateOneWithoutSettlementsNestedInput
+  importBatch?: Prisma.ImportBatchUpdateOneWithoutSettlementsNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutMatchSettlementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  importBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type SettlementCreateManyPartnerInput = {
+  id?: string
+  orderId: string
+  grossAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived: runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate: Date | string
+  referenceNumber?: string | null
+  importBatchId?: string | null
+}
+
+export type SettlementUpdateWithoutPartnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.OrderUpdateOneRequiredWithoutSettlementsNestedInput
+  matchSettlements?: Prisma.MatchSettlementUpdateManyWithoutSettlementNestedInput
+  importBatch?: Prisma.ImportBatchUpdateOneWithoutSettlementsNestedInput
+}
+
+export type SettlementUncheckedUpdateWithoutPartnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  importBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  matchSettlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutSettlementNestedInput
+}
+
+export type SettlementUncheckedUpdateManyWithoutPartnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  importBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type SettlementCreateManyImportBatchInput = {
+  id?: string
+  orderId: string
+  partnerId?: string | null
+  grossAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived: runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate: Date | string
+  referenceNumber?: string | null
+}
+
+export type SettlementUpdateWithoutImportBatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.OrderUpdateOneRequiredWithoutSettlementsNestedInput
+  partner?: Prisma.PartnerUpdateOneWithoutSettlementsNestedInput
+  matchSettlements?: Prisma.MatchSettlementUpdateManyWithoutSettlementNestedInput
+}
+
+export type SettlementUncheckedUpdateWithoutImportBatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  otherFeeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tcsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  matchSettlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutSettlementNestedInput
+}
+
+export type SettlementUncheckedUpdateManyWithoutImportBatchInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -745,11 +1096,11 @@ export type SettlementCreateManyOrderInput = {
   tdsAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate: Date | string
   referenceNumber?: string | null
+  importBatchId?: string | null
 }
 
 export type SettlementUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  partnerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grossAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   amountReceived?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   commissionAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -758,7 +1109,9 @@ export type SettlementUpdateWithoutOrderInput = {
   tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partner?: Prisma.PartnerUpdateOneWithoutSettlementsNestedInput
   matchSettlements?: Prisma.MatchSettlementUpdateManyWithoutSettlementNestedInput
+  importBatch?: Prisma.ImportBatchUpdateOneWithoutSettlementsNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutOrderInput = {
@@ -772,6 +1125,7 @@ export type SettlementUncheckedUpdateWithoutOrderInput = {
   tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  importBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchSettlements?: Prisma.MatchSettlementUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
@@ -786,6 +1140,7 @@ export type SettlementUncheckedUpdateManyWithoutOrderInput = {
   tdsAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   settlementDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   referenceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  importBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -831,8 +1186,11 @@ export type SettlementSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   tdsAmount?: boolean
   settlementDate?: boolean
   referenceNumber?: boolean
+  importBatchId?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  partner?: boolean | Prisma.Settlement$partnerArgs<ExtArgs>
   matchSettlements?: boolean | Prisma.Settlement$matchSettlementsArgs<ExtArgs>
+  importBatch?: boolean | Prisma.Settlement$importBatchArgs<ExtArgs>
   _count?: boolean | Prisma.SettlementCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settlement"]>
 
@@ -848,7 +1206,10 @@ export type SettlementSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   tdsAmount?: boolean
   settlementDate?: boolean
   referenceNumber?: boolean
+  importBatchId?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  partner?: boolean | Prisma.Settlement$partnerArgs<ExtArgs>
+  importBatch?: boolean | Prisma.Settlement$importBatchArgs<ExtArgs>
 }, ExtArgs["result"]["settlement"]>
 
 export type SettlementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -863,7 +1224,10 @@ export type SettlementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   tdsAmount?: boolean
   settlementDate?: boolean
   referenceNumber?: boolean
+  importBatchId?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  partner?: boolean | Prisma.Settlement$partnerArgs<ExtArgs>
+  importBatch?: boolean | Prisma.Settlement$importBatchArgs<ExtArgs>
 }, ExtArgs["result"]["settlement"]>
 
 export type SettlementSelectScalar = {
@@ -878,26 +1242,35 @@ export type SettlementSelectScalar = {
   tdsAmount?: boolean
   settlementDate?: boolean
   referenceNumber?: boolean
+  importBatchId?: boolean
 }
 
-export type SettlementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "partnerId" | "grossAmount" | "amountReceived" | "commissionAmount" | "otherFeeAmount" | "tcsAmount" | "tdsAmount" | "settlementDate" | "referenceNumber", ExtArgs["result"]["settlement"]>
+export type SettlementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "partnerId" | "grossAmount" | "amountReceived" | "commissionAmount" | "otherFeeAmount" | "tcsAmount" | "tdsAmount" | "settlementDate" | "referenceNumber" | "importBatchId", ExtArgs["result"]["settlement"]>
 export type SettlementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  partner?: boolean | Prisma.Settlement$partnerArgs<ExtArgs>
   matchSettlements?: boolean | Prisma.Settlement$matchSettlementsArgs<ExtArgs>
+  importBatch?: boolean | Prisma.Settlement$importBatchArgs<ExtArgs>
   _count?: boolean | Prisma.SettlementCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SettlementIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  partner?: boolean | Prisma.Settlement$partnerArgs<ExtArgs>
+  importBatch?: boolean | Prisma.Settlement$importBatchArgs<ExtArgs>
 }
 export type SettlementIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  partner?: boolean | Prisma.Settlement$partnerArgs<ExtArgs>
+  importBatch?: boolean | Prisma.Settlement$importBatchArgs<ExtArgs>
 }
 
 export type $SettlementPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Settlement"
   objects: {
     order: Prisma.$OrderPayload<ExtArgs>
+    partner: Prisma.$PartnerPayload<ExtArgs> | null
     matchSettlements: Prisma.$MatchSettlementPayload<ExtArgs>[]
+    importBatch: Prisma.$ImportBatchPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -911,6 +1284,7 @@ export type $SettlementPayload<ExtArgs extends runtime.Types.Extensions.Internal
     tdsAmount: runtime.Decimal
     settlementDate: Date
     referenceNumber: string | null
+    importBatchId: string | null
   }, ExtArgs["result"]["settlement"]>
   composites: {}
 }
@@ -1306,7 +1680,9 @@ readonly fields: SettlementFieldRefs;
 export interface Prisma__SettlementClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   order<T extends Prisma.OrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderDefaultArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  partner<T extends Prisma.Settlement$partnerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$partnerArgs<ExtArgs>>): Prisma.Prisma__PartnerClient<runtime.Types.Result.GetResult<Prisma.$PartnerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   matchSettlements<T extends Prisma.Settlement$matchSettlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$matchSettlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MatchSettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  importBatch<T extends Prisma.Settlement$importBatchArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$importBatchArgs<ExtArgs>>): Prisma.Prisma__ImportBatchClient<runtime.Types.Result.GetResult<Prisma.$ImportBatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1347,6 +1723,7 @@ export interface SettlementFieldRefs {
   readonly tdsAmount: Prisma.FieldRef<"Settlement", 'Decimal'>
   readonly settlementDate: Prisma.FieldRef<"Settlement", 'DateTime'>
   readonly referenceNumber: Prisma.FieldRef<"Settlement", 'String'>
+  readonly importBatchId: Prisma.FieldRef<"Settlement", 'String'>
 }
     
 
@@ -1748,6 +2125,25 @@ export type SettlementDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
+ * Settlement.partner
+ */
+export type Settlement$partnerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Partner
+   */
+  select?: Prisma.PartnerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Partner
+   */
+  omit?: Prisma.PartnerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartnerInclude<ExtArgs> | null
+  where?: Prisma.PartnerWhereInput
+}
+
+/**
  * Settlement.matchSettlements
  */
 export type Settlement$matchSettlementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1769,6 +2165,25 @@ export type Settlement$matchSettlementsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.MatchSettlementScalarFieldEnum | Prisma.MatchSettlementScalarFieldEnum[]
+}
+
+/**
+ * Settlement.importBatch
+ */
+export type Settlement$importBatchArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ImportBatch
+   */
+  select?: Prisma.ImportBatchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ImportBatch
+   */
+  omit?: Prisma.ImportBatchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImportBatchInclude<ExtArgs> | null
+  where?: Prisma.ImportBatchWhereInput
 }
 
 /**

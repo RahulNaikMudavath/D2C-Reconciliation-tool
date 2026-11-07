@@ -68,6 +68,7 @@ model Partner {
   channelRateCards ChannelRateCard[]
   claims           Claim[]
   orders           Order[]
+  settlements      Settlement[]
 }
 
 model ImportBatch {
@@ -83,6 +84,7 @@ model ImportBatch {
 
   sourceRecords SourceRecord[]
   mappings      ColumnMapping[]
+  settlements   Settlement[]
 
   @@index([importType, status])
 }
@@ -174,10 +176,16 @@ model Settlement {
   referenceNumber String?
 
   order            Order             @relation(fields: [orderId], references: [id])
+  partner          Partner?          @relation(fields: [partnerId], references: [id])
   matchSettlements MatchSettlement[]
 
+  importBatchId String?
+  importBatch   ImportBatch? @relation(fields: [importBatchId], references: [id])
+
+  @@unique([partnerId, referenceNumber])
   @@index([orderId])
   @@index([settlementDate])
+  @@index([importBatchId])
 }
 
 model RateCard {
@@ -264,9 +272,10 @@ model ReconciliationMatch {
   freightChargeId String?
   returnRecordId  String?
   status          ReconciliationStatus
-  expectedAmount  Decimal              @db.Decimal(14, 2)
-  actualAmount    Decimal?             @db.Decimal(14, 2)
-  difference      Decimal              @db.Decimal(14, 2)
+  expectedAmount Decimal? @db.Decimal(14, 2)
+  actualAmount   Decimal? @db.Decimal(14, 2)
+  difference     Decimal? @db.Decimal(14, 2)
+  reviewReason String?
   createdAt       DateTime             @default(now())
 
   run           ReconciliationRun @relation(fields: [runId], references: [id])

@@ -178,6 +178,7 @@ export type PartnerWhereInput = {
   channelRateCards?: Prisma.ChannelRateCardListRelationFilter
   claims?: Prisma.ClaimListRelationFilter
   orders?: Prisma.OrderListRelationFilter
+  settlements?: Prisma.SettlementListRelationFilter
 }
 
 export type PartnerOrderByWithRelationInput = {
@@ -189,6 +190,7 @@ export type PartnerOrderByWithRelationInput = {
   channelRateCards?: Prisma.ChannelRateCardOrderByRelationAggregateInput
   claims?: Prisma.ClaimOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
+  settlements?: Prisma.SettlementOrderByRelationAggregateInput
 }
 
 export type PartnerWhereUniqueInput = Prisma.AtLeast<{
@@ -203,6 +205,7 @@ export type PartnerWhereUniqueInput = Prisma.AtLeast<{
   channelRateCards?: Prisma.ChannelRateCardListRelationFilter
   claims?: Prisma.ClaimListRelationFilter
   orders?: Prisma.OrderListRelationFilter
+  settlements?: Prisma.SettlementListRelationFilter
 }, "id">
 
 export type PartnerOrderByWithAggregationInput = {
@@ -234,6 +237,7 @@ export type PartnerCreateInput = {
   channelRateCards?: Prisma.ChannelRateCardCreateNestedManyWithoutPartnerInput
   claims?: Prisma.ClaimCreateNestedManyWithoutPartnerInput
   orders?: Prisma.OrderCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerUncheckedCreateInput = {
@@ -245,6 +249,7 @@ export type PartnerUncheckedCreateInput = {
   channelRateCards?: Prisma.ChannelRateCardUncheckedCreateNestedManyWithoutPartnerInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutPartnerInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerUpdateInput = {
@@ -256,6 +261,7 @@ export type PartnerUpdateInput = {
   channelRateCards?: Prisma.ChannelRateCardUpdateManyWithoutPartnerNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutPartnerNestedInput
   orders?: Prisma.OrderUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutPartnerNestedInput
 }
 
 export type PartnerUncheckedUpdateInput = {
@@ -267,6 +273,7 @@ export type PartnerUncheckedUpdateInput = {
   channelRateCards?: Prisma.ChannelRateCardUncheckedUpdateManyWithoutPartnerNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutPartnerNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutPartnerNestedInput
 }
 
 export type PartnerCreateManyInput = {
@@ -337,6 +344,22 @@ export type PartnerUpdateOneWithoutOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerUpdateToOneWithWhereWithoutOrdersInput, Prisma.PartnerUpdateWithoutOrdersInput>, Prisma.PartnerUncheckedUpdateWithoutOrdersInput>
 }
 
+export type PartnerCreateNestedOneWithoutSettlementsInput = {
+  create?: Prisma.XOR<Prisma.PartnerCreateWithoutSettlementsInput, Prisma.PartnerUncheckedCreateWithoutSettlementsInput>
+  connectOrCreate?: Prisma.PartnerCreateOrConnectWithoutSettlementsInput
+  connect?: Prisma.PartnerWhereUniqueInput
+}
+
+export type PartnerUpdateOneWithoutSettlementsNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerCreateWithoutSettlementsInput, Prisma.PartnerUncheckedCreateWithoutSettlementsInput>
+  connectOrCreate?: Prisma.PartnerCreateOrConnectWithoutSettlementsInput
+  upsert?: Prisma.PartnerUpsertWithoutSettlementsInput
+  disconnect?: Prisma.PartnerWhereInput | boolean
+  delete?: Prisma.PartnerWhereInput | boolean
+  connect?: Prisma.PartnerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerUpdateToOneWithWhereWithoutSettlementsInput, Prisma.PartnerUpdateWithoutSettlementsInput>, Prisma.PartnerUncheckedUpdateWithoutSettlementsInput>
+}
+
 export type PartnerCreateNestedOneWithoutRateCardsInput = {
   create?: Prisma.XOR<Prisma.PartnerCreateWithoutRateCardsInput, Prisma.PartnerUncheckedCreateWithoutRateCardsInput>
   connectOrCreate?: Prisma.PartnerCreateOrConnectWithoutRateCardsInput
@@ -387,6 +410,7 @@ export type PartnerCreateWithoutOrdersInput = {
   rateCards?: Prisma.RateCardCreateNestedManyWithoutPartnerInput
   channelRateCards?: Prisma.ChannelRateCardCreateNestedManyWithoutPartnerInput
   claims?: Prisma.ClaimCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerUncheckedCreateWithoutOrdersInput = {
@@ -397,6 +421,7 @@ export type PartnerUncheckedCreateWithoutOrdersInput = {
   rateCards?: Prisma.RateCardUncheckedCreateNestedManyWithoutPartnerInput
   channelRateCards?: Prisma.ChannelRateCardUncheckedCreateNestedManyWithoutPartnerInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerCreateOrConnectWithoutOrdersInput = {
@@ -423,6 +448,7 @@ export type PartnerUpdateWithoutOrdersInput = {
   rateCards?: Prisma.RateCardUpdateManyWithoutPartnerNestedInput
   channelRateCards?: Prisma.ChannelRateCardUpdateManyWithoutPartnerNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutPartnerNestedInput
 }
 
 export type PartnerUncheckedUpdateWithoutOrdersInput = {
@@ -433,6 +459,67 @@ export type PartnerUncheckedUpdateWithoutOrdersInput = {
   rateCards?: Prisma.RateCardUncheckedUpdateManyWithoutPartnerNestedInput
   channelRateCards?: Prisma.ChannelRateCardUncheckedUpdateManyWithoutPartnerNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutPartnerNestedInput
+}
+
+export type PartnerCreateWithoutSettlementsInput = {
+  id?: string
+  name: string
+  type: string
+  createdAt?: Date | string
+  rateCards?: Prisma.RateCardCreateNestedManyWithoutPartnerInput
+  channelRateCards?: Prisma.ChannelRateCardCreateNestedManyWithoutPartnerInput
+  claims?: Prisma.ClaimCreateNestedManyWithoutPartnerInput
+  orders?: Prisma.OrderCreateNestedManyWithoutPartnerInput
+}
+
+export type PartnerUncheckedCreateWithoutSettlementsInput = {
+  id?: string
+  name: string
+  type: string
+  createdAt?: Date | string
+  rateCards?: Prisma.RateCardUncheckedCreateNestedManyWithoutPartnerInput
+  channelRateCards?: Prisma.ChannelRateCardUncheckedCreateNestedManyWithoutPartnerInput
+  claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutPartnerInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutPartnerInput
+}
+
+export type PartnerCreateOrConnectWithoutSettlementsInput = {
+  where: Prisma.PartnerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartnerCreateWithoutSettlementsInput, Prisma.PartnerUncheckedCreateWithoutSettlementsInput>
+}
+
+export type PartnerUpsertWithoutSettlementsInput = {
+  update: Prisma.XOR<Prisma.PartnerUpdateWithoutSettlementsInput, Prisma.PartnerUncheckedUpdateWithoutSettlementsInput>
+  create: Prisma.XOR<Prisma.PartnerCreateWithoutSettlementsInput, Prisma.PartnerUncheckedCreateWithoutSettlementsInput>
+  where?: Prisma.PartnerWhereInput
+}
+
+export type PartnerUpdateToOneWithWhereWithoutSettlementsInput = {
+  where?: Prisma.PartnerWhereInput
+  data: Prisma.XOR<Prisma.PartnerUpdateWithoutSettlementsInput, Prisma.PartnerUncheckedUpdateWithoutSettlementsInput>
+}
+
+export type PartnerUpdateWithoutSettlementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rateCards?: Prisma.RateCardUpdateManyWithoutPartnerNestedInput
+  channelRateCards?: Prisma.ChannelRateCardUpdateManyWithoutPartnerNestedInput
+  claims?: Prisma.ClaimUpdateManyWithoutPartnerNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutPartnerNestedInput
+}
+
+export type PartnerUncheckedUpdateWithoutSettlementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rateCards?: Prisma.RateCardUncheckedUpdateManyWithoutPartnerNestedInput
+  channelRateCards?: Prisma.ChannelRateCardUncheckedUpdateManyWithoutPartnerNestedInput
+  claims?: Prisma.ClaimUncheckedUpdateManyWithoutPartnerNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutPartnerNestedInput
 }
 
 export type PartnerCreateWithoutRateCardsInput = {
@@ -443,6 +530,7 @@ export type PartnerCreateWithoutRateCardsInput = {
   channelRateCards?: Prisma.ChannelRateCardCreateNestedManyWithoutPartnerInput
   claims?: Prisma.ClaimCreateNestedManyWithoutPartnerInput
   orders?: Prisma.OrderCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerUncheckedCreateWithoutRateCardsInput = {
@@ -453,6 +541,7 @@ export type PartnerUncheckedCreateWithoutRateCardsInput = {
   channelRateCards?: Prisma.ChannelRateCardUncheckedCreateNestedManyWithoutPartnerInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutPartnerInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerCreateOrConnectWithoutRateCardsInput = {
@@ -479,6 +568,7 @@ export type PartnerUpdateWithoutRateCardsInput = {
   channelRateCards?: Prisma.ChannelRateCardUpdateManyWithoutPartnerNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutPartnerNestedInput
   orders?: Prisma.OrderUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutPartnerNestedInput
 }
 
 export type PartnerUncheckedUpdateWithoutRateCardsInput = {
@@ -489,6 +579,7 @@ export type PartnerUncheckedUpdateWithoutRateCardsInput = {
   channelRateCards?: Prisma.ChannelRateCardUncheckedUpdateManyWithoutPartnerNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutPartnerNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutPartnerNestedInput
 }
 
 export type PartnerCreateWithoutChannelRateCardsInput = {
@@ -499,6 +590,7 @@ export type PartnerCreateWithoutChannelRateCardsInput = {
   rateCards?: Prisma.RateCardCreateNestedManyWithoutPartnerInput
   claims?: Prisma.ClaimCreateNestedManyWithoutPartnerInput
   orders?: Prisma.OrderCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerUncheckedCreateWithoutChannelRateCardsInput = {
@@ -509,6 +601,7 @@ export type PartnerUncheckedCreateWithoutChannelRateCardsInput = {
   rateCards?: Prisma.RateCardUncheckedCreateNestedManyWithoutPartnerInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutPartnerInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerCreateOrConnectWithoutChannelRateCardsInput = {
@@ -535,6 +628,7 @@ export type PartnerUpdateWithoutChannelRateCardsInput = {
   rateCards?: Prisma.RateCardUpdateManyWithoutPartnerNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutPartnerNestedInput
   orders?: Prisma.OrderUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutPartnerNestedInput
 }
 
 export type PartnerUncheckedUpdateWithoutChannelRateCardsInput = {
@@ -545,6 +639,7 @@ export type PartnerUncheckedUpdateWithoutChannelRateCardsInput = {
   rateCards?: Prisma.RateCardUncheckedUpdateManyWithoutPartnerNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutPartnerNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutPartnerNestedInput
 }
 
 export type PartnerCreateWithoutClaimsInput = {
@@ -555,6 +650,7 @@ export type PartnerCreateWithoutClaimsInput = {
   rateCards?: Prisma.RateCardCreateNestedManyWithoutPartnerInput
   channelRateCards?: Prisma.ChannelRateCardCreateNestedManyWithoutPartnerInput
   orders?: Prisma.OrderCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerUncheckedCreateWithoutClaimsInput = {
@@ -565,6 +661,7 @@ export type PartnerUncheckedCreateWithoutClaimsInput = {
   rateCards?: Prisma.RateCardUncheckedCreateNestedManyWithoutPartnerInput
   channelRateCards?: Prisma.ChannelRateCardUncheckedCreateNestedManyWithoutPartnerInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutPartnerInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutPartnerInput
 }
 
 export type PartnerCreateOrConnectWithoutClaimsInput = {
@@ -591,6 +688,7 @@ export type PartnerUpdateWithoutClaimsInput = {
   rateCards?: Prisma.RateCardUpdateManyWithoutPartnerNestedInput
   channelRateCards?: Prisma.ChannelRateCardUpdateManyWithoutPartnerNestedInput
   orders?: Prisma.OrderUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutPartnerNestedInput
 }
 
 export type PartnerUncheckedUpdateWithoutClaimsInput = {
@@ -601,6 +699,7 @@ export type PartnerUncheckedUpdateWithoutClaimsInput = {
   rateCards?: Prisma.RateCardUncheckedUpdateManyWithoutPartnerNestedInput
   channelRateCards?: Prisma.ChannelRateCardUncheckedUpdateManyWithoutPartnerNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutPartnerNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutPartnerNestedInput
 }
 
 
@@ -613,6 +712,7 @@ export type PartnerCountOutputType = {
   channelRateCards: number
   claims: number
   orders: number
+  settlements: number
 }
 
 export type PartnerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -620,6 +720,7 @@ export type PartnerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   channelRateCards?: boolean | PartnerCountOutputTypeCountChannelRateCardsArgs
   claims?: boolean | PartnerCountOutputTypeCountClaimsArgs
   orders?: boolean | PartnerCountOutputTypeCountOrdersArgs
+  settlements?: boolean | PartnerCountOutputTypeCountSettlementsArgs
 }
 
 /**
@@ -660,6 +761,13 @@ export type PartnerCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.
   where?: Prisma.OrderWhereInput
 }
 
+/**
+ * PartnerCountOutputType without action
+ */
+export type PartnerCountOutputTypeCountSettlementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SettlementWhereInput
+}
+
 
 export type PartnerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -670,6 +778,7 @@ export type PartnerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   channelRateCards?: boolean | Prisma.Partner$channelRateCardsArgs<ExtArgs>
   claims?: boolean | Prisma.Partner$claimsArgs<ExtArgs>
   orders?: boolean | Prisma.Partner$ordersArgs<ExtArgs>
+  settlements?: boolean | Prisma.Partner$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.PartnerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partner"]>
 
@@ -700,6 +809,7 @@ export type PartnerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   channelRateCards?: boolean | Prisma.Partner$channelRateCardsArgs<ExtArgs>
   claims?: boolean | Prisma.Partner$claimsArgs<ExtArgs>
   orders?: boolean | Prisma.Partner$ordersArgs<ExtArgs>
+  settlements?: boolean | Prisma.Partner$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.PartnerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PartnerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -712,6 +822,7 @@ export type $PartnerPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     channelRateCards: Prisma.$ChannelRateCardPayload<ExtArgs>[]
     claims: Prisma.$ClaimPayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
+    settlements: Prisma.$SettlementPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1116,6 +1227,7 @@ export interface Prisma__PartnerClient<T, Null = never, ExtArgs extends runtime.
   channelRateCards<T extends Prisma.Partner$channelRateCardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Partner$channelRateCardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChannelRateCardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   claims<T extends Prisma.Partner$claimsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Partner$claimsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClaimPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.Partner$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Partner$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  settlements<T extends Prisma.Partner$settlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Partner$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1635,6 +1747,30 @@ export type Partner$ordersArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * Partner.settlements
+ */
+export type Partner$settlementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Settlement
+   */
+  select?: Prisma.SettlementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Settlement
+   */
+  omit?: Prisma.SettlementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettlementInclude<ExtArgs> | null
+  where?: Prisma.SettlementWhereInput
+  orderBy?: Prisma.SettlementOrderByWithRelationInput | Prisma.SettlementOrderByWithRelationInput[]
+  cursor?: Prisma.SettlementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SettlementScalarFieldEnum | Prisma.SettlementScalarFieldEnum[]
 }
 
 /**

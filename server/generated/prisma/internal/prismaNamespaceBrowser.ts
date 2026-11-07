@@ -176,7 +176,8 @@ export const SettlementScalarFieldEnum = {
   tcsAmount: 'tcsAmount',
   tdsAmount: 'tdsAmount',
   settlementDate: 'settlementDate',
-  referenceNumber: 'referenceNumber'
+  referenceNumber: 'referenceNumber',
+  importBatchId: 'importBatchId'
 } as const
 
 export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
@@ -256,6 +257,7 @@ export const ReconciliationMatchScalarFieldEnum = {
   expectedAmount: 'expectedAmount',
   actualAmount: 'actualAmount',
   difference: 'difference',
+  reviewReason: 'reviewReason',
   createdAt: 'createdAt'
 } as const
 

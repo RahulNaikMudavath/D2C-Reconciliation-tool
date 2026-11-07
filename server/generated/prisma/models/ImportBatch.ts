@@ -235,6 +235,7 @@ export type ImportBatchWhereInput = {
   uploadedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   sourceRecords?: Prisma.SourceRecordListRelationFilter
   mappings?: Prisma.ColumnMappingListRelationFilter
+  settlements?: Prisma.SettlementListRelationFilter
 }
 
 export type ImportBatchOrderByWithRelationInput = {
@@ -248,6 +249,7 @@ export type ImportBatchOrderByWithRelationInput = {
   uploadedBy?: Prisma.UserOrderByWithRelationInput
   sourceRecords?: Prisma.SourceRecordOrderByRelationAggregateInput
   mappings?: Prisma.ColumnMappingOrderByRelationAggregateInput
+  settlements?: Prisma.SettlementOrderByRelationAggregateInput
 }
 
 export type ImportBatchWhereUniqueInput = Prisma.AtLeast<{
@@ -264,6 +266,7 @@ export type ImportBatchWhereUniqueInput = Prisma.AtLeast<{
   uploadedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   sourceRecords?: Prisma.SourceRecordListRelationFilter
   mappings?: Prisma.ColumnMappingListRelationFilter
+  settlements?: Prisma.SettlementListRelationFilter
 }, "id">
 
 export type ImportBatchOrderByWithAggregationInput = {
@@ -304,6 +307,7 @@ export type ImportBatchCreateInput = {
   uploadedBy: Prisma.UserCreateNestedOneWithoutImportsInput
   sourceRecords?: Prisma.SourceRecordCreateNestedManyWithoutImportBatchInput
   mappings?: Prisma.ColumnMappingCreateNestedManyWithoutImportBatchInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutImportBatchInput
 }
 
 export type ImportBatchUncheckedCreateInput = {
@@ -316,6 +320,7 @@ export type ImportBatchUncheckedCreateInput = {
   uploadedById: string
   sourceRecords?: Prisma.SourceRecordUncheckedCreateNestedManyWithoutImportBatchInput
   mappings?: Prisma.ColumnMappingUncheckedCreateNestedManyWithoutImportBatchInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutImportBatchInput
 }
 
 export type ImportBatchUpdateInput = {
@@ -328,6 +333,7 @@ export type ImportBatchUpdateInput = {
   uploadedBy?: Prisma.UserUpdateOneRequiredWithoutImportsNestedInput
   sourceRecords?: Prisma.SourceRecordUpdateManyWithoutImportBatchNestedInput
   mappings?: Prisma.ColumnMappingUpdateManyWithoutImportBatchNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutImportBatchNestedInput
 }
 
 export type ImportBatchUncheckedUpdateInput = {
@@ -340,6 +346,7 @@ export type ImportBatchUncheckedUpdateInput = {
   uploadedById?: Prisma.StringFieldUpdateOperationsInput | string
   sourceRecords?: Prisma.SourceRecordUncheckedUpdateManyWithoutImportBatchNestedInput
   mappings?: Prisma.ColumnMappingUncheckedUpdateManyWithoutImportBatchNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutImportBatchNestedInput
 }
 
 export type ImportBatchCreateManyInput = {
@@ -422,6 +429,11 @@ export type ImportBatchSumOrderByAggregateInput = {
 export type ImportBatchScalarRelationFilter = {
   is?: Prisma.ImportBatchWhereInput
   isNot?: Prisma.ImportBatchWhereInput
+}
+
+export type ImportBatchNullableScalarRelationFilter = {
+  is?: Prisma.ImportBatchWhereInput | null
+  isNot?: Prisma.ImportBatchWhereInput | null
 }
 
 export type ImportBatchCreateNestedManyWithoutUploadedByInput = {
@@ -510,6 +522,22 @@ export type ImportBatchUpdateOneRequiredWithoutMappingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ImportBatchUpdateToOneWithWhereWithoutMappingsInput, Prisma.ImportBatchUpdateWithoutMappingsInput>, Prisma.ImportBatchUncheckedUpdateWithoutMappingsInput>
 }
 
+export type ImportBatchCreateNestedOneWithoutSettlementsInput = {
+  create?: Prisma.XOR<Prisma.ImportBatchCreateWithoutSettlementsInput, Prisma.ImportBatchUncheckedCreateWithoutSettlementsInput>
+  connectOrCreate?: Prisma.ImportBatchCreateOrConnectWithoutSettlementsInput
+  connect?: Prisma.ImportBatchWhereUniqueInput
+}
+
+export type ImportBatchUpdateOneWithoutSettlementsNestedInput = {
+  create?: Prisma.XOR<Prisma.ImportBatchCreateWithoutSettlementsInput, Prisma.ImportBatchUncheckedCreateWithoutSettlementsInput>
+  connectOrCreate?: Prisma.ImportBatchCreateOrConnectWithoutSettlementsInput
+  upsert?: Prisma.ImportBatchUpsertWithoutSettlementsInput
+  disconnect?: Prisma.ImportBatchWhereInput | boolean
+  delete?: Prisma.ImportBatchWhereInput | boolean
+  connect?: Prisma.ImportBatchWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ImportBatchUpdateToOneWithWhereWithoutSettlementsInput, Prisma.ImportBatchUpdateWithoutSettlementsInput>, Prisma.ImportBatchUncheckedUpdateWithoutSettlementsInput>
+}
+
 export type ImportBatchCreateWithoutUploadedByInput = {
   id?: string
   fileName: string
@@ -519,6 +547,7 @@ export type ImportBatchCreateWithoutUploadedByInput = {
   uploadedAt?: Date | string
   sourceRecords?: Prisma.SourceRecordCreateNestedManyWithoutImportBatchInput
   mappings?: Prisma.ColumnMappingCreateNestedManyWithoutImportBatchInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutImportBatchInput
 }
 
 export type ImportBatchUncheckedCreateWithoutUploadedByInput = {
@@ -530,6 +559,7 @@ export type ImportBatchUncheckedCreateWithoutUploadedByInput = {
   uploadedAt?: Date | string
   sourceRecords?: Prisma.SourceRecordUncheckedCreateNestedManyWithoutImportBatchInput
   mappings?: Prisma.ColumnMappingUncheckedCreateNestedManyWithoutImportBatchInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutImportBatchInput
 }
 
 export type ImportBatchCreateOrConnectWithoutUploadedByInput = {
@@ -580,6 +610,7 @@ export type ImportBatchCreateWithoutSourceRecordsInput = {
   uploadedAt?: Date | string
   uploadedBy: Prisma.UserCreateNestedOneWithoutImportsInput
   mappings?: Prisma.ColumnMappingCreateNestedManyWithoutImportBatchInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutImportBatchInput
 }
 
 export type ImportBatchUncheckedCreateWithoutSourceRecordsInput = {
@@ -591,6 +622,7 @@ export type ImportBatchUncheckedCreateWithoutSourceRecordsInput = {
   uploadedAt?: Date | string
   uploadedById: string
   mappings?: Prisma.ColumnMappingUncheckedCreateNestedManyWithoutImportBatchInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutImportBatchInput
 }
 
 export type ImportBatchCreateOrConnectWithoutSourceRecordsInput = {
@@ -618,6 +650,7 @@ export type ImportBatchUpdateWithoutSourceRecordsInput = {
   uploadedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedBy?: Prisma.UserUpdateOneRequiredWithoutImportsNestedInput
   mappings?: Prisma.ColumnMappingUpdateManyWithoutImportBatchNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutImportBatchNestedInput
 }
 
 export type ImportBatchUncheckedUpdateWithoutSourceRecordsInput = {
@@ -629,6 +662,7 @@ export type ImportBatchUncheckedUpdateWithoutSourceRecordsInput = {
   uploadedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedById?: Prisma.StringFieldUpdateOperationsInput | string
   mappings?: Prisma.ColumnMappingUncheckedUpdateManyWithoutImportBatchNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutImportBatchNestedInput
 }
 
 export type ImportBatchCreateWithoutMappingsInput = {
@@ -640,6 +674,7 @@ export type ImportBatchCreateWithoutMappingsInput = {
   uploadedAt?: Date | string
   uploadedBy: Prisma.UserCreateNestedOneWithoutImportsInput
   sourceRecords?: Prisma.SourceRecordCreateNestedManyWithoutImportBatchInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutImportBatchInput
 }
 
 export type ImportBatchUncheckedCreateWithoutMappingsInput = {
@@ -651,6 +686,7 @@ export type ImportBatchUncheckedCreateWithoutMappingsInput = {
   uploadedAt?: Date | string
   uploadedById: string
   sourceRecords?: Prisma.SourceRecordUncheckedCreateNestedManyWithoutImportBatchInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutImportBatchInput
 }
 
 export type ImportBatchCreateOrConnectWithoutMappingsInput = {
@@ -678,6 +714,7 @@ export type ImportBatchUpdateWithoutMappingsInput = {
   uploadedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedBy?: Prisma.UserUpdateOneRequiredWithoutImportsNestedInput
   sourceRecords?: Prisma.SourceRecordUpdateManyWithoutImportBatchNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutImportBatchNestedInput
 }
 
 export type ImportBatchUncheckedUpdateWithoutMappingsInput = {
@@ -689,6 +726,71 @@ export type ImportBatchUncheckedUpdateWithoutMappingsInput = {
   uploadedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedById?: Prisma.StringFieldUpdateOperationsInput | string
   sourceRecords?: Prisma.SourceRecordUncheckedUpdateManyWithoutImportBatchNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutImportBatchNestedInput
+}
+
+export type ImportBatchCreateWithoutSettlementsInput = {
+  id?: string
+  fileName: string
+  importType: $Enums.ImportType
+  status?: $Enums.ImportStatus
+  rowCount?: number
+  uploadedAt?: Date | string
+  uploadedBy: Prisma.UserCreateNestedOneWithoutImportsInput
+  sourceRecords?: Prisma.SourceRecordCreateNestedManyWithoutImportBatchInput
+  mappings?: Prisma.ColumnMappingCreateNestedManyWithoutImportBatchInput
+}
+
+export type ImportBatchUncheckedCreateWithoutSettlementsInput = {
+  id?: string
+  fileName: string
+  importType: $Enums.ImportType
+  status?: $Enums.ImportStatus
+  rowCount?: number
+  uploadedAt?: Date | string
+  uploadedById: string
+  sourceRecords?: Prisma.SourceRecordUncheckedCreateNestedManyWithoutImportBatchInput
+  mappings?: Prisma.ColumnMappingUncheckedCreateNestedManyWithoutImportBatchInput
+}
+
+export type ImportBatchCreateOrConnectWithoutSettlementsInput = {
+  where: Prisma.ImportBatchWhereUniqueInput
+  create: Prisma.XOR<Prisma.ImportBatchCreateWithoutSettlementsInput, Prisma.ImportBatchUncheckedCreateWithoutSettlementsInput>
+}
+
+export type ImportBatchUpsertWithoutSettlementsInput = {
+  update: Prisma.XOR<Prisma.ImportBatchUpdateWithoutSettlementsInput, Prisma.ImportBatchUncheckedUpdateWithoutSettlementsInput>
+  create: Prisma.XOR<Prisma.ImportBatchCreateWithoutSettlementsInput, Prisma.ImportBatchUncheckedCreateWithoutSettlementsInput>
+  where?: Prisma.ImportBatchWhereInput
+}
+
+export type ImportBatchUpdateToOneWithWhereWithoutSettlementsInput = {
+  where?: Prisma.ImportBatchWhereInput
+  data: Prisma.XOR<Prisma.ImportBatchUpdateWithoutSettlementsInput, Prisma.ImportBatchUncheckedUpdateWithoutSettlementsInput>
+}
+
+export type ImportBatchUpdateWithoutSettlementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  importType?: Prisma.EnumImportTypeFieldUpdateOperationsInput | $Enums.ImportType
+  status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  rowCount?: Prisma.IntFieldUpdateOperationsInput | number
+  uploadedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uploadedBy?: Prisma.UserUpdateOneRequiredWithoutImportsNestedInput
+  sourceRecords?: Prisma.SourceRecordUpdateManyWithoutImportBatchNestedInput
+  mappings?: Prisma.ColumnMappingUpdateManyWithoutImportBatchNestedInput
+}
+
+export type ImportBatchUncheckedUpdateWithoutSettlementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  importType?: Prisma.EnumImportTypeFieldUpdateOperationsInput | $Enums.ImportType
+  status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  rowCount?: Prisma.IntFieldUpdateOperationsInput | number
+  uploadedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uploadedById?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceRecords?: Prisma.SourceRecordUncheckedUpdateManyWithoutImportBatchNestedInput
+  mappings?: Prisma.ColumnMappingUncheckedUpdateManyWithoutImportBatchNestedInput
 }
 
 export type ImportBatchCreateManyUploadedByInput = {
@@ -709,6 +811,7 @@ export type ImportBatchUpdateWithoutUploadedByInput = {
   uploadedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sourceRecords?: Prisma.SourceRecordUpdateManyWithoutImportBatchNestedInput
   mappings?: Prisma.ColumnMappingUpdateManyWithoutImportBatchNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutImportBatchNestedInput
 }
 
 export type ImportBatchUncheckedUpdateWithoutUploadedByInput = {
@@ -720,6 +823,7 @@ export type ImportBatchUncheckedUpdateWithoutUploadedByInput = {
   uploadedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sourceRecords?: Prisma.SourceRecordUncheckedUpdateManyWithoutImportBatchNestedInput
   mappings?: Prisma.ColumnMappingUncheckedUpdateManyWithoutImportBatchNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutImportBatchNestedInput
 }
 
 export type ImportBatchUncheckedUpdateManyWithoutUploadedByInput = {
@@ -739,11 +843,13 @@ export type ImportBatchUncheckedUpdateManyWithoutUploadedByInput = {
 export type ImportBatchCountOutputType = {
   sourceRecords: number
   mappings: number
+  settlements: number
 }
 
 export type ImportBatchCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sourceRecords?: boolean | ImportBatchCountOutputTypeCountSourceRecordsArgs
   mappings?: boolean | ImportBatchCountOutputTypeCountMappingsArgs
+  settlements?: boolean | ImportBatchCountOutputTypeCountSettlementsArgs
 }
 
 /**
@@ -770,6 +876,13 @@ export type ImportBatchCountOutputTypeCountMappingsArgs<ExtArgs extends runtime.
   where?: Prisma.ColumnMappingWhereInput
 }
 
+/**
+ * ImportBatchCountOutputType without action
+ */
+export type ImportBatchCountOutputTypeCountSettlementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SettlementWhereInput
+}
+
 
 export type ImportBatchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -782,6 +895,7 @@ export type ImportBatchSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   uploadedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   sourceRecords?: boolean | Prisma.ImportBatch$sourceRecordsArgs<ExtArgs>
   mappings?: boolean | Prisma.ImportBatch$mappingsArgs<ExtArgs>
+  settlements?: boolean | Prisma.ImportBatch$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.ImportBatchCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["importBatch"]>
 
@@ -822,6 +936,7 @@ export type ImportBatchInclude<ExtArgs extends runtime.Types.Extensions.Internal
   uploadedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   sourceRecords?: boolean | Prisma.ImportBatch$sourceRecordsArgs<ExtArgs>
   mappings?: boolean | Prisma.ImportBatch$mappingsArgs<ExtArgs>
+  settlements?: boolean | Prisma.ImportBatch$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.ImportBatchCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ImportBatchIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -837,6 +952,7 @@ export type $ImportBatchPayload<ExtArgs extends runtime.Types.Extensions.Interna
     uploadedBy: Prisma.$UserPayload<ExtArgs>
     sourceRecords: Prisma.$SourceRecordPayload<ExtArgs>[]
     mappings: Prisma.$ColumnMappingPayload<ExtArgs>[]
+    settlements: Prisma.$SettlementPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1243,6 +1359,7 @@ export interface Prisma__ImportBatchClient<T, Null = never, ExtArgs extends runt
   uploadedBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   sourceRecords<T extends Prisma.ImportBatch$sourceRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ImportBatch$sourceRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SourceRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   mappings<T extends Prisma.ImportBatch$mappingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ImportBatch$mappingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ColumnMappingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  settlements<T extends Prisma.ImportBatch$settlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ImportBatch$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1725,6 +1842,30 @@ export type ImportBatch$mappingsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.ColumnMappingScalarFieldEnum | Prisma.ColumnMappingScalarFieldEnum[]
+}
+
+/**
+ * ImportBatch.settlements
+ */
+export type ImportBatch$settlementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Settlement
+   */
+  select?: Prisma.SettlementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Settlement
+   */
+  omit?: Prisma.SettlementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettlementInclude<ExtArgs> | null
+  where?: Prisma.SettlementWhereInput
+  orderBy?: Prisma.SettlementOrderByWithRelationInput | Prisma.SettlementOrderByWithRelationInput[]
+  cursor?: Prisma.SettlementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SettlementScalarFieldEnum | Prisma.SettlementScalarFieldEnum[]
 }
 
 /**
