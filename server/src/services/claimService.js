@@ -26,6 +26,21 @@ export async function generateClaims(runId) {
     const createdClaims = [];
 
     for (const match of matches) {
+      // Prevent duplicate active claims for the same order.
+      const existingActiveClaim = await tx.claim.findFirst({
+        where: {
+          status: {
+            in: ["OPEN", "IN_REVIEW"],
+          },
+          match: {
+            orderId: match.orderId,
+          },
+        },
+      });
+
+      if (existingActiveClaim) {
+        continue;
+      }
       if (!match.order.partner) {
         continue;
       }

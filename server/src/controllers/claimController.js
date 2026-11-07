@@ -4,16 +4,28 @@ import { updateClaimStatus } from "../services/claimService.js";
 import { updateClaimStatusSchema } from "../validators/claimValidator.js";
 import { assignClaimOwner } from "../services/claimService.js";
 import { assignClaimSchema } from "../validators/assignClaimValidator.js";
+import prisma from "../config/database.js";
 
 export async function createClaims(req, res, next) {
   try {
-    const { runId } = req.body;
+    let runId = req.body?.runId;
 
-    if (!runId || typeof runId !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "A valid reconciliation runId is required.",
+    // Automatically find the latest completed run if no runId is supplied.
+    if (!runId) {
+      const latestRun = await prisma.reconciliationRun.findFirst({
+        where: { status: "COMPLETED" },
+        orderBy: { completedAt: "desc" },
+        select: { id: true },
       });
+
+      if (!latestRun) {
+        return res.status(400).json({
+          success: false,
+          message: "Please run reconciliation before generating claims.",
+        });
+      }
+
+      runId = latestRun.id;
     }
 
     const result = await generateClaims(runId);
