@@ -1,6 +1,9 @@
 import express from "express";
-import { startReconciliation } from "../controllers/reconciliationController.js";
 import { authenticate, authorizeRoles } from "../middleware/authMiddleware.js";
+import {
+  startReconciliation,
+  getReconciliationResults,
+} from "../controllers/reconciliationController.js";
 
 const router = express.Router();
 
@@ -9,6 +12,12 @@ router.post(
   authenticate,
   authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
   startReconciliation
+);
+router.get(
+  "/",
+  authenticate,
+  authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
+  getReconciliationResults
 );
 
 export default router;
