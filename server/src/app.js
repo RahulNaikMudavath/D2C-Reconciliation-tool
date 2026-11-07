@@ -9,6 +9,9 @@ import reconciliationRoutes from "./routes/reconciliationRoutes.js";
 import claimRoutes from "./routes/claimRoutes.js";
 import auditRoutes from "./routes/auditRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import importRoutes from "./routes/importRoutes.js";
+import importHistoryRoutes from "./routes/importHistoryRoutes.js";
+import importDetailsRoutes from "./routes/importDetailsRoutes.js";
 
 const app = express();
 
@@ -50,6 +53,9 @@ app.use("/api/reconciliation", reconciliationRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/audit-logs", auditRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/imports", importRoutes);
+app.use("/api/import-history", importHistoryRoutes);
+app.use("/api/import-details", importDetailsRoutes);
 
 // Handle unknown routes
 app.use((req, res) => {
