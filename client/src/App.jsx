@@ -2,6 +2,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/auth/Login";
+import Dashboard from "./pages/dashboard/Dashboard";
+import Sidebar from "./components/layout/Sidebar";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -28,15 +30,19 @@ function AppRoutes() {
       />
 
       <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <div className="p-10 text-2xl font-bold">
-              Welcome to ReconcileX Dashboard!
-            </div>
-          </ProtectedRoute>
-        }
-      />
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <div className="flex min-h-screen bg-slate-50">
+        <Sidebar />
+
+        <main className="min-w-0 flex-1 overflow-y-auto p-8">
+          <Dashboard />
+        </main>
+      </div>
+    </ProtectedRoute>
+  }
+/>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
