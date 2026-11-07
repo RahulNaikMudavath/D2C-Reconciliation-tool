@@ -28,25 +28,36 @@ export async function runReconciliation() {
   try {
     // 3. Calculate and prepare a result for each order.
     const results = orders.map((order) => {
-      const actualAmount = order.settlements.reduce(
-        (total, settlement) =>
-          total.plus(toMoney(settlement.amountReceived)),
-        toMoney(0)
-      );
+  // Prefer imported settlements when available.
+  const importedSettlements = order.settlements.filter(
+    (settlement) => settlement.importBatchId !== null
+  );
 
-      const hasSettlements = order.settlements.length > 0;
+  // Otherwise, retain existing seed/demo settlements.
+  const selectedSettlements =
+    importedSettlements.length > 0
+      ? importedSettlements
+      : order.settlements;
 
-      const result = reconcileSettlement({
-        expectedAmount: order.expectedSettlementAmount,
-        actualAmount: hasSettlements
-          ? actualAmount
-          : null,
-        dueDate: order.settlementDueAt,
-      });
+  // Aggregate selected payments using Decimal.js.
+  const actualAmount = selectedSettlements.reduce(
+    (total, settlement) =>
+      total.plus(toMoney(settlement.amountReceived)),
+    toMoney(0)
+  );
+
+  const hasSettlements = selectedSettlements.length > 0;
+
+  const result = reconcileSettlement({
+    expectedAmount: order.expectedSettlementAmount,
+    actualAmount: hasSettlements ? actualAmount : null,
+    dueDate: order.settlementDueAt,
+  });
 
       return {
         order,
         result,
+        settlements: selectedSettlements,
         actualAmount: hasSettlements
           ? formatMoney(actualAmount)
           : null,
@@ -64,12 +75,13 @@ export async function runReconciliation() {
             expectedAmount: item.result.expectedAmount,
             actualAmount: item.actualAmount,
             difference: item.result.difference,
+            reviewReason: item.result.reviewReason,
           },
         });
 
-        if (item.order.settlements.length > 0) {
+        if (item.settlements.length > 0) {
           await tx.matchSettlement.createMany({
-            data: item.order.settlements.map((settlement) => ({
+            data: item.settlements.map((settlement) => ({
               reconciliationMatchId: match.id,
               settlementId: settlement.id,
             })),

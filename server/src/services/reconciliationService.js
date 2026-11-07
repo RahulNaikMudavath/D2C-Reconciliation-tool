@@ -1,4 +1,3 @@
-
 import {
   calculateDifference,
   formatMoney,
@@ -11,6 +10,26 @@ export function reconcileSettlement({
   dueDate,
   currentDate = new Date(),
 }) {
+  // 1. Missing expected amount requires manual review.
+  if (
+    expectedAmount === null ||
+    expectedAmount === undefined ||
+    String(expectedAmount).trim() === ""
+  ) {
+    return {
+      status: "REVIEW_REQUIRED",
+      expectedAmount: null,
+      actualAmount:
+        actualAmount === null || actualAmount === undefined
+          ? null
+          : formatMoney(actualAmount),
+      difference: null,
+      isOverdue: false,
+      requiresClaim: false,
+      reviewReason: "Expected settlement amount is missing.",
+    };
+  }
+
   const expected = toMoney(expectedAmount);
 
   const actual =
@@ -53,5 +72,13 @@ export function reconcileSettlement({
     requiresClaim:
       status === "SHORT_PAID" ||
       status === "UNPAID_PAST_DUE",
+    reviewReason:
+      status === "REVIEW_REQUIRED"
+        ? actual === null
+          ? "Settlement is not yet due."
+          : difference.lessThan(-10)
+            ? "Received amount exceeds expected settlement amount."
+            : "Settlement requires manual review."
+        : null,
   };
 }

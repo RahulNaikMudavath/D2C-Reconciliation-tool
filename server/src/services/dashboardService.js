@@ -60,18 +60,22 @@ export async function getDashboardSummary() {
   const orderIds = matches.map((match) => match.orderId);
 
   const claims = await prisma.claim.findMany({
-    where: {
-      match: {
-        orderId: {
-          in: orderIds,
-        },
+  where: {
+    match: {
+      orderId: {
+        in: orderIds,
+      },
+      runId: latestRun.id,
+      status: {
+        in: ["SHORT_PAID", "UNPAID_PAST_DUE"],
       },
     },
-    select: {
-      amount: true,
-      status: true,
-    },
-  });
+  },
+  select: {
+    amount: true,
+    status: true,   
+  },
+});
 
   const totalExpected = matches.reduce(
     (sum, match) => sum.plus(match.expectedAmount),
