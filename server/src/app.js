@@ -33,7 +33,8 @@ app.use(express.json({ limit: "1mb" }));
 // Limit repeated requests to authentication endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 20,
+  limit: process.env.NODE_ENV === "production" ? 50 : 1000,
+  skip: (req) => req.path === "/me",
   standardHeaders: "draft-8",
   legacyHeaders: false,
   message: {
