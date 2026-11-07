@@ -8,6 +8,18 @@ const COLUMN_ALIASES = {
     "order item id",
     "order reference",
   ],
+  settlementReference: [
+  "settlement reference",
+  "settlement reference id",
+  "transaction id",
+  "transaction reference",
+  "transaction reference id",
+  "payment reference",
+  "payment reference id",
+  "utr number",
+  "utr",
+  "reference number",
+],
 
   amount: [
     "amount",
