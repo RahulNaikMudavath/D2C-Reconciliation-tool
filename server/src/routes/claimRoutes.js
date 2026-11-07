@@ -3,14 +3,22 @@ import {
   createClaims,
   fetchClaims,
   changeClaimStatus,
+  assignClaim,
 } from "../controllers/claimController.js";
+import { fetchFinanceTeam } from "../controllers/teamController.js";
 import {
   authenticate,
   authorizeRoles,
 } from "../middleware/authMiddleware.js";
-import { assignClaim } from "../controllers/claimController.js";
 
 const router = express.Router();
+
+router.get(
+  "/finance-team",
+  authenticate,
+  authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
+  fetchFinanceTeam
+);
 
 router.post(
   "/generate",
