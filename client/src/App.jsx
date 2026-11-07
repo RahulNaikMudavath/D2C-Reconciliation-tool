@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/auth/Login";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Sidebar from "./components/layout/Sidebar";
+import Reconciliation from "./pages/reconciliation/Reconciliation";
+import Imports from "./pages/imports/Imports";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -38,6 +40,34 @@ function AppRoutes() {
 
         <main className="min-w-0 flex-1 overflow-y-auto p-8">
           <Dashboard />
+        </main>
+      </div>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/reconciliation"
+  element={
+    <ProtectedRoute>
+      <div className="flex min-h-screen bg-slate-50">
+        <Sidebar />
+
+        <main className="min-w-0 flex-1 overflow-y-auto p-8">
+          <Reconciliation />
+        </main>
+      </div>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/imports"
+  element={
+    <ProtectedRoute>
+      <div className="flex min-h-screen bg-slate-50">
+        <Sidebar />
+
+        <main className="min-w-0 flex-1 overflow-y-auto p-8">
+          <Imports />
         </main>
       </div>
     </ProtectedRoute>
