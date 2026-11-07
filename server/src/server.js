@@ -9,6 +9,7 @@ import app from "./app.js";
 import { prisma } from "./config/database.js";
 
 const PORT = process.env.PORT || 5000;
+let serverInstance;
 
 async function startServer() {
   try {
@@ -16,8 +17,17 @@ async function startServer() {
 
     console.log("PostgreSQL connected successfully!");
 
-    app.listen(PORT, () => {
+    serverInstance = app.listen(PORT, () => {
       console.log(`ReconcileX API running on http://localhost:${PORT}`);
+    });
+
+    serverInstance.on("error", (error) => {
+      if (error.code === "EADDRINUSE") {
+        console.error(`Port ${PORT} is already in use.`);
+      } else {
+        console.error("Server error:", error.message);
+      }
+      process.exit(1);
     });
   } catch (error) {
     console.error("Failed to start server:", error.message);
@@ -27,6 +37,10 @@ async function startServer() {
 
 async function shutdown() {
   console.log("Shutting down ReconcileX...");
+
+  if (serverInstance) {
+    serverInstance.close();
+  }
 
   await prisma.$disconnect();
   process.exit(0);

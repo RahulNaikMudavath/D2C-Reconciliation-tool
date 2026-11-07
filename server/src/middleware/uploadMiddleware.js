@@ -2,10 +2,12 @@ import multer from "multer";
 import path from "node:path";
 import crypto from "node:crypto";
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 
 const allowedExtensions = [".csv", ".xlsx"];
 
-const uploadDirectory = path.resolve("uploads");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const uploadDirectory = path.resolve(__dirname, "../../uploads");
 if (!fs.existsSync(uploadDirectory)) {
   fs.mkdirSync(uploadDirectory, { recursive: true });
 }

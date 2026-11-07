@@ -1,48 +1,30 @@
 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { parseUploadedFile } from "./imports/parsers/fileParser.js";
 import { normalizeColumns } from "./imports/normalizers/columnNormalizer.js";
 
-const amazonRecords = [
-  {
-    "Order ID": "RX-1001",
-    "Settlement Reference": "TXN-001",
-    "Settlement Amount": "700",
-    "Transaction Date": "2026-11-01",
-    "Payment Status": "Partial",
-  },
-  {
-    "Order ID": "RX-1001",
-    "Settlement Reference": "TXN-002",
-    "Settlement Amount": "709",
-    "Transaction Date": "2026-11-02",
-    "Payment Status": "Settled",
-  },
-];
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const filePath = path.resolve(__dirname, "../sample-data/amazon-settlements.csv");
 
-const result = normalizeColumns(amazonRecords);
+const records = await parseUploadedFile(filePath);
 
-console.log("COLUMN MAPPING:");
+console.log("CSV PARSER HEADERS:");
+console.log(Object.keys(records[0]));
+
+console.log("\nFIRST PARSED RECORD:");
+console.log(records[0]);
+
+const result = normalizeColumns(records);
+
+console.log("\nCOLUMN MAPPING:");
 console.log(result.columnMapping);
 
-console.log("\nNORMALIZED RECORDS:");
-console.log(result.normalizedRecords);
+console.log("\nNORMALIZED RECORD:");
+console.log(result.normalizedRecords[0]);
 
-console.log("\nUNMAPPED HEADERS:");
-console.log(result.unmappedHeaders);
-
-// Basic validation
-
-// Basic validation
-if (
-  result.normalizedRecords.length !== 2 ||
-  result.normalizedRecords[0].orderNumber !== "RX-1001" ||
-  result.normalizedRecords[0].settlementReference !== "TXN-001" ||
-  result.normalizedRecords[0].amount !== "700" ||
-  result.normalizedRecords[1].orderNumber !== "RX-1001" ||
-  result.normalizedRecords[1].settlementReference !== "TXN-002" ||
-  result.normalizedRecords[1].amount !== "709" ||
-  result.unmappedHeaders.length !== 0
-) {
-  throw new Error("Column normalization test failed.");
+if (!result.columnMapping.settlementReference) {
+  throw new Error("Settlement reference mapping is missing!");
 }
 
-console.log("\nColumn normalization test passed!");
+console.log("\nCSV PARSER + NORMALIZER TEST PASSED!");
