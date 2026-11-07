@@ -12,6 +12,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import importRoutes from "./routes/importRoutes.js";
 import importHistoryRoutes from "./routes/importHistoryRoutes.js";
 import importDetailsRoutes from "./routes/importDetailsRoutes.js";
+import settlementProcessingRoutes from "./routes/settlementProcessingRoutes.js";
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/imports", importRoutes);
 app.use("/api/import-history", importHistoryRoutes);
 app.use("/api/import-details", importDetailsRoutes);
+app.use("/api/settlement-processing", settlementProcessingRoutes);
 
 // Handle unknown routes
 app.use((req, res) => {
