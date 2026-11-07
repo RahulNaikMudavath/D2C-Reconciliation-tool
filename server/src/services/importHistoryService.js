@@ -11,6 +11,12 @@ export async function getImportHistory() {
           role: true,
         },
       },
+      _count: {
+        select: {
+          sourceRecords: true,
+          settlements: true,
+        },
+      },
     },
     orderBy: {
       uploadedAt: "desc",
