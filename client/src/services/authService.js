@@ -3,7 +3,14 @@ import api from "./api";
 
 export const registerUser = async (userData) => {
   const response = await api.post("/auth/register", userData);
-  return response.data.data;
+
+  const { token, user } = response.data.data;
+
+  localStorage.setItem("reconcilex_token", token);
+  localStorage.setItem("token", token);
+  localStorage.setItem("reconcilex_user", JSON.stringify(user));
+
+  return user;
 };
 
 export const loginUser = async (credentials) => {

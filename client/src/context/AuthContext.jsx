@@ -8,6 +8,7 @@ import {
 
 import {
   loginUser,
+  registerUser,
   getCurrentUser,
   logoutUser,
 } from "../services/authService";
@@ -47,6 +48,12 @@ export function AuthProvider({ children }) {
     return loggedInUser;
   };
 
+  const register = async (userData) => {
+    const registeredUser = await registerUser(userData);
+    setUser(registeredUser);
+    return registeredUser;
+  };
+
   const logout = () => {
     logoutUser();
     setUser(null);
@@ -54,7 +61,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, logout }}
+      value={{ user, loading, login, register, logout }}
     >
       {children}
     </AuthContext.Provider>
