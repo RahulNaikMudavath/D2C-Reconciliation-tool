@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/auth/Login";
@@ -6,19 +5,30 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import Sidebar from "./components/layout/Sidebar";
 import Reconciliation from "./pages/reconciliation/Reconciliation";
 import Imports from "./pages/imports/Imports";
+import Claims from "./pages/claims/Claims";
+import AuditLogs from "./pages/audit/AuditLogs";
 
-function ProtectedRoute({ children }) {
+function ProtectedLayout({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
         Loading ReconcileX...
       </div>
     );
   }
 
-  return user ? children : <Navigate to="/login" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <div className="flex min-h-screen bg-slate-50">
+      <Sidebar />
+      <main className="min-w-0 flex-1 overflow-y-auto p-8">{children}</main>
+    </div>
+  );
 }
 
 function AppRoutes() {
@@ -32,47 +42,63 @@ function AppRoutes() {
       />
 
       <Route
-  path="/dashboard"
-  element={
-    <ProtectedRoute>
-      <div className="flex min-h-screen bg-slate-50">
-        <Sidebar />
+        path="/dashboard"
+        element={
+          <ProtectedLayout>
+            <Dashboard />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/reconciliation"
+        element={
+          <ProtectedLayout>
+            <Reconciliation />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/imports"
+        element={
+          <ProtectedLayout>
+            <Imports />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/claims"
+        element={
+          <ProtectedLayout>
+            <Claims />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/audit-logs"
+        element={
+          <ProtectedLayout>
+            <AuditLogs />
+          </ProtectedLayout>
+        }
+      />
 
-        <main className="min-w-0 flex-1 overflow-y-auto p-8">
-          <Dashboard />
-        </main>
-      </div>
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/reconciliation"
-  element={
-    <ProtectedRoute>
-      <div className="flex min-h-screen bg-slate-50">
-        <Sidebar />
-
-        <main className="min-w-0 flex-1 overflow-y-auto p-8">
-          <Reconciliation />
-        </main>
-      </div>
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/imports"
-  element={
-    <ProtectedRoute>
-      <div className="flex min-h-screen bg-slate-50">
-        <Sidebar />
-
-        <main className="min-w-0 flex-1 overflow-y-auto p-8">
-          <Imports />
-        </main>
-      </div>
-    </ProtectedRoute>
-  }
-/>
+      {/* Aliases for nested /dashboard subpaths */}
+      <Route
+        path="/dashboard/imports"
+        element={<Navigate to="/imports" replace />}
+      />
+      <Route
+        path="/dashboard/reconciliation"
+        element={<Navigate to="/reconciliation" replace />}
+      />
+      <Route
+        path="/dashboard/claims"
+        element={<Navigate to="/claims" replace />}
+      />
+      <Route
+        path="/dashboard/audit-logs"
+        element={<Navigate to="/audit-logs" replace />}
+      />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
