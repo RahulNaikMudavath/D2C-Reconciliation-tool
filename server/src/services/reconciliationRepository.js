@@ -2,6 +2,9 @@
 import prisma from "../config/database.js";
 import { reconcileSettlement } from "./reconciliationService.js";
 import { toMoney, formatMoney } from "../utils/money.js";
+import {
+  calculateExpectedSettlement,
+} from "./rateCardService.js";
 
 export async function runReconciliation() {
   // 1. Fetch orders and their settlement records.
@@ -27,42 +30,60 @@ export async function runReconciliation() {
 
   try {
     // 3. Calculate and prepare a result for each order.
-    const results = orders.map((order) => {
-  // Prefer imported settlements when available.
-  const importedSettlements = order.settlements.filter(
-    (settlement) => settlement.importBatchId !== null
-  );
+    const results = await Promise.all(
+      orders.map(async (order) => {
+        // Prefer imported settlements when available.
+        const importedSettlements = order.settlements.filter(
+          (settlement) => settlement.importBatchId !== null
+        );
 
-  // Otherwise, retain existing seed/demo settlements.
-  const selectedSettlements =
-    importedSettlements.length > 0
-      ? importedSettlements
-      : order.settlements;
+        // Otherwise, retain existing seed/demo settlements.
+        const selectedSettlements =
+          importedSettlements.length > 0
+            ? importedSettlements
+            : order.settlements;
 
-  // Aggregate selected payments using Decimal.js.
-  const actualAmount = selectedSettlements.reduce(
-    (total, settlement) =>
-      total.plus(toMoney(settlement.amountReceived)),
-    toMoney(0)
-  );
+        // Aggregate selected payments using Decimal.js.
+        const actualAmount = selectedSettlements.reduce(
+          (total, settlement) =>
+            total.plus(toMoney(settlement.amountReceived)),
+          toMoney(0)
+        );
 
-  const hasSettlements = selectedSettlements.length > 0;
+        const hasSettlements = selectedSettlements.length > 0;
 
-  const result = reconcileSettlement({
-    expectedAmount: order.expectedSettlementAmount,
-    actualAmount: hasSettlements ? actualAmount : null,
-    dueDate: order.settlementDueAt,
-  });
+        // Calculate expected settlement using the applicable rate card.
+        const rateCardResult = order.partnerId
+          ? await calculateExpectedSettlement({
+              partnerId: order.partnerId,
+              channel: order.channel,
+              orderValue: order.orderValue,
+              orderDate: order.orderDate,
+            })
+          : { success: false };
 
-      return {
-        order,
-        result,
-        settlements: selectedSettlements,
-        actualAmount: hasSettlements
-          ? formatMoney(actualAmount)
-          : null,
-      };
-    });
+        // Use rate-card calculation when available.
+        // Otherwise retain the existing expected settlement amount.
+        const expectedAmount = rateCardResult.success
+          ? rateCardResult.expectedSettlementAmount
+          : order.expectedSettlementAmount;
+
+        const result = reconcileSettlement({
+          expectedAmount,
+          actualAmount: hasSettlements ? actualAmount : null,
+          dueDate: order.settlementDueAt,
+        });
+
+        return {
+          order,
+          result,
+          settlements: selectedSettlements,
+          actualAmount: hasSettlements
+            ? formatMoney(actualAmount)
+            : null,
+        };
+      })
+    );
 
     // 4. Save matches and settlement links atomically.
     await prisma.$transaction(async (tx) => {
