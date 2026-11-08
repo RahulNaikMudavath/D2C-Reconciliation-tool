@@ -1,0 +1,5 @@
+Order ID,Courier Name,Freight Charge,Actual Weight,Invoice Number,Invoice Date
+RX-1001,BlueDart,85,1.5,INV-001,2026-11-01
+RX-1002,Delhivery,120,2.0,INV-002,2026-11-02
+RX-1003,BlueDart,95,2.0,INV-003,2026-11-03
+RX-1004,Delhivery,110,1.0,INV-004,2026-11-04
