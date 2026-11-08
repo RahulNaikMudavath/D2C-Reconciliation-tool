@@ -1,6 +1,9 @@
 
 import express from "express";
-import { uploadImportFile } from "../controllers/importController.js";
+import {
+  uploadImportFile,
+  suggestMappings,
+} from "../controllers/importController.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 import {
   authenticate,
@@ -15,6 +18,13 @@ router.post(
   authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
   upload.single("file"),
   uploadImportFile
+);
+
+router.post(
+  "/suggest-mappings",
+  authenticate,
+  authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
+  suggestMappings
 );
 
 export default router;

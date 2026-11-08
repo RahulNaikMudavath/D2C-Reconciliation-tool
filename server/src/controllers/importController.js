@@ -1,5 +1,6 @@
 
 import { processUploadedFile } from "../services/importService.js";
+import { suggestColumnMappings } from "../services/aiMappingService.js";
 
 const allowedImportTypes = [
   "ORDERS",
@@ -37,6 +38,50 @@ export async function uploadImportFile(req, res, next) {
     return res.status(201).json({
       success: true,
       message: "File imported successfully.",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function suggestMappings(req, res, next) {
+  try {
+    const { headers, importType } = req.body;
+
+    if (!Array.isArray(headers) || headers.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide column headers.",
+      });
+    }
+
+    if (!allowedImportTypes.includes(importType)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid import type.",
+      });
+    }
+
+    if (
+      headers.length > 100 ||
+      headers.some(
+        (header) =>
+          typeof header !== "string" ||
+          !header.trim() ||
+          header.length > 200
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid column headers.",
+      });
+    }
+
+    const result = await suggestColumnMappings(headers, importType);
+
+    return res.status(200).json({
+      success: true,
       data: result,
     });
   } catch (error) {
