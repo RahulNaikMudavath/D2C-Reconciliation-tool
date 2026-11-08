@@ -14,6 +14,7 @@ import importHistoryRoutes from "./routes/importHistoryRoutes.js";
 import importDetailsRoutes from "./routes/importDetailsRoutes.js";
 import settlementProcessingRoutes from "./routes/settlementProcessingRoutes.js";
 import columnMappingRoutes from "./routes/columnMappingRoutes.js";
+import rateCardRoutes from "./routes/rateCardRoutes.js";
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use("/api/import-history", importHistoryRoutes);
 app.use("/api/import-details", importDetailsRoutes);
 app.use("/api/settlement-processing", settlementProcessingRoutes);
 app.use("/api/column-mappings", columnMappingRoutes);
+app.use("/api/rate-cards", rateCardRoutes);
 
 // Handle unknown routes
 app.use((req, res) => {
