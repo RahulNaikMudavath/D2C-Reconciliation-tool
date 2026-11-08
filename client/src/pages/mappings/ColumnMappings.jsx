@@ -16,6 +16,11 @@ export default function ColumnMappings() {
   const [status, setStatus] = useState("PENDING");
   const [mappings, setMappings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    approved: 0,
+  });
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState("");
   const [success, setSuccess] = useState("");
@@ -25,8 +30,21 @@ export default function ColumnMappings() {
       setLoading(true);
       setError("");
 
-      const response = await getColumnMappings(status);
-      setMappings(response.data || []);
+      const [filteredResponse, allResponse] = await Promise.all([
+        getColumnMappings(status),
+        getColumnMappings("ALL"),
+      ]);
+
+      const filteredMappings = filteredResponse.data || [];
+      const allMappings = allResponse.data || [];
+
+      setMappings(filteredMappings);
+
+      setStats({
+        total: allMappings.length,
+        pending: allMappings.filter((item) => !item.approved).length,
+        approved: allMappings.filter((item) => item.approved).length,
+      });
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -60,14 +78,6 @@ export default function ColumnMappings() {
       setActionLoading("");
     }
   }
-
-  const pendingCount = mappings.filter(
-    (item) => !item.approved
-  ).length;
-
-  const approvedCount = mappings.filter(
-    (item) => item.approved
-  ).length;
 
   function getConfidenceColor(confidence) {
     if (confidence >= 0.9) {
@@ -114,21 +124,21 @@ export default function ColumnMappings() {
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-sm text-slate-500">Total Mappings</p>
           <p className="mt-2 text-3xl font-bold text-slate-900">
-            {mappings.length}
+            {stats.total}
           </p>
         </div>
 
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
           <p className="text-sm text-amber-700">Pending Review</p>
           <p className="mt-2 text-3xl font-bold text-amber-900">
-            {pendingCount}
+            {stats.pending}
           </p>
         </div>
 
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
           <p className="text-sm text-emerald-700">Approved</p>
           <p className="mt-2 text-3xl font-bold text-emerald-900">
-            {approvedCount}
+            {stats.approved}
           </p>
         </div>
       </div>
