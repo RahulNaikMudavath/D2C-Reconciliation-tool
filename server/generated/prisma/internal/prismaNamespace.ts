@@ -1711,6 +1711,10 @@ export const ColumnMappingScalarFieldEnum = {
   approved: 'approved',
   approvedAt: 'approvedAt',
   approvedById: 'approvedById',
+  rejected: 'rejected',
+  rejectedAt: 'rejectedAt',
+  rejectedById: 'rejectedById',
+  rejectionReason: 'rejectionReason',
   createdAt: 'createdAt',
   importBatchId: 'importBatchId'
 } as const

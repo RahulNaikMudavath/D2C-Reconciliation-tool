@@ -57,6 +57,7 @@ model User {
   assignedClaims         Claim[]         @relation("ClaimOwner")
   auditLogs              AuditLog[]
   approvedColumnMappings ColumnMapping[] @relation("ColumnMappingApprover")
+  rejectedColumnMappings ColumnMapping[] @relation("ColumnMappingRejector")
 }
 
 model Partner {
@@ -103,22 +104,33 @@ model SourceRecord {
   @@index([importBatchId, rowNumber])
 }
 
+
 model ColumnMapping {
   id            String    @id @default(uuid())
   sourceName    String
   version       Int
   mapping       Json
+
   approved      Boolean   @default(false)
   approvedAt    DateTime?
   approvedById  String?
+
+  rejected      Boolean   @default(false)
+  rejectedAt    DateTime?
+  rejectedById  String?
+  rejectionReason String?
+
   createdAt     DateTime  @default(now())
 
   importBatchId String
   importBatch   ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
-  approvedBy    User?       @relation("ColumnMappingApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  approvedBy    User? @relation("ColumnMappingApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  rejectedBy    User? @relation("ColumnMappingRejector", fields: [rejectedById], references: [id], onDelete: SetNull)
 
   @@unique([sourceName, version])
 }
+
 
 model Order {
   id          String @id @default(uuid())
