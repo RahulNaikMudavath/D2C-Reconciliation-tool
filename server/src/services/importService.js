@@ -1,7 +1,10 @@
 
 import prisma from "../config/database.js";
 import { parseUploadedFile } from "../imports/parsers/fileParser.js";
-import { normalizeColumns } from "../imports/normalizers/columnNormalizer.js";
+import {
+  normalizeColumns,
+  normalizeColumnsWithApprovedMapping,
+} from "../imports/normalizers/columnNormalizer.js";
 import { validateImportRecords } from "../imports/validators/importValidator.js";
 
 export async function processUploadedFile({
@@ -30,8 +33,48 @@ export async function processUploadedFile({
       throw new Error("Uploaded file contains no records.");
     }
 
-    // 2. Normalize column names.
-    const normalization = normalizeColumns(records);
+    // 2. Find the latest approved mapping for this source.
+    const approvedMappings = await prisma.columnMapping.findMany({
+      where: {
+        sourceName: file.originalname,
+        approved: true,
+      },
+      orderBy: {
+        version: "desc",
+      },
+    });
+
+    const approvedMapping = approvedMappings.find(
+      (item) => item.mapping?.importType === importType
+    );
+
+    let normalization;
+    let mappingSource;
+
+    if (approvedMapping) {
+      const mappingObject = {};
+
+      for (const suggestion of approvedMapping.mapping.suggestions) {
+        mappingObject[suggestion.suggestedField] =
+          suggestion.originalHeader;
+      }
+
+      normalization = normalizeColumnsWithApprovedMapping(
+        records,
+        mappingObject
+      );
+
+      mappingSource = "APPROVED_AI_MAPPING";
+
+      console.log(
+        `Reusing approved mapping version ${approvedMapping.version}`
+      );
+    } else {
+      normalization = normalizeColumns(records);
+      mappingSource = "DEFAULT_ALIAS_MAPPING";
+
+      console.log("No approved mapping found. Using default aliases.");
+    }
 
     // 3. Validate normalized records.
     const validation = validateImportRecords(
@@ -99,6 +142,7 @@ const sourceRecords = records.map((record, index) => {
 
     return {
       importBatchId: importBatch.id,
+      mappingSource,
       fileName: file.originalname,
       importType,
       totalRows: validation.totalRows,
