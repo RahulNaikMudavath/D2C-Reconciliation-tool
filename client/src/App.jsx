@@ -7,6 +7,7 @@ import Reconciliation from "./pages/reconciliation/Reconciliation";
 import Imports from "./pages/imports/Imports";
 import Claims from "./pages/claims/Claims";
 import AuditLogs from "./pages/audit/AuditLogs";
+import ColumnMappings from "./pages/mappings/ColumnMappings";
 
 function ProtectedLayout({ children }) {
   const { user, loading } = useAuth();
@@ -78,6 +79,14 @@ function AppRoutes() {
         element={
           <ProtectedLayout>
             <AuditLogs />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/column-mappings"
+        element={
+          <ProtectedLayout>
+            <ColumnMappings />
           </ProtectedLayout>
         }
       />

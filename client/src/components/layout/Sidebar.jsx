@@ -8,6 +8,7 @@ import {
   ClipboardList,
   LogOut,
   ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -15,6 +16,7 @@ const navigation = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Reconciliation", path: "/reconciliation", icon: GitCompareArrows },
   { name: "Imports", path: "/imports", icon: Upload },
+  { name: "Column Mappings", path: "/column-mappings", icon: Sparkles },
   { name: "Claims", path: "/claims", icon: FileText },
   { name: "Audit Logs", path: "/audit-logs", icon: ClipboardList },
 ];
