@@ -4,6 +4,7 @@ import {
   fetchClaims,
   changeClaimStatus,
   assignClaim,
+  fetchPartnerClaimsSummary,
 } from "../controllers/claimController.js";
 import { fetchFinanceTeam } from "../controllers/teamController.js";
 import {
@@ -18,6 +19,13 @@ router.get(
   authenticate,
   authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
   fetchFinanceTeam
+);
+
+router.get(
+  "/partner-summary",
+  authenticate,
+  authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
+  fetchPartnerClaimsSummary
 );
 
 router.post(

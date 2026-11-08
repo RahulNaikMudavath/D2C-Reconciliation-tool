@@ -1,5 +1,6 @@
 import prisma from "../config/database.js";
 import { randomUUID } from "node:crypto";
+import Decimal from "decimal.js";
 
 export async function generateClaims(runId) {
   return prisma.$transaction(async (tx) => {
@@ -227,4 +228,61 @@ export async function assignClaimOwner(claimId, ownerId, assignedByUserId) {
 
     return updatedClaim;
   });
+}
+
+export async function getPartnerClaimsSummary() {
+  const claims = await prisma.claim.findMany({
+    include: {
+      partner: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  const summary = new Map();
+
+  for (const claim of claims) {
+    if (!claim.partner) continue;
+
+    const partnerId = claim.partner.id;
+
+    if (!summary.has(partnerId)) {
+      summary.set(partnerId, {
+        partnerId,
+        partnerName: claim.partner.name,
+        totalClaims: 0,
+        openClaims: 0,
+        resolvedClaims: 0,
+        totalClaimValue: new Decimal(0),
+        openClaimValue: new Decimal(0),
+        resolvedClaimValue: new Decimal(0),
+      });
+    }
+
+    const item = summary.get(partnerId);
+    const amount = new Decimal(claim.amount.toString());
+
+    item.totalClaims += 1;
+    item.totalClaimValue = item.totalClaimValue.plus(amount);
+
+    if (["OPEN", "IN_REVIEW"].includes(claim.status)) {
+      item.openClaims += 1;
+      item.openClaimValue = item.openClaimValue.plus(amount);
+    }
+
+    if (claim.status === "RESOLVED") {
+      item.resolvedClaims += 1;
+      item.resolvedClaimValue = item.resolvedClaimValue.plus(amount);
+    }
+  }
+
+  return Array.from(summary.values()).map((item) => ({
+    ...item,
+    totalClaimValue: item.totalClaimValue.toFixed(2),
+    openClaimValue: item.openClaimValue.toFixed(2),
+    resolvedClaimValue: item.resolvedClaimValue.toFixed(2),
+  }));
 }

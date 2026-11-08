@@ -65,6 +65,8 @@ const getClaimPriority = (age, status) => {
 
 export default function Claims() {
   const [claims, setClaims] = useState([]);
+  const [partnerSummary, setPartnerSummary] = useState([]);
+  const [loadingPartners, setLoadingPartners] = useState(false);
   const [filter, setFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -103,10 +105,25 @@ export default function Claims() {
     }
   }, []);
 
+  const fetchPartnerSummary = useCallback(async () => {
+    try {
+      setLoadingPartners(true);
+
+      const response = await api.get("/claims/partner-summary");
+
+      setPartnerSummary(response.data.data || []);
+    } catch (err) {
+      console.error("Unable to load partner summary:", err);
+    } finally {
+      setLoadingPartners(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchClaims();
     fetchFinanceTeam();
-  }, [fetchClaims, fetchFinanceTeam]);
+    fetchPartnerSummary();
+  }, [fetchClaims, fetchFinanceTeam, fetchPartnerSummary]);
 
   const generateClaims = async () => {
     try {
@@ -271,6 +288,65 @@ export default function Claims() {
           icon={<IndianRupee size={21} />}
         />
       </div>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-slate-900">
+            Partner-wise Claims Summary
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Compare outstanding disputes and resolved claims across partners.
+          </p>
+        </div>
+
+        {loadingPartners ? (
+          <div className="py-8 text-center text-slate-500">
+            Loading partner summary...
+          </div>
+        ) : partnerSummary.length === 0 ? (
+          <div className="py-8 text-center text-slate-500">
+            No partner claim data available.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[750px] text-left text-sm">
+              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                <tr>
+                  <th className="px-4 py-3">Partner</th>
+                  <th className="px-4 py-3">Total Claims</th>
+                  <th className="px-4 py-3">Open</th>
+                  <th className="px-4 py-3">Resolved</th>
+                  <th className="px-4 py-3">Total Value</th>
+                  <th className="px-4 py-3">Open Value</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-slate-100">
+                {partnerSummary.map((partner) => (
+                  <tr key={partner.partnerId} className="hover:bg-slate-50">
+                    <td className="px-4 py-4 font-semibold text-slate-800">
+                      {partner.partnerName}
+                    </td>
+                    <td className="px-4 py-4">{partner.totalClaims}</td>
+                    <td className="px-4 py-4 font-semibold text-red-600">
+                      {partner.openClaims}
+                    </td>
+                    <td className="px-4 py-4 text-green-700">
+                      {partner.resolvedClaims}
+                    </td>
+                    <td className="px-4 py-4 font-semibold">
+                      {formatMoney(partner.totalClaimValue)}
+                    </td>
+                    <td className="px-4 py-4 font-bold text-red-600">
+                      {formatMoney(partner.openClaimValue)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-col justify-between gap-3 border-b border-slate-100 p-5 sm:flex-row sm:items-center">

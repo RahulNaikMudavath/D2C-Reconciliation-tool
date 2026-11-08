@@ -1,8 +1,11 @@
-import { generateClaims } from "../services/claimService.js";
-import { getAllClaims } from "../services/claimService.js";
-import { updateClaimStatus } from "../services/claimService.js";
+import {
+  generateClaims,
+  getAllClaims,
+  updateClaimStatus,
+  assignClaimOwner,
+  getPartnerClaimsSummary,
+} from "../services/claimService.js";
 import { updateClaimStatusSchema } from "../validators/claimValidator.js";
-import { assignClaimOwner } from "../services/claimService.js";
 import { assignClaimSchema } from "../validators/assignClaimValidator.js";
 import prisma from "../config/database.js";
 
@@ -140,6 +143,20 @@ export async function assignClaim(req, res, next) {
       });
     }
 
+    next(error);
+  }
+}
+
+export async function fetchPartnerClaimsSummary(req, res, next) {
+  try {
+    const summary = await getPartnerClaimsSummary();
+
+    return res.status(200).json({
+      success: true,
+      totalPartners: summary.length,
+      data: summary,
+    });
+  } catch (error) {
     next(error);
   }
 }
