@@ -8,8 +8,12 @@ export async function getColumnMappings(req, res, next) {
 
     if (status === "PENDING") {
       where.approved = false;
+      where.rejected = false;
     } else if (status === "APPROVED") {
       where.approved = true;
+      where.rejected = false;
+    } else if (status === "REJECTED") {
+      where.rejected = true;
     } else if (status && status !== "ALL") {
       return res.status(400).json({
         success: false,
@@ -30,6 +34,10 @@ export async function getColumnMappings(req, res, next) {
         approved: true,
         approvedAt: true,
         approvedById: true,
+        rejected: true,
+        rejectedAt: true,
+        rejectedById: true,
+        rejectionReason: true,
         createdAt: true,
         importBatchId: true,
         importBatch: {
