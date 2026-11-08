@@ -47,6 +47,45 @@ const COLUMN_ALIASES = {
     "payment status",
     "transaction status",
   ],
+
+  courierName: [
+    "courier",
+    "courier name",
+    "logistics partner",
+    "shipping partner",
+    "delivery partner",
+    "carrier",
+  ],
+
+  chargedAmount: [
+    "charged amount",
+    "freight charge",
+    "shipping charge",
+    "delivery charge",
+    "logistics charge",
+  ],
+
+  actualWeight: [
+    "actual weight",
+    "weight",
+    "shipment weight",
+    "chargeable weight",
+    "weight kg",
+  ],
+
+  invoiceNumber: [
+    "invoice number",
+    "invoice no",
+    "freight invoice",
+    "awb invoice",
+  ],
+
+  chargedAt: [
+    "charged at",
+    "charge date",
+    "freight date",
+    "invoice date",
+  ],
 };
 
 function normalizeHeader(header) {
