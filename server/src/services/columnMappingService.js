@@ -33,7 +33,6 @@ export async function approveColumnMapping({
         entity: "ColumnMapping",
         entityId: mappingId,
         details: {
-          mappingId,
           sourceName: mapping.sourceName,
           version: mapping.version,
         },
