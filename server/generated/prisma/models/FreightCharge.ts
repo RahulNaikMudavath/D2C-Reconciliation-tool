@@ -303,7 +303,7 @@ export type FreightChargeCreateInput = {
   invoiceNumber?: string | null
   chargedAt?: Date | string
   order: Prisma.OrderCreateNestedOneWithoutFreightChargesInput
-  matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutFreightChargeInput
+  matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutFreightChargesInput
 }
 
 export type FreightChargeUncheckedCreateInput = {
@@ -314,7 +314,7 @@ export type FreightChargeUncheckedCreateInput = {
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoiceNumber?: string | null
   chargedAt?: Date | string
-  matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutFreightChargeInput
+  matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutFreightChargesInput
 }
 
 export type FreightChargeUpdateInput = {
@@ -325,7 +325,7 @@ export type FreightChargeUpdateInput = {
   invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneRequiredWithoutFreightChargesNestedInput
-  matches?: Prisma.ReconciliationMatchUpdateManyWithoutFreightChargeNestedInput
+  matches?: Prisma.ReconciliationMatchUpdateManyWithoutFreightChargesNestedInput
 }
 
 export type FreightChargeUncheckedUpdateInput = {
@@ -336,7 +336,7 @@ export type FreightChargeUncheckedUpdateInput = {
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutFreightChargeNestedInput
+  matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutFreightChargesNestedInput
 }
 
 export type FreightChargeCreateManyInput = {
@@ -418,11 +418,6 @@ export type FreightChargeSumOrderByAggregateInput = {
   actualWeight?: Prisma.SortOrder
 }
 
-export type FreightChargeNullableScalarRelationFilter = {
-  is?: Prisma.FreightChargeWhereInput | null
-  isNot?: Prisma.FreightChargeWhereInput | null
-}
-
 export type FreightChargeCreateNestedManyWithoutOrderInput = {
   create?: Prisma.XOR<Prisma.FreightChargeCreateWithoutOrderInput, Prisma.FreightChargeUncheckedCreateWithoutOrderInput> | Prisma.FreightChargeCreateWithoutOrderInput[] | Prisma.FreightChargeUncheckedCreateWithoutOrderInput[]
   connectOrCreate?: Prisma.FreightChargeCreateOrConnectWithoutOrderInput | Prisma.FreightChargeCreateOrConnectWithoutOrderInput[]
@@ -465,20 +460,42 @@ export type FreightChargeUncheckedUpdateManyWithoutOrderNestedInput = {
   deleteMany?: Prisma.FreightChargeScalarWhereInput | Prisma.FreightChargeScalarWhereInput[]
 }
 
-export type FreightChargeCreateNestedOneWithoutMatchesInput = {
-  create?: Prisma.XOR<Prisma.FreightChargeCreateWithoutMatchesInput, Prisma.FreightChargeUncheckedCreateWithoutMatchesInput>
-  connectOrCreate?: Prisma.FreightChargeCreateOrConnectWithoutMatchesInput
-  connect?: Prisma.FreightChargeWhereUniqueInput
+export type FreightChargeCreateNestedManyWithoutMatchesInput = {
+  create?: Prisma.XOR<Prisma.FreightChargeCreateWithoutMatchesInput, Prisma.FreightChargeUncheckedCreateWithoutMatchesInput> | Prisma.FreightChargeCreateWithoutMatchesInput[] | Prisma.FreightChargeUncheckedCreateWithoutMatchesInput[]
+  connectOrCreate?: Prisma.FreightChargeCreateOrConnectWithoutMatchesInput | Prisma.FreightChargeCreateOrConnectWithoutMatchesInput[]
+  connect?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
 }
 
-export type FreightChargeUpdateOneWithoutMatchesNestedInput = {
-  create?: Prisma.XOR<Prisma.FreightChargeCreateWithoutMatchesInput, Prisma.FreightChargeUncheckedCreateWithoutMatchesInput>
-  connectOrCreate?: Prisma.FreightChargeCreateOrConnectWithoutMatchesInput
-  upsert?: Prisma.FreightChargeUpsertWithoutMatchesInput
-  disconnect?: Prisma.FreightChargeWhereInput | boolean
-  delete?: Prisma.FreightChargeWhereInput | boolean
-  connect?: Prisma.FreightChargeWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.FreightChargeUpdateToOneWithWhereWithoutMatchesInput, Prisma.FreightChargeUpdateWithoutMatchesInput>, Prisma.FreightChargeUncheckedUpdateWithoutMatchesInput>
+export type FreightChargeUncheckedCreateNestedManyWithoutMatchesInput = {
+  create?: Prisma.XOR<Prisma.FreightChargeCreateWithoutMatchesInput, Prisma.FreightChargeUncheckedCreateWithoutMatchesInput> | Prisma.FreightChargeCreateWithoutMatchesInput[] | Prisma.FreightChargeUncheckedCreateWithoutMatchesInput[]
+  connectOrCreate?: Prisma.FreightChargeCreateOrConnectWithoutMatchesInput | Prisma.FreightChargeCreateOrConnectWithoutMatchesInput[]
+  connect?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
+}
+
+export type FreightChargeUpdateManyWithoutMatchesNestedInput = {
+  create?: Prisma.XOR<Prisma.FreightChargeCreateWithoutMatchesInput, Prisma.FreightChargeUncheckedCreateWithoutMatchesInput> | Prisma.FreightChargeCreateWithoutMatchesInput[] | Prisma.FreightChargeUncheckedCreateWithoutMatchesInput[]
+  connectOrCreate?: Prisma.FreightChargeCreateOrConnectWithoutMatchesInput | Prisma.FreightChargeCreateOrConnectWithoutMatchesInput[]
+  upsert?: Prisma.FreightChargeUpsertWithWhereUniqueWithoutMatchesInput | Prisma.FreightChargeUpsertWithWhereUniqueWithoutMatchesInput[]
+  set?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
+  disconnect?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
+  delete?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
+  connect?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
+  update?: Prisma.FreightChargeUpdateWithWhereUniqueWithoutMatchesInput | Prisma.FreightChargeUpdateWithWhereUniqueWithoutMatchesInput[]
+  updateMany?: Prisma.FreightChargeUpdateManyWithWhereWithoutMatchesInput | Prisma.FreightChargeUpdateManyWithWhereWithoutMatchesInput[]
+  deleteMany?: Prisma.FreightChargeScalarWhereInput | Prisma.FreightChargeScalarWhereInput[]
+}
+
+export type FreightChargeUncheckedUpdateManyWithoutMatchesNestedInput = {
+  create?: Prisma.XOR<Prisma.FreightChargeCreateWithoutMatchesInput, Prisma.FreightChargeUncheckedCreateWithoutMatchesInput> | Prisma.FreightChargeCreateWithoutMatchesInput[] | Prisma.FreightChargeUncheckedCreateWithoutMatchesInput[]
+  connectOrCreate?: Prisma.FreightChargeCreateOrConnectWithoutMatchesInput | Prisma.FreightChargeCreateOrConnectWithoutMatchesInput[]
+  upsert?: Prisma.FreightChargeUpsertWithWhereUniqueWithoutMatchesInput | Prisma.FreightChargeUpsertWithWhereUniqueWithoutMatchesInput[]
+  set?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
+  disconnect?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
+  delete?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
+  connect?: Prisma.FreightChargeWhereUniqueInput | Prisma.FreightChargeWhereUniqueInput[]
+  update?: Prisma.FreightChargeUpdateWithWhereUniqueWithoutMatchesInput | Prisma.FreightChargeUpdateWithWhereUniqueWithoutMatchesInput[]
+  updateMany?: Prisma.FreightChargeUpdateManyWithWhereWithoutMatchesInput | Prisma.FreightChargeUpdateManyWithWhereWithoutMatchesInput[]
+  deleteMany?: Prisma.FreightChargeScalarWhereInput | Prisma.FreightChargeScalarWhereInput[]
 }
 
 export type FreightChargeCreateWithoutOrderInput = {
@@ -488,7 +505,7 @@ export type FreightChargeCreateWithoutOrderInput = {
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoiceNumber?: string | null
   chargedAt?: Date | string
-  matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutFreightChargeInput
+  matches?: Prisma.ReconciliationMatchCreateNestedManyWithoutFreightChargesInput
 }
 
 export type FreightChargeUncheckedCreateWithoutOrderInput = {
@@ -498,7 +515,7 @@ export type FreightChargeUncheckedCreateWithoutOrderInput = {
   actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoiceNumber?: string | null
   chargedAt?: Date | string
-  matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutFreightChargeInput
+  matches?: Prisma.ReconciliationMatchUncheckedCreateNestedManyWithoutFreightChargesInput
 }
 
 export type FreightChargeCreateOrConnectWithoutOrderInput = {
@@ -565,15 +582,58 @@ export type FreightChargeCreateOrConnectWithoutMatchesInput = {
   create: Prisma.XOR<Prisma.FreightChargeCreateWithoutMatchesInput, Prisma.FreightChargeUncheckedCreateWithoutMatchesInput>
 }
 
-export type FreightChargeUpsertWithoutMatchesInput = {
+export type FreightChargeUpsertWithWhereUniqueWithoutMatchesInput = {
+  where: Prisma.FreightChargeWhereUniqueInput
   update: Prisma.XOR<Prisma.FreightChargeUpdateWithoutMatchesInput, Prisma.FreightChargeUncheckedUpdateWithoutMatchesInput>
   create: Prisma.XOR<Prisma.FreightChargeCreateWithoutMatchesInput, Prisma.FreightChargeUncheckedCreateWithoutMatchesInput>
-  where?: Prisma.FreightChargeWhereInput
 }
 
-export type FreightChargeUpdateToOneWithWhereWithoutMatchesInput = {
-  where?: Prisma.FreightChargeWhereInput
+export type FreightChargeUpdateWithWhereUniqueWithoutMatchesInput = {
+  where: Prisma.FreightChargeWhereUniqueInput
   data: Prisma.XOR<Prisma.FreightChargeUpdateWithoutMatchesInput, Prisma.FreightChargeUncheckedUpdateWithoutMatchesInput>
+}
+
+export type FreightChargeUpdateManyWithWhereWithoutMatchesInput = {
+  where: Prisma.FreightChargeScalarWhereInput
+  data: Prisma.XOR<Prisma.FreightChargeUpdateManyMutationInput, Prisma.FreightChargeUncheckedUpdateManyWithoutMatchesInput>
+}
+
+export type FreightChargeCreateManyOrderInput = {
+  id?: string
+  courierName: string
+  chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  invoiceNumber?: string | null
+  chargedAt?: Date | string
+}
+
+export type FreightChargeUpdateWithoutOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  matches?: Prisma.ReconciliationMatchUpdateManyWithoutFreightChargesNestedInput
+}
+
+export type FreightChargeUncheckedUpdateWithoutOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutFreightChargesNestedInput
+}
+
+export type FreightChargeUncheckedUpdateManyWithoutOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  courierName?: Prisma.StringFieldUpdateOperationsInput | string
+  chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FreightChargeUpdateWithoutMatchesInput = {
@@ -596,37 +656,9 @@ export type FreightChargeUncheckedUpdateWithoutMatchesInput = {
   chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type FreightChargeCreateManyOrderInput = {
-  id?: string
-  courierName: string
-  chargedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  actualWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  invoiceNumber?: string | null
-  chargedAt?: Date | string
-}
-
-export type FreightChargeUpdateWithoutOrderInput = {
+export type FreightChargeUncheckedUpdateManyWithoutMatchesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  courierName?: Prisma.StringFieldUpdateOperationsInput | string
-  chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  matches?: Prisma.ReconciliationMatchUpdateManyWithoutFreightChargeNestedInput
-}
-
-export type FreightChargeUncheckedUpdateWithoutOrderInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  courierName?: Prisma.StringFieldUpdateOperationsInput | string
-  chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chargedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  matches?: Prisma.ReconciliationMatchUncheckedUpdateManyWithoutFreightChargeNestedInput
-}
-
-export type FreightChargeUncheckedUpdateManyWithoutOrderInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
   courierName?: Prisma.StringFieldUpdateOperationsInput | string
   chargedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   actualWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null

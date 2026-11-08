@@ -285,7 +285,11 @@ model ReconciliationMatch {
   id              String               @id @default(uuid())
   runId           String
   orderId         String
-  freightChargeId String?
+  // Freight reconciliation results
+  freightStatus         ReconciliationStatus?
+  expectedFreightAmount Decimal? @db.Decimal(14, 2)
+  actualFreightAmount   Decimal? @db.Decimal(14, 2)
+  freightDifference     Decimal? @db.Decimal(14, 2)
   returnRecordId  String?
   status          ReconciliationStatus
   expectedAmount Decimal? @db.Decimal(14, 2)
@@ -297,7 +301,7 @@ model ReconciliationMatch {
   run           ReconciliationRun @relation(fields: [runId], references: [id])
   order         Order             @relation(fields: [orderId], references: [id])
   settlements   MatchSettlement[]
-  freightCharge FreightCharge?    @relation(fields: [freightChargeId], references: [id])
+  freightCharges FreightCharge[]
   returnRecord  ReturnRecord?     @relation(fields: [returnRecordId], references: [id])
   claims        Claim[]
 

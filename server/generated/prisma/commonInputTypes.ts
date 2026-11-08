@@ -382,11 +382,28 @@ export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
 }
 
+export type EnumReconciliationStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReconciliationStatus | Prisma.EnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumReconciliationStatusNullableFilter<$PrismaModel> | $Enums.ReconciliationStatus | null
+}
+
 export type EnumReconciliationStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.ReconciliationStatus | Prisma.EnumReconciliationStatusFieldRefInput<$PrismaModel>
   in?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel>
   notIn?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumReconciliationStatusFilter<$PrismaModel> | $Enums.ReconciliationStatus
+}
+
+export type EnumReconciliationStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReconciliationStatus | Prisma.EnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumReconciliationStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.ReconciliationStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumReconciliationStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumReconciliationStatusNullableFilter<$PrismaModel>
 }
 
 export type EnumReconciliationStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -743,11 +760,28 @@ export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
 }
 
+export type NestedEnumReconciliationStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReconciliationStatus | Prisma.EnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumReconciliationStatusNullableFilter<$PrismaModel> | $Enums.ReconciliationStatus | null
+}
+
 export type NestedEnumReconciliationStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.ReconciliationStatus | Prisma.EnumReconciliationStatusFieldRefInput<$PrismaModel>
   in?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel>
   notIn?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumReconciliationStatusFilter<$PrismaModel> | $Enums.ReconciliationStatus
+}
+
+export type NestedEnumReconciliationStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReconciliationStatus | Prisma.EnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ReconciliationStatus[] | Prisma.ListEnumReconciliationStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumReconciliationStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.ReconciliationStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumReconciliationStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumReconciliationStatusNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumReconciliationStatusWithAggregatesFilter<$PrismaModel = never> = {
