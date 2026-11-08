@@ -640,14 +640,6 @@ export type NullableDecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type OrderCreateNestedOneWithoutSettlementsInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutSettlementsInput, Prisma.OrderUncheckedCreateWithoutSettlementsInput>
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutSettlementsInput

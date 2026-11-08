@@ -201,6 +201,7 @@ export type UserWhereInput = {
   imports?: Prisma.ImportBatchListRelationFilter
   assignedClaims?: Prisma.ClaimListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  approvedColumnMappings?: Prisma.ColumnMappingListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -214,6 +215,7 @@ export type UserOrderByWithRelationInput = {
   imports?: Prisma.ImportBatchOrderByRelationAggregateInput
   assignedClaims?: Prisma.ClaimOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  approvedColumnMappings?: Prisma.ColumnMappingOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -230,6 +232,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   imports?: Prisma.ImportBatchListRelationFilter
   assignedClaims?: Prisma.ClaimListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  approvedColumnMappings?: Prisma.ColumnMappingListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -269,6 +272,7 @@ export type UserCreateInput = {
   imports?: Prisma.ImportBatchCreateNestedManyWithoutUploadedByInput
   assignedClaims?: Prisma.ClaimCreateNestedManyWithoutOwnerInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  approvedColumnMappings?: Prisma.ColumnMappingCreateNestedManyWithoutApprovedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -282,6 +286,7 @@ export type UserUncheckedCreateInput = {
   imports?: Prisma.ImportBatchUncheckedCreateNestedManyWithoutUploadedByInput
   assignedClaims?: Prisma.ClaimUncheckedCreateNestedManyWithoutOwnerInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  approvedColumnMappings?: Prisma.ColumnMappingUncheckedCreateNestedManyWithoutApprovedByInput
 }
 
 export type UserUpdateInput = {
@@ -295,6 +300,7 @@ export type UserUpdateInput = {
   imports?: Prisma.ImportBatchUpdateManyWithoutUploadedByNestedInput
   assignedClaims?: Prisma.ClaimUpdateManyWithoutOwnerNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  approvedColumnMappings?: Prisma.ColumnMappingUpdateManyWithoutApprovedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -308,6 +314,7 @@ export type UserUncheckedUpdateInput = {
   imports?: Prisma.ImportBatchUncheckedUpdateManyWithoutUploadedByNestedInput
   assignedClaims?: Prisma.ClaimUncheckedUpdateManyWithoutOwnerNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  approvedColumnMappings?: Prisma.ColumnMappingUncheckedUpdateManyWithoutApprovedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -406,6 +413,22 @@ export type UserUpdateOneRequiredWithoutImportsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutImportsInput, Prisma.UserUpdateWithoutImportsInput>, Prisma.UserUncheckedUpdateWithoutImportsInput>
 }
 
+export type UserCreateNestedOneWithoutApprovedColumnMappingsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApprovedColumnMappingsInput, Prisma.UserUncheckedCreateWithoutApprovedColumnMappingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApprovedColumnMappingsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutApprovedColumnMappingsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApprovedColumnMappingsInput, Prisma.UserUncheckedCreateWithoutApprovedColumnMappingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApprovedColumnMappingsInput
+  upsert?: Prisma.UserUpsertWithoutApprovedColumnMappingsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApprovedColumnMappingsInput, Prisma.UserUpdateWithoutApprovedColumnMappingsInput>, Prisma.UserUncheckedUpdateWithoutApprovedColumnMappingsInput>
+}
+
 export type UserCreateNestedOneWithoutAssignedClaimsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedClaimsInput, Prisma.UserUncheckedCreateWithoutAssignedClaimsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedClaimsInput
@@ -446,6 +469,7 @@ export type UserCreateWithoutImportsInput = {
   updatedAt?: Date | string
   assignedClaims?: Prisma.ClaimCreateNestedManyWithoutOwnerInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  approvedColumnMappings?: Prisma.ColumnMappingCreateNestedManyWithoutApprovedByInput
 }
 
 export type UserUncheckedCreateWithoutImportsInput = {
@@ -458,6 +482,7 @@ export type UserUncheckedCreateWithoutImportsInput = {
   updatedAt?: Date | string
   assignedClaims?: Prisma.ClaimUncheckedCreateNestedManyWithoutOwnerInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  approvedColumnMappings?: Prisma.ColumnMappingUncheckedCreateNestedManyWithoutApprovedByInput
 }
 
 export type UserCreateOrConnectWithoutImportsInput = {
@@ -486,6 +511,7 @@ export type UserUpdateWithoutImportsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedClaims?: Prisma.ClaimUpdateManyWithoutOwnerNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  approvedColumnMappings?: Prisma.ColumnMappingUpdateManyWithoutApprovedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImportsInput = {
@@ -496,6 +522,75 @@ export type UserUncheckedUpdateWithoutImportsInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedClaims?: Prisma.ClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  approvedColumnMappings?: Prisma.ColumnMappingUncheckedUpdateManyWithoutApprovedByNestedInput
+}
+
+export type UserCreateWithoutApprovedColumnMappingsInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.UserRole
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  imports?: Prisma.ImportBatchCreateNestedManyWithoutUploadedByInput
+  assignedClaims?: Prisma.ClaimCreateNestedManyWithoutOwnerInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutApprovedColumnMappingsInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.UserRole
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  imports?: Prisma.ImportBatchUncheckedCreateNestedManyWithoutUploadedByInput
+  assignedClaims?: Prisma.ClaimUncheckedCreateNestedManyWithoutOwnerInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutApprovedColumnMappingsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutApprovedColumnMappingsInput, Prisma.UserUncheckedCreateWithoutApprovedColumnMappingsInput>
+}
+
+export type UserUpsertWithoutApprovedColumnMappingsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutApprovedColumnMappingsInput, Prisma.UserUncheckedUpdateWithoutApprovedColumnMappingsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutApprovedColumnMappingsInput, Prisma.UserUncheckedCreateWithoutApprovedColumnMappingsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutApprovedColumnMappingsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutApprovedColumnMappingsInput, Prisma.UserUncheckedUpdateWithoutApprovedColumnMappingsInput>
+}
+
+export type UserUpdateWithoutApprovedColumnMappingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  imports?: Prisma.ImportBatchUpdateManyWithoutUploadedByNestedInput
+  assignedClaims?: Prisma.ClaimUpdateManyWithoutOwnerNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutApprovedColumnMappingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  imports?: Prisma.ImportBatchUncheckedUpdateManyWithoutUploadedByNestedInput
   assignedClaims?: Prisma.ClaimUncheckedUpdateManyWithoutOwnerNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -510,6 +605,7 @@ export type UserCreateWithoutAssignedClaimsInput = {
   updatedAt?: Date | string
   imports?: Prisma.ImportBatchCreateNestedManyWithoutUploadedByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  approvedColumnMappings?: Prisma.ColumnMappingCreateNestedManyWithoutApprovedByInput
 }
 
 export type UserUncheckedCreateWithoutAssignedClaimsInput = {
@@ -522,6 +618,7 @@ export type UserUncheckedCreateWithoutAssignedClaimsInput = {
   updatedAt?: Date | string
   imports?: Prisma.ImportBatchUncheckedCreateNestedManyWithoutUploadedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  approvedColumnMappings?: Prisma.ColumnMappingUncheckedCreateNestedManyWithoutApprovedByInput
 }
 
 export type UserCreateOrConnectWithoutAssignedClaimsInput = {
@@ -550,6 +647,7 @@ export type UserUpdateWithoutAssignedClaimsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   imports?: Prisma.ImportBatchUpdateManyWithoutUploadedByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  approvedColumnMappings?: Prisma.ColumnMappingUpdateManyWithoutApprovedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedClaimsInput = {
@@ -562,6 +660,7 @@ export type UserUncheckedUpdateWithoutAssignedClaimsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   imports?: Prisma.ImportBatchUncheckedUpdateManyWithoutUploadedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  approvedColumnMappings?: Prisma.ColumnMappingUncheckedUpdateManyWithoutApprovedByNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -574,6 +673,7 @@ export type UserCreateWithoutAuditLogsInput = {
   updatedAt?: Date | string
   imports?: Prisma.ImportBatchCreateNestedManyWithoutUploadedByInput
   assignedClaims?: Prisma.ClaimCreateNestedManyWithoutOwnerInput
+  approvedColumnMappings?: Prisma.ColumnMappingCreateNestedManyWithoutApprovedByInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -586,6 +686,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   updatedAt?: Date | string
   imports?: Prisma.ImportBatchUncheckedCreateNestedManyWithoutUploadedByInput
   assignedClaims?: Prisma.ClaimUncheckedCreateNestedManyWithoutOwnerInput
+  approvedColumnMappings?: Prisma.ColumnMappingUncheckedCreateNestedManyWithoutApprovedByInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -614,6 +715,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   imports?: Prisma.ImportBatchUpdateManyWithoutUploadedByNestedInput
   assignedClaims?: Prisma.ClaimUpdateManyWithoutOwnerNestedInput
+  approvedColumnMappings?: Prisma.ColumnMappingUpdateManyWithoutApprovedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -626,6 +728,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   imports?: Prisma.ImportBatchUncheckedUpdateManyWithoutUploadedByNestedInput
   assignedClaims?: Prisma.ClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  approvedColumnMappings?: Prisma.ColumnMappingUncheckedUpdateManyWithoutApprovedByNestedInput
 }
 
 
@@ -637,12 +740,14 @@ export type UserCountOutputType = {
   imports: number
   assignedClaims: number
   auditLogs: number
+  approvedColumnMappings: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   imports?: boolean | UserCountOutputTypeCountImportsArgs
   assignedClaims?: boolean | UserCountOutputTypeCountAssignedClaimsArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
+  approvedColumnMappings?: boolean | UserCountOutputTypeCountApprovedColumnMappingsArgs
 }
 
 /**
@@ -676,6 +781,13 @@ export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.AuditLogWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountApprovedColumnMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ColumnMappingWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -688,6 +800,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   imports?: boolean | Prisma.User$importsArgs<ExtArgs>
   assignedClaims?: boolean | Prisma.User$assignedClaimsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  approvedColumnMappings?: boolean | Prisma.User$approvedColumnMappingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -726,6 +839,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   imports?: boolean | Prisma.User$importsArgs<ExtArgs>
   assignedClaims?: boolean | Prisma.User$assignedClaimsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  approvedColumnMappings?: boolean | Prisma.User$approvedColumnMappingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -737,6 +851,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     imports: Prisma.$ImportBatchPayload<ExtArgs>[]
     assignedClaims: Prisma.$ClaimPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    approvedColumnMappings: Prisma.$ColumnMappingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1143,6 +1258,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   imports<T extends Prisma.User$importsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$importsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImportBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedClaims<T extends Prisma.User$assignedClaimsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedClaimsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClaimPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  approvedColumnMappings<T extends Prisma.User$approvedColumnMappingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$approvedColumnMappingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ColumnMappingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1641,6 +1757,30 @@ export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * User.approvedColumnMappings
+ */
+export type User$approvedColumnMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ColumnMapping
+   */
+  select?: Prisma.ColumnMappingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ColumnMapping
+   */
+  omit?: Prisma.ColumnMappingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ColumnMappingInclude<ExtArgs> | null
+  where?: Prisma.ColumnMappingWhereInput
+  orderBy?: Prisma.ColumnMappingOrderByWithRelationInput | Prisma.ColumnMappingOrderByWithRelationInput[]
+  cursor?: Prisma.ColumnMappingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ColumnMappingScalarFieldEnum | Prisma.ColumnMappingScalarFieldEnum[]
 }
 
 /**

@@ -39,6 +39,8 @@ export type ColumnMappingMinAggregateOutputType = {
   sourceName: string | null
   version: number | null
   approved: boolean | null
+  approvedAt: Date | null
+  approvedById: string | null
   createdAt: Date | null
   importBatchId: string | null
 }
@@ -48,6 +50,8 @@ export type ColumnMappingMaxAggregateOutputType = {
   sourceName: string | null
   version: number | null
   approved: boolean | null
+  approvedAt: Date | null
+  approvedById: string | null
   createdAt: Date | null
   importBatchId: string | null
 }
@@ -58,6 +62,8 @@ export type ColumnMappingCountAggregateOutputType = {
   version: number
   mapping: number
   approved: number
+  approvedAt: number
+  approvedById: number
   createdAt: number
   importBatchId: number
   _all: number
@@ -77,6 +83,8 @@ export type ColumnMappingMinAggregateInputType = {
   sourceName?: true
   version?: true
   approved?: true
+  approvedAt?: true
+  approvedById?: true
   createdAt?: true
   importBatchId?: true
 }
@@ -86,6 +94,8 @@ export type ColumnMappingMaxAggregateInputType = {
   sourceName?: true
   version?: true
   approved?: true
+  approvedAt?: true
+  approvedById?: true
   createdAt?: true
   importBatchId?: true
 }
@@ -96,6 +106,8 @@ export type ColumnMappingCountAggregateInputType = {
   version?: true
   mapping?: true
   approved?: true
+  approvedAt?: true
+  approvedById?: true
   createdAt?: true
   importBatchId?: true
   _all?: true
@@ -193,6 +205,8 @@ export type ColumnMappingGroupByOutputType = {
   version: number
   mapping: runtime.JsonValue
   approved: boolean
+  approvedAt: Date | null
+  approvedById: string | null
   createdAt: Date
   importBatchId: string
   _count: ColumnMappingCountAggregateOutputType | null
@@ -226,9 +240,12 @@ export type ColumnMappingWhereInput = {
   version?: Prisma.IntFilter<"ColumnMapping"> | number
   mapping?: Prisma.JsonFilter<"ColumnMapping">
   approved?: Prisma.BoolFilter<"ColumnMapping"> | boolean
+  approvedAt?: Prisma.DateTimeNullableFilter<"ColumnMapping"> | Date | string | null
+  approvedById?: Prisma.StringNullableFilter<"ColumnMapping"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ColumnMapping"> | Date | string
   importBatchId?: Prisma.StringFilter<"ColumnMapping"> | string
   importBatch?: Prisma.XOR<Prisma.ImportBatchScalarRelationFilter, Prisma.ImportBatchWhereInput>
+  approvedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type ColumnMappingOrderByWithRelationInput = {
@@ -237,9 +254,12 @@ export type ColumnMappingOrderByWithRelationInput = {
   version?: Prisma.SortOrder
   mapping?: Prisma.SortOrder
   approved?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   importBatchId?: Prisma.SortOrder
   importBatch?: Prisma.ImportBatchOrderByWithRelationInput
+  approvedBy?: Prisma.UserOrderByWithRelationInput
 }
 
 export type ColumnMappingWhereUniqueInput = Prisma.AtLeast<{
@@ -252,9 +272,12 @@ export type ColumnMappingWhereUniqueInput = Prisma.AtLeast<{
   version?: Prisma.IntFilter<"ColumnMapping"> | number
   mapping?: Prisma.JsonFilter<"ColumnMapping">
   approved?: Prisma.BoolFilter<"ColumnMapping"> | boolean
+  approvedAt?: Prisma.DateTimeNullableFilter<"ColumnMapping"> | Date | string | null
+  approvedById?: Prisma.StringNullableFilter<"ColumnMapping"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ColumnMapping"> | Date | string
   importBatchId?: Prisma.StringFilter<"ColumnMapping"> | string
   importBatch?: Prisma.XOR<Prisma.ImportBatchScalarRelationFilter, Prisma.ImportBatchWhereInput>
+  approvedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "sourceName_version">
 
 export type ColumnMappingOrderByWithAggregationInput = {
@@ -263,6 +286,8 @@ export type ColumnMappingOrderByWithAggregationInput = {
   version?: Prisma.SortOrder
   mapping?: Prisma.SortOrder
   approved?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   importBatchId?: Prisma.SortOrder
   _count?: Prisma.ColumnMappingCountOrderByAggregateInput
@@ -281,6 +306,8 @@ export type ColumnMappingScalarWhereWithAggregatesInput = {
   version?: Prisma.IntWithAggregatesFilter<"ColumnMapping"> | number
   mapping?: Prisma.JsonWithAggregatesFilter<"ColumnMapping">
   approved?: Prisma.BoolWithAggregatesFilter<"ColumnMapping"> | boolean
+  approvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ColumnMapping"> | Date | string | null
+  approvedById?: Prisma.StringNullableWithAggregatesFilter<"ColumnMapping"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ColumnMapping"> | Date | string
   importBatchId?: Prisma.StringWithAggregatesFilter<"ColumnMapping"> | string
 }
@@ -291,8 +318,10 @@ export type ColumnMappingCreateInput = {
   version: number
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: boolean
+  approvedAt?: Date | string | null
   createdAt?: Date | string
   importBatch: Prisma.ImportBatchCreateNestedOneWithoutMappingsInput
+  approvedBy?: Prisma.UserCreateNestedOneWithoutApprovedColumnMappingsInput
 }
 
 export type ColumnMappingUncheckedCreateInput = {
@@ -301,6 +330,8 @@ export type ColumnMappingUncheckedCreateInput = {
   version: number
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: boolean
+  approvedAt?: Date | string | null
+  approvedById?: string | null
   createdAt?: Date | string
   importBatchId: string
 }
@@ -311,8 +342,10 @@ export type ColumnMappingUpdateInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   importBatch?: Prisma.ImportBatchUpdateOneRequiredWithoutMappingsNestedInput
+  approvedBy?: Prisma.UserUpdateOneWithoutApprovedColumnMappingsNestedInput
 }
 
 export type ColumnMappingUncheckedUpdateInput = {
@@ -321,6 +354,8 @@ export type ColumnMappingUncheckedUpdateInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   importBatchId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -331,6 +366,8 @@ export type ColumnMappingCreateManyInput = {
   version: number
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: boolean
+  approvedAt?: Date | string | null
+  approvedById?: string | null
   createdAt?: Date | string
   importBatchId: string
 }
@@ -341,6 +378,7 @@ export type ColumnMappingUpdateManyMutationInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -350,6 +388,8 @@ export type ColumnMappingUncheckedUpdateManyInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   importBatchId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -375,6 +415,8 @@ export type ColumnMappingCountOrderByAggregateInput = {
   version?: Prisma.SortOrder
   mapping?: Prisma.SortOrder
   approved?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrder
+  approvedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   importBatchId?: Prisma.SortOrder
 }
@@ -388,6 +430,8 @@ export type ColumnMappingMaxOrderByAggregateInput = {
   sourceName?: Prisma.SortOrder
   version?: Prisma.SortOrder
   approved?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrder
+  approvedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   importBatchId?: Prisma.SortOrder
 }
@@ -397,12 +441,56 @@ export type ColumnMappingMinOrderByAggregateInput = {
   sourceName?: Prisma.SortOrder
   version?: Prisma.SortOrder
   approved?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrder
+  approvedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   importBatchId?: Prisma.SortOrder
 }
 
 export type ColumnMappingSumOrderByAggregateInput = {
   version?: Prisma.SortOrder
+}
+
+export type ColumnMappingCreateNestedManyWithoutApprovedByInput = {
+  create?: Prisma.XOR<Prisma.ColumnMappingCreateWithoutApprovedByInput, Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput> | Prisma.ColumnMappingCreateWithoutApprovedByInput[] | Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput[]
+  connectOrCreate?: Prisma.ColumnMappingCreateOrConnectWithoutApprovedByInput | Prisma.ColumnMappingCreateOrConnectWithoutApprovedByInput[]
+  createMany?: Prisma.ColumnMappingCreateManyApprovedByInputEnvelope
+  connect?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+}
+
+export type ColumnMappingUncheckedCreateNestedManyWithoutApprovedByInput = {
+  create?: Prisma.XOR<Prisma.ColumnMappingCreateWithoutApprovedByInput, Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput> | Prisma.ColumnMappingCreateWithoutApprovedByInput[] | Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput[]
+  connectOrCreate?: Prisma.ColumnMappingCreateOrConnectWithoutApprovedByInput | Prisma.ColumnMappingCreateOrConnectWithoutApprovedByInput[]
+  createMany?: Prisma.ColumnMappingCreateManyApprovedByInputEnvelope
+  connect?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+}
+
+export type ColumnMappingUpdateManyWithoutApprovedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ColumnMappingCreateWithoutApprovedByInput, Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput> | Prisma.ColumnMappingCreateWithoutApprovedByInput[] | Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput[]
+  connectOrCreate?: Prisma.ColumnMappingCreateOrConnectWithoutApprovedByInput | Prisma.ColumnMappingCreateOrConnectWithoutApprovedByInput[]
+  upsert?: Prisma.ColumnMappingUpsertWithWhereUniqueWithoutApprovedByInput | Prisma.ColumnMappingUpsertWithWhereUniqueWithoutApprovedByInput[]
+  createMany?: Prisma.ColumnMappingCreateManyApprovedByInputEnvelope
+  set?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+  disconnect?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+  delete?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+  connect?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+  update?: Prisma.ColumnMappingUpdateWithWhereUniqueWithoutApprovedByInput | Prisma.ColumnMappingUpdateWithWhereUniqueWithoutApprovedByInput[]
+  updateMany?: Prisma.ColumnMappingUpdateManyWithWhereWithoutApprovedByInput | Prisma.ColumnMappingUpdateManyWithWhereWithoutApprovedByInput[]
+  deleteMany?: Prisma.ColumnMappingScalarWhereInput | Prisma.ColumnMappingScalarWhereInput[]
+}
+
+export type ColumnMappingUncheckedUpdateManyWithoutApprovedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ColumnMappingCreateWithoutApprovedByInput, Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput> | Prisma.ColumnMappingCreateWithoutApprovedByInput[] | Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput[]
+  connectOrCreate?: Prisma.ColumnMappingCreateOrConnectWithoutApprovedByInput | Prisma.ColumnMappingCreateOrConnectWithoutApprovedByInput[]
+  upsert?: Prisma.ColumnMappingUpsertWithWhereUniqueWithoutApprovedByInput | Prisma.ColumnMappingUpsertWithWhereUniqueWithoutApprovedByInput[]
+  createMany?: Prisma.ColumnMappingCreateManyApprovedByInputEnvelope
+  set?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+  disconnect?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+  delete?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+  connect?: Prisma.ColumnMappingWhereUniqueInput | Prisma.ColumnMappingWhereUniqueInput[]
+  update?: Prisma.ColumnMappingUpdateWithWhereUniqueWithoutApprovedByInput | Prisma.ColumnMappingUpdateWithWhereUniqueWithoutApprovedByInput[]
+  updateMany?: Prisma.ColumnMappingUpdateManyWithWhereWithoutApprovedByInput | Prisma.ColumnMappingUpdateManyWithWhereWithoutApprovedByInput[]
+  deleteMany?: Prisma.ColumnMappingScalarWhereInput | Prisma.ColumnMappingScalarWhereInput[]
 }
 
 export type ColumnMappingCreateNestedManyWithoutImportBatchInput = {
@@ -447,13 +535,86 @@ export type ColumnMappingUncheckedUpdateManyWithoutImportBatchNestedInput = {
   deleteMany?: Prisma.ColumnMappingScalarWhereInput | Prisma.ColumnMappingScalarWhereInput[]
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type ColumnMappingCreateWithoutApprovedByInput = {
+  id?: string
+  sourceName: string
+  version: number
+  mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  approved?: boolean
+  approvedAt?: Date | string | null
+  createdAt?: Date | string
+  importBatch: Prisma.ImportBatchCreateNestedOneWithoutMappingsInput
+}
+
+export type ColumnMappingUncheckedCreateWithoutApprovedByInput = {
+  id?: string
+  sourceName: string
+  version: number
+  mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  approved?: boolean
+  approvedAt?: Date | string | null
+  createdAt?: Date | string
+  importBatchId: string
+}
+
+export type ColumnMappingCreateOrConnectWithoutApprovedByInput = {
+  where: Prisma.ColumnMappingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ColumnMappingCreateWithoutApprovedByInput, Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput>
+}
+
+export type ColumnMappingCreateManyApprovedByInputEnvelope = {
+  data: Prisma.ColumnMappingCreateManyApprovedByInput | Prisma.ColumnMappingCreateManyApprovedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type ColumnMappingUpsertWithWhereUniqueWithoutApprovedByInput = {
+  where: Prisma.ColumnMappingWhereUniqueInput
+  update: Prisma.XOR<Prisma.ColumnMappingUpdateWithoutApprovedByInput, Prisma.ColumnMappingUncheckedUpdateWithoutApprovedByInput>
+  create: Prisma.XOR<Prisma.ColumnMappingCreateWithoutApprovedByInput, Prisma.ColumnMappingUncheckedCreateWithoutApprovedByInput>
+}
+
+export type ColumnMappingUpdateWithWhereUniqueWithoutApprovedByInput = {
+  where: Prisma.ColumnMappingWhereUniqueInput
+  data: Prisma.XOR<Prisma.ColumnMappingUpdateWithoutApprovedByInput, Prisma.ColumnMappingUncheckedUpdateWithoutApprovedByInput>
+}
+
+export type ColumnMappingUpdateManyWithWhereWithoutApprovedByInput = {
+  where: Prisma.ColumnMappingScalarWhereInput
+  data: Prisma.XOR<Prisma.ColumnMappingUpdateManyMutationInput, Prisma.ColumnMappingUncheckedUpdateManyWithoutApprovedByInput>
+}
+
+export type ColumnMappingScalarWhereInput = {
+  AND?: Prisma.ColumnMappingScalarWhereInput | Prisma.ColumnMappingScalarWhereInput[]
+  OR?: Prisma.ColumnMappingScalarWhereInput[]
+  NOT?: Prisma.ColumnMappingScalarWhereInput | Prisma.ColumnMappingScalarWhereInput[]
+  id?: Prisma.StringFilter<"ColumnMapping"> | string
+  sourceName?: Prisma.StringFilter<"ColumnMapping"> | string
+  version?: Prisma.IntFilter<"ColumnMapping"> | number
+  mapping?: Prisma.JsonFilter<"ColumnMapping">
+  approved?: Prisma.BoolFilter<"ColumnMapping"> | boolean
+  approvedAt?: Prisma.DateTimeNullableFilter<"ColumnMapping"> | Date | string | null
+  approvedById?: Prisma.StringNullableFilter<"ColumnMapping"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ColumnMapping"> | Date | string
+  importBatchId?: Prisma.StringFilter<"ColumnMapping"> | string
+}
+
 export type ColumnMappingCreateWithoutImportBatchInput = {
   id?: string
   sourceName: string
   version: number
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: boolean
+  approvedAt?: Date | string | null
   createdAt?: Date | string
+  approvedBy?: Prisma.UserCreateNestedOneWithoutApprovedColumnMappingsInput
 }
 
 export type ColumnMappingUncheckedCreateWithoutImportBatchInput = {
@@ -462,6 +623,8 @@ export type ColumnMappingUncheckedCreateWithoutImportBatchInput = {
   version: number
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: boolean
+  approvedAt?: Date | string | null
+  approvedById?: string | null
   createdAt?: Date | string
 }
 
@@ -491,17 +654,48 @@ export type ColumnMappingUpdateManyWithWhereWithoutImportBatchInput = {
   data: Prisma.XOR<Prisma.ColumnMappingUpdateManyMutationInput, Prisma.ColumnMappingUncheckedUpdateManyWithoutImportBatchInput>
 }
 
-export type ColumnMappingScalarWhereInput = {
-  AND?: Prisma.ColumnMappingScalarWhereInput | Prisma.ColumnMappingScalarWhereInput[]
-  OR?: Prisma.ColumnMappingScalarWhereInput[]
-  NOT?: Prisma.ColumnMappingScalarWhereInput | Prisma.ColumnMappingScalarWhereInput[]
-  id?: Prisma.StringFilter<"ColumnMapping"> | string
-  sourceName?: Prisma.StringFilter<"ColumnMapping"> | string
-  version?: Prisma.IntFilter<"ColumnMapping"> | number
-  mapping?: Prisma.JsonFilter<"ColumnMapping">
-  approved?: Prisma.BoolFilter<"ColumnMapping"> | boolean
-  createdAt?: Prisma.DateTimeFilter<"ColumnMapping"> | Date | string
-  importBatchId?: Prisma.StringFilter<"ColumnMapping"> | string
+export type ColumnMappingCreateManyApprovedByInput = {
+  id?: string
+  sourceName: string
+  version: number
+  mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  approved?: boolean
+  approvedAt?: Date | string | null
+  createdAt?: Date | string
+  importBatchId: string
+}
+
+export type ColumnMappingUpdateWithoutApprovedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceName?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  importBatch?: Prisma.ImportBatchUpdateOneRequiredWithoutMappingsNestedInput
+}
+
+export type ColumnMappingUncheckedUpdateWithoutApprovedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceName?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  importBatchId?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type ColumnMappingUncheckedUpdateManyWithoutApprovedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceName?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  importBatchId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ColumnMappingCreateManyImportBatchInput = {
@@ -510,6 +704,8 @@ export type ColumnMappingCreateManyImportBatchInput = {
   version: number
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: boolean
+  approvedAt?: Date | string | null
+  approvedById?: string | null
   createdAt?: Date | string
 }
 
@@ -519,7 +715,9 @@ export type ColumnMappingUpdateWithoutImportBatchInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvedBy?: Prisma.UserUpdateOneWithoutApprovedColumnMappingsNestedInput
 }
 
 export type ColumnMappingUncheckedUpdateWithoutImportBatchInput = {
@@ -528,6 +726,8 @@ export type ColumnMappingUncheckedUpdateWithoutImportBatchInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -537,6 +737,8 @@ export type ColumnMappingUncheckedUpdateManyWithoutImportBatchInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -548,9 +750,12 @@ export type ColumnMappingSelect<ExtArgs extends runtime.Types.Extensions.Interna
   version?: boolean
   mapping?: boolean
   approved?: boolean
+  approvedAt?: boolean
+  approvedById?: boolean
   createdAt?: boolean
   importBatchId?: boolean
   importBatch?: boolean | Prisma.ImportBatchDefaultArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.ColumnMapping$approvedByArgs<ExtArgs>
 }, ExtArgs["result"]["columnMapping"]>
 
 export type ColumnMappingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -559,9 +764,12 @@ export type ColumnMappingSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   version?: boolean
   mapping?: boolean
   approved?: boolean
+  approvedAt?: boolean
+  approvedById?: boolean
   createdAt?: boolean
   importBatchId?: boolean
   importBatch?: boolean | Prisma.ImportBatchDefaultArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.ColumnMapping$approvedByArgs<ExtArgs>
 }, ExtArgs["result"]["columnMapping"]>
 
 export type ColumnMappingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -570,9 +778,12 @@ export type ColumnMappingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   version?: boolean
   mapping?: boolean
   approved?: boolean
+  approvedAt?: boolean
+  approvedById?: boolean
   createdAt?: boolean
   importBatchId?: boolean
   importBatch?: boolean | Prisma.ImportBatchDefaultArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.ColumnMapping$approvedByArgs<ExtArgs>
 }, ExtArgs["result"]["columnMapping"]>
 
 export type ColumnMappingSelectScalar = {
@@ -581,25 +792,31 @@ export type ColumnMappingSelectScalar = {
   version?: boolean
   mapping?: boolean
   approved?: boolean
+  approvedAt?: boolean
+  approvedById?: boolean
   createdAt?: boolean
   importBatchId?: boolean
 }
 
-export type ColumnMappingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sourceName" | "version" | "mapping" | "approved" | "createdAt" | "importBatchId", ExtArgs["result"]["columnMapping"]>
+export type ColumnMappingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sourceName" | "version" | "mapping" | "approved" | "approvedAt" | "approvedById" | "createdAt" | "importBatchId", ExtArgs["result"]["columnMapping"]>
 export type ColumnMappingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   importBatch?: boolean | Prisma.ImportBatchDefaultArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.ColumnMapping$approvedByArgs<ExtArgs>
 }
 export type ColumnMappingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   importBatch?: boolean | Prisma.ImportBatchDefaultArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.ColumnMapping$approvedByArgs<ExtArgs>
 }
 export type ColumnMappingIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   importBatch?: boolean | Prisma.ImportBatchDefaultArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.ColumnMapping$approvedByArgs<ExtArgs>
 }
 
 export type $ColumnMappingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ColumnMapping"
   objects: {
     importBatch: Prisma.$ImportBatchPayload<ExtArgs>
+    approvedBy: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -607,6 +824,8 @@ export type $ColumnMappingPayload<ExtArgs extends runtime.Types.Extensions.Inter
     version: number
     mapping: runtime.JsonValue
     approved: boolean
+    approvedAt: Date | null
+    approvedById: string | null
     createdAt: Date
     importBatchId: string
   }, ExtArgs["result"]["columnMapping"]>
@@ -1004,6 +1223,7 @@ readonly fields: ColumnMappingFieldRefs;
 export interface Prisma__ColumnMappingClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   importBatch<T extends Prisma.ImportBatchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ImportBatchDefaultArgs<ExtArgs>>): Prisma.Prisma__ImportBatchClient<runtime.Types.Result.GetResult<Prisma.$ImportBatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  approvedBy<T extends Prisma.ColumnMapping$approvedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ColumnMapping$approvedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1038,6 +1258,8 @@ export interface ColumnMappingFieldRefs {
   readonly version: Prisma.FieldRef<"ColumnMapping", 'Int'>
   readonly mapping: Prisma.FieldRef<"ColumnMapping", 'Json'>
   readonly approved: Prisma.FieldRef<"ColumnMapping", 'Boolean'>
+  readonly approvedAt: Prisma.FieldRef<"ColumnMapping", 'DateTime'>
+  readonly approvedById: Prisma.FieldRef<"ColumnMapping", 'String'>
   readonly createdAt: Prisma.FieldRef<"ColumnMapping", 'DateTime'>
   readonly importBatchId: Prisma.FieldRef<"ColumnMapping", 'String'>
 }
@@ -1438,6 +1660,25 @@ export type ColumnMappingDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many ColumnMappings to delete.
    */
   limit?: number
+}
+
+/**
+ * ColumnMapping.approvedBy
+ */
+export type ColumnMapping$approvedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

@@ -53,9 +53,10 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  imports        ImportBatch[]
-  assignedClaims Claim[]       @relation("ClaimOwner")
-  auditLogs      AuditLog[]
+  imports                ImportBatch[]
+  assignedClaims         Claim[]         @relation("ClaimOwner")
+  auditLogs              AuditLog[]
+  approvedColumnMappings ColumnMapping[] @relation("ColumnMappingApprover")
 }
 
 model Partner {
@@ -103,15 +104,18 @@ model SourceRecord {
 }
 
 model ColumnMapping {
-  id         String   @id @default(uuid())
-  sourceName String
-  version    Int
-  mapping    Json
-  approved   Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id            String    @id @default(uuid())
+  sourceName    String
+  version       Int
+  mapping       Json
+  approved      Boolean   @default(false)
+  approvedAt    DateTime?
+  approvedById  String?
+  createdAt     DateTime  @default(now())
 
   importBatchId String
   importBatch   ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  approvedBy    User?       @relation("ColumnMappingApprover", fields: [approvedById], references: [id], onDelete: SetNull)
 
   @@unique([sourceName, version])
 }
