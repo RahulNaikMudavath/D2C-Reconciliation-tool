@@ -3,6 +3,7 @@ import express from "express";
 import {
   uploadImportFile,
   suggestMappings,
+  approveMapping,
 } from "../controllers/importController.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 import {
@@ -25,6 +26,13 @@ router.post(
   authenticate,
   authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
   suggestMappings
+);
+
+router.patch(
+  "/mappings/:mappingId/approve",
+  authenticate,
+  authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
+  approveMapping
 );
 
 export default router;
