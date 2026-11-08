@@ -2,7 +2,10 @@
 import prisma from "../config/database.js";
 import { processUploadedFile } from "../services/importService.js";
 import { suggestColumnMappings } from "../services/aiMappingService.js";
-import { approveColumnMapping } from "../services/columnMappingService.js";
+import {
+  approveColumnMapping,
+  rejectColumnMapping,
+} from "../services/columnMappingService.js";
 import { saveColumnMappingSuggestions } from "../services/columnMappingPersistenceService.js";
 
 const allowedImportTypes = [
@@ -141,6 +144,44 @@ export async function approveMapping(req, res, next) {
     return res.status(200).json({
       success: true,
       message: "Column mapping approved successfully.",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function rejectMapping(req, res, next) {
+  try {
+    const { mappingId } = req.params;
+    const { rejectionReason } = req.body;
+
+    if (!mappingId) {
+      return res.status(400).json({
+        success: false,
+        message: "Mapping ID is required.",
+      });
+    }
+
+    if (
+      typeof rejectionReason !== "string" ||
+      !rejectionReason.trim()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Rejection reason is required.",
+      });
+    }
+
+    const result = await rejectColumnMapping({
+      mappingId,
+      userId: req.user.id,
+      rejectionReason,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Column mapping rejected successfully.",
       data: result,
     });
   } catch (error) {
