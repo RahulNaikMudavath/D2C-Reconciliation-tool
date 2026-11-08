@@ -1,6 +1,7 @@
 
 import { processUploadedFile } from "../services/importService.js";
 import { suggestColumnMappings } from "../services/aiMappingService.js";
+import { approveColumnMapping } from "../services/columnMappingService.js";
 
 const allowedImportTypes = [
   "ORDERS",
@@ -82,6 +83,32 @@ export async function suggestMappings(req, res, next) {
 
     return res.status(200).json({
       success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function approveMapping(req, res, next) {
+  try {
+    const { mappingId } = req.params;
+
+    if (!mappingId) {
+      return res.status(400).json({
+        success: false,
+        message: "Mapping ID is required.",
+      });
+    }
+
+    const result = await approveColumnMapping({
+      mappingId,
+      userId: req.user.id,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Column mapping approved successfully.",
       data: result,
     });
   } catch (error) {
