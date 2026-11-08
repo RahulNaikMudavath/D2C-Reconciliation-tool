@@ -101,3 +101,51 @@ export function normalizeColumns(records) {
     ),
   };
 }
+
+export function normalizeColumnsWithApprovedMapping(
+  records,
+  approvedMapping
+) {
+  if (!Array.isArray(records) || records.length === 0) {
+    throw new Error("No records available for normalization.");
+  }
+
+  if (!approvedMapping || typeof approvedMapping !== "object") {
+    throw new Error("A valid approved mapping is required.");
+  }
+
+  const headers = Object.keys(records[0]);
+  const columnMapping = {};
+
+  for (const [standardField, originalHeader] of Object.entries(
+    approvedMapping
+  )) {
+    if (!headers.includes(originalHeader)) {
+      throw new Error(
+        `Approved mapping header "${originalHeader}" was not found in the uploaded file.`
+      );
+    }
+
+    columnMapping[standardField] = originalHeader;
+  }
+
+  const normalizedRecords = records.map((record) => {
+    const normalizedRecord = {};
+
+    for (const [standardField, originalHeader] of Object.entries(
+      columnMapping
+    )) {
+      normalizedRecord[standardField] = record[originalHeader];
+    }
+
+    return normalizedRecord;
+  });
+
+  return {
+    columnMapping,
+    normalizedRecords,
+    unmappedHeaders: headers.filter(
+      (header) => !Object.values(columnMapping).includes(header)
+    ),
+  };
+}
