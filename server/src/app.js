@@ -72,11 +72,15 @@ app.use((req, res) => {
 
 // Centralized error handler
 app.use((error, req, res, next) => {
-  console.error("Server error:", error);
+  const statusCode = error.statusCode || error.status || 500;
 
-  res.status(500).json({
+  if (statusCode >= 500) {
+    console.error("Server error:", error);
+  }
+
+  res.status(statusCode).json({
     success: false,
-    message: "Internal server error",
+    message: statusCode >= 500 ? "Internal server error" : error.message,
   });
 });
 

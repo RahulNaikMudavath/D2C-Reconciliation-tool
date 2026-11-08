@@ -147,6 +147,30 @@ export async function approveMapping(req, res, next) {
       data: result,
     });
   } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    if (error.message === "Column mapping not found.") {
+      return res.status(404).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    if (
+      error.message.includes("approved") ||
+      error.message.includes("rejected")
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
     next(error);
   }
 }
@@ -185,6 +209,31 @@ export async function rejectMapping(req, res, next) {
       data: result,
     });
   } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    if (error.message === "Column mapping not found.") {
+      return res.status(404).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    if (
+      error.message.includes("rejected") ||
+      error.message.includes("approved") ||
+      error.message.includes("reason")
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
     next(error);
   }
 }

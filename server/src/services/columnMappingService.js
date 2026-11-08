@@ -10,11 +10,15 @@ export async function approveColumnMapping({
     });
 
     if (!mapping) {
-      throw new Error("Column mapping not found.");
+      const err = new Error("Column mapping not found.");
+      err.statusCode = 404;
+      throw err;
     }
 
     if (mapping.approved) {
-      throw new Error("This mapping is already approved.");
+      const err = new Error("This mapping is already approved.");
+      err.statusCode = 400;
+      throw err;
     }
 
     const updatedMapping = await tx.columnMapping.update({
@@ -65,15 +69,21 @@ export async function rejectColumnMapping({
     });
 
     if (!mapping) {
-      throw new Error("Column mapping not found.");
+      const err = new Error("Column mapping not found.");
+      err.statusCode = 404;
+      throw err;
     }
 
     if (mapping.approved) {
-      throw new Error("An approved mapping cannot be rejected.");
+      const err = new Error("An approved mapping cannot be rejected.");
+      err.statusCode = 400;
+      throw err;
     }
 
     if (mapping.rejected) {
-      throw new Error("This mapping is already rejected.");
+      const err = new Error("This mapping is already rejected.");
+      err.statusCode = 400;
+      throw err;
     }
 
     const updatedMapping = await tx.columnMapping.update({
