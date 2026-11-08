@@ -1,18 +1,23 @@
 import { generateAIResponse } from "./geminiService.js";
 
-const ALLOWED_FIELDS = [
-  "orderNumber",
-  "settlementReference",
-  "amount",
-  "transactionDate",
-  "paymentMode",
-  "status",
-  "courierName",
-  "chargedAmount",
-  "actualWeight",
-  "invoiceNumber",
-  "chargedAt",
-];
+const ALLOWED_FIELDS_BY_TYPE = {
+  SETTLEMENTS: [
+    "orderNumber",
+    "settlementReference",
+    "amount",
+    "transactionDate",
+    "paymentMode",
+    "status",
+  ],
+  FREIGHT: [
+    "orderNumber",
+    "courierName",
+    "chargedAmount",
+    "actualWeight",
+    "invoiceNumber",
+    "chargedAt",
+  ],
+};
 
 const COLUMN_ALIASES = {
   orderNumber: [
@@ -93,7 +98,11 @@ const COLUMN_ALIASES = {
   ],
 };
 
-function getHeuristicMappings(headers, importType) {
+function getHeuristicMappings(
+  headers,
+  importType,
+  allowedFields = ALLOWED_FIELDS_BY_TYPE[importType] || []
+) {
   const usedFields = new Set();
   const suggestions = [];
 
@@ -107,7 +116,9 @@ function getHeuristicMappings(headers, importType) {
     let matchedField = null;
     let confidence = 0.98;
 
-    for (const [field, aliases] of Object.entries(COLUMN_ALIASES)) {
+    for (const [field, aliases] of Object.entries(COLUMN_ALIASES).filter(([field]) =>
+      allowedFields.includes(field)
+    )) {
       if (usedFields.has(field)) continue;
       if (aliases.some((alias) => normalized === alias)) {
         matchedField = field;
@@ -118,7 +129,9 @@ function getHeuristicMappings(headers, importType) {
     // 2. If no exact match, try substring match
     if (!matchedField) {
       confidence = 0.85;
-      for (const [field, aliases] of Object.entries(COLUMN_ALIASES)) {
+      for (const [field, aliases] of Object.entries(COLUMN_ALIASES).filter(([field]) =>
+        allowedFields.includes(field)
+      )) {
         if (usedFields.has(field)) continue;
         if (
           aliases.some(
@@ -157,6 +170,11 @@ export async function suggestColumnMappings(headers, importType) {
   }
 
   const uniqueHeaders = [...new Set(headers.map(String))];
+  const allowedFields = ALLOWED_FIELDS_BY_TYPE[importType];
+
+if (!allowedFields) {
+  throw new Error(`Unsupported import type: ${importType}`);
+}
 
   const prompt = `
 You are a data-mapping assistant for ReconcileX, a financial reconciliation platform.
@@ -169,7 +187,7 @@ Uploaded headers:
 ${JSON.stringify(uniqueHeaders)}
 
 Allowed standard fields:
-${JSON.stringify(ALLOWED_FIELDS)}
+${JSON.stringify(allowedFields)}
 
 Rules:
 1. Only use the exact uploaded header names.
@@ -203,7 +221,7 @@ Return ONLY valid JSON in this structure:
     console.warn(
       `AI mapping unavailable (${aiError.message}). Falling back to pattern-matching engine.`
     );
-    return getHeuristicMappings(uniqueHeaders, importType);
+    return getHeuristicMappings(uniqueHeaders, importType, allowedFields);
   }
 
   let parsed;
@@ -216,11 +234,11 @@ Return ONLY valid JSON in this structure:
 
     parsed = JSON.parse(cleanedResponse);
   } catch {
-    return getHeuristicMappings(uniqueHeaders, importType);
+    return getHeuristicMappings(uniqueHeaders, importType, allowedFields);
   }
 
   if (!Array.isArray(parsed?.suggestions)) {
-    return getHeuristicMappings(uniqueHeaders, importType);
+    return getHeuristicMappings(uniqueHeaders, importType, allowedFields);
   }
 
   const usedFields = new Set();
@@ -232,7 +250,7 @@ Return ONLY valid JSON in this structure:
 
       if (!validHeaders.has(item.originalHeader)) return false;
 
-      if (!ALLOWED_FIELDS.includes(item.suggestedField)) return false;
+      if (!allowedFields.includes(item.suggestedField)) return false;
 
       if (usedFields.has(item.suggestedField)) return false;
 
@@ -260,7 +278,7 @@ Return ONLY valid JSON in this structure:
 
   // If AI produced no matches, fall back to heuristic matches
   if (suggestions.length === 0) {
-    return getHeuristicMappings(uniqueHeaders, importType);
+    return getHeuristicMappings(uniqueHeaders, importType, allowedFields);
   }
 
   return {
