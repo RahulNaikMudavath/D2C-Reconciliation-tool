@@ -7,6 +7,11 @@ const ALLOWED_FIELDS = [
   "transactionDate",
   "paymentMode",
   "status",
+  "courierName",
+  "chargedAmount",
+  "actualWeight",
+  "invoiceNumber",
+  "chargedAt",
 ];
 
 const COLUMN_ALIASES = {
@@ -52,6 +57,40 @@ const COLUMN_ALIASES = {
     "payment status",
     "transaction status",
   ],
+  courierName: [
+    "courier",
+    "courier name",
+    "logistics partner",
+    "shipping partner",
+    "delivery partner",
+    "carrier",
+  ],
+  chargedAmount: [
+    "charged amount",
+    "freight charge",
+    "shipping charge",
+    "delivery charge",
+    "logistics charge",
+  ],
+  actualWeight: [
+    "actual weight",
+    "weight",
+    "shipment weight",
+    "chargeable weight",
+    "weight kg",
+  ],
+  invoiceNumber: [
+    "invoice number",
+    "invoice no",
+    "freight invoice",
+    "awb invoice",
+  ],
+  chargedAt: [
+    "charged at",
+    "charge date",
+    "freight date",
+    "invoice date",
+  ],
 };
 
 function getHeuristicMappings(headers, importType) {
@@ -64,27 +103,44 @@ function getHeuristicMappings(headers, importType) {
       .replace(/[^a-z0-9]+/g, " ")
       .trim();
 
+    // 1. Try exact match first
+    let matchedField = null;
+    let confidence = 0.98;
+
     for (const [field, aliases] of Object.entries(COLUMN_ALIASES)) {
       if (usedFields.has(field)) continue;
-
-      const isMatch = aliases.some(
-        (alias) =>
-          normalized === alias ||
-          normalized.includes(alias) ||
-          alias.includes(normalized)
-      );
-
-      if (isMatch) {
-        usedFields.add(field);
-        suggestions.push({
-          originalHeader: header,
-          suggestedField: field,
-          confidence: 0.95,
-          reason: `Matched standard ${field} alias based on header pattern.`,
-          approved: false,
-        });
+      if (aliases.some((alias) => normalized === alias)) {
+        matchedField = field;
         break;
       }
+    }
+
+    // 2. If no exact match, try substring match
+    if (!matchedField) {
+      confidence = 0.85;
+      for (const [field, aliases] of Object.entries(COLUMN_ALIASES)) {
+        if (usedFields.has(field)) continue;
+        if (
+          aliases.some(
+            (alias) =>
+              normalized.includes(alias) || alias.includes(normalized)
+          )
+        ) {
+          matchedField = field;
+          break;
+        }
+      }
+    }
+
+    if (matchedField) {
+      usedFields.add(matchedField);
+      suggestions.push({
+        originalHeader: header,
+        suggestedField: matchedField,
+        confidence,
+        reason: `Matched standard ${matchedField} alias based on header pattern.`,
+        approved: false,
+      });
     }
   }
 
