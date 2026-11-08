@@ -154,7 +154,7 @@ export async function approveMapping(req, res, next) {
 export async function rejectMapping(req, res, next) {
   try {
     const { mappingId } = req.params;
-    const { rejectionReason } = req.body;
+    const { rejectionReason } = req.body || {};
 
     if (!mappingId) {
       return res.status(400).json({
