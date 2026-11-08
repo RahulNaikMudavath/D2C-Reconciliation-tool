@@ -4,6 +4,7 @@ import {
   uploadImportFile,
   suggestMappings,
   approveMapping,
+  rejectMapping,
 } from "../controllers/importController.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 import {
@@ -33,6 +34,13 @@ router.patch(
   authenticate,
   authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
   approveMapping
+);
+
+router.patch(
+  "/mappings/:mappingId/reject",
+  authenticate,
+  authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
+  rejectMapping
 );
 
 export default router;
