@@ -1,7 +1,9 @@
 
+import prisma from "../config/database.js";
 import { processUploadedFile } from "../services/importService.js";
 import { suggestColumnMappings } from "../services/aiMappingService.js";
 import { approveColumnMapping } from "../services/columnMappingService.js";
+import { saveColumnMappingSuggestions } from "../services/columnMappingPersistenceService.js";
 
 const allowedImportTypes = [
   "ORDERS",
@@ -48,19 +50,12 @@ export async function uploadImportFile(req, res, next) {
 
 export async function suggestMappings(req, res, next) {
   try {
-    const { headers, importType } = req.body;
+    const { headers, importType, importBatchId } = req.body;
 
     if (!Array.isArray(headers) || headers.length === 0) {
       return res.status(400).json({
         success: false,
         message: "Please provide column headers.",
-      });
-    }
-
-    if (!allowedImportTypes.includes(importType)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid import type.",
       });
     }
 
@@ -79,11 +74,48 @@ export async function suggestMappings(req, res, next) {
       });
     }
 
-    const result = await suggestColumnMappings(headers, importType);
+    let batch = null;
+    if (importBatchId) {
+      batch = await prisma.importBatch.findUnique({
+        where: { id: importBatchId },
+      });
+
+      if (!batch) {
+        return res.status(404).json({
+          success: false,
+          message: "Import batch not found.",
+        });
+      }
+    }
+
+    const effectiveImportType = batch ? batch.importType : importType;
+
+    if (!effectiveImportType || !allowedImportTypes.includes(effectiveImportType)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid import type.",
+      });
+    }
+
+    const aiResult = await suggestColumnMappings(
+      headers,
+      batch ? batch.importType : effectiveImportType
+    );
+
+    let savedMapping = null;
+    if (importBatchId) {
+      savedMapping = await saveColumnMappingSuggestions({
+        importBatchId,
+        suggestions: aiResult.suggestions,
+      });
+    }
 
     return res.status(200).json({
       success: true,
-      data: result,
+      data: {
+        ...aiResult,
+        savedMapping,
+      },
     });
   } catch (error) {
     next(error);
