@@ -15,3 +15,13 @@ export async function approveColumnMapping(mappingId) {
 
   return response.data;
 }
+
+export async function rejectColumnMapping(mappingId, rejectionReason) {
+  const response = await api.patch(
+    `/imports/mappings/${mappingId}/reject`,
+    { rejectionReason }
+  );
+
+  return response.data;
+}
+

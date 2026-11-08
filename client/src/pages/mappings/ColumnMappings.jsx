@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   getColumnMappings,
   approveColumnMapping,
+  rejectColumnMapping,
 } from "../../services/columnMappingService";
 import {
   CheckCircle2,
@@ -10,6 +11,8 @@ import {
   Sparkles,
   FileSpreadsheet,
   AlertCircle,
+  XCircle,
+  X,
 } from "lucide-react";
 
 export default function ColumnMappings() {
@@ -20,10 +23,15 @@ export default function ColumnMappings() {
     total: 0,
     pending: 0,
     approved: 0,
+    rejected: 0,
   });
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [rejectModalMapping, setRejectModalMapping] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [rejectionError, setRejectionError] = useState("");
 
   async function loadMappings() {
     try {
@@ -42,8 +50,9 @@ export default function ColumnMappings() {
 
       setStats({
         total: allMappings.length,
-        pending: allMappings.filter((item) => !item.approved).length,
+        pending: allMappings.filter((item) => !item.approved && !item.rejected).length,
         approved: allMappings.filter((item) => item.approved).length,
+        rejected: allMappings.filter((item) => item.rejected).length,
       });
     } catch (err) {
       setError(
@@ -77,6 +86,51 @@ export default function ColumnMappings() {
     } finally {
       setActionLoading("");
     }
+  }
+
+  async function handleRejectSubmit(e) {
+    e.preventDefault();
+    if (!rejectionReason.trim()) {
+      setRejectionError("Please provide a reason for rejecting this mapping.");
+      return;
+    }
+    if (rejectionReason.trim().length > 1000) {
+      setRejectionError("Rejection reason cannot exceed 1000 characters.");
+      return;
+    }
+
+    try {
+      setActionLoading(rejectModalMapping.id);
+      setRejectionError("");
+      setError("");
+      setSuccess("");
+
+      await rejectColumnMapping(rejectModalMapping.id, rejectionReason.trim());
+
+      setSuccess("Column mapping rejected successfully.");
+      setRejectModalMapping(null);
+      setRejectionReason("");
+      await loadMappings();
+    } catch (err) {
+      setRejectionError(
+        err.response?.data?.message || "Failed to reject column mapping."
+      );
+    } finally {
+      setActionLoading("");
+    }
+  }
+
+  function openRejectModal(item) {
+    setRejectModalMapping(item);
+    setRejectionReason("");
+    setRejectionError("");
+  }
+
+  function closeRejectModal() {
+    if (actionLoading) return;
+    setRejectModalMapping(null);
+    setRejectionReason("");
+    setRejectionError("");
   }
 
   function getConfidenceColor(confidence) {
@@ -120,45 +174,54 @@ export default function ColumnMappings() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-sm text-slate-500">Total Mappings</p>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-medium text-slate-500">Total Mappings</p>
           <p className="mt-2 text-3xl font-bold text-slate-900">
             {stats.total}
           </p>
         </div>
 
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
-          <p className="text-sm text-amber-700">Pending Review</p>
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+          <p className="text-sm font-medium text-amber-700">Pending Review</p>
           <p className="mt-2 text-3xl font-bold text-amber-900">
             {stats.pending}
           </p>
         </div>
 
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
-          <p className="text-sm text-emerald-700">Approved</p>
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
+          <p className="text-sm font-medium text-emerald-700">Approved</p>
           <p className="mt-2 text-3xl font-bold text-emerald-900">
             {stats.approved}
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-5 shadow-sm">
+          <p className="text-sm font-medium text-rose-700">Rejected</p>
+          <p className="mt-2 text-3xl font-bold text-rose-900">
+            {stats.rejected}
           </p>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {["PENDING", "APPROVED", "ALL"].map((filter) => (
+        {["PENDING", "APPROVED", "REJECTED", "ALL"].map((filter) => (
           <button
             key={filter}
             onClick={() => setStatus(filter)}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
               status === filter
-                ? "bg-indigo-600 text-white"
+                ? "bg-indigo-600 text-white shadow-sm"
                 : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
             }`}
           >
             {filter === "PENDING"
-              ? "Pending Review"
+              ? `Pending Review (${stats.pending})`
               : filter === "APPROVED"
-                ? "Approved"
-                : "All Mappings"}
+                ? `Approved (${stats.approved})`
+                : filter === "REJECTED"
+                  ? `Rejected (${stats.rejected})`
+                  : `All Mappings (${stats.total})`}
           </button>
         ))}
       </div>
@@ -217,19 +280,46 @@ export default function ColumnMappings() {
 
                 <span
                   className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
-                    item.approved
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "bg-amber-50 text-amber-700"
+                    item.rejected
+                      ? "border border-rose-200 bg-rose-50 text-rose-700"
+                      : item.approved
+                        ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : "border border-amber-200 bg-amber-50 text-amber-700"
                   }`}
                 >
-                  {item.approved ? (
+                  {item.rejected ? (
+                    <XCircle size={14} />
+                  ) : item.approved ? (
                     <CheckCircle2 size={14} />
                   ) : (
                     <Clock size={14} />
                   )}
-                  {item.approved ? "Approved" : "Pending Review"}
+                  {item.rejected
+                    ? "Rejected"
+                    : item.approved
+                      ? "Approved"
+                      : "Pending Review"}
                 </span>
               </div>
+
+              {item.rejected && item.rejectionReason && (
+                <div className="mx-5 mt-4 rounded-lg border border-rose-200 bg-rose-50/60 p-3.5 text-sm text-rose-900">
+                  <div className="flex items-start gap-2.5">
+                    <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+                    <div>
+                      <p className="font-semibold text-rose-900">Rejection Reason</p>
+                      <p className="mt-0.5 whitespace-pre-wrap text-xs text-rose-800">
+                        {item.rejectionReason}
+                      </p>
+                      {item.rejectedAt && (
+                        <p className="mt-1.5 text-[11px] text-rose-600">
+                          Rejected on {new Date(item.rejectedAt).toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="overflow-x-auto p-5">
                 <table className="w-full min-w-[600px] text-left text-sm">
@@ -283,23 +373,116 @@ export default function ColumnMappings() {
                 <p className="text-xs text-slate-500">
                   Created:{" "}
                   {new Date(item.createdAt).toLocaleString()}
+                  {item.approved && item.approvedAt && ` · Approved on ${new Date(item.approvedAt).toLocaleString()}`}
+                  {item.rejected && item.rejectedAt && ` · Rejected on ${new Date(item.rejectedAt).toLocaleString()}`}
                 </p>
 
-                {!item.approved && (
-                  <button
-                    onClick={() => handleApprove(item.id)}
-                    disabled={actionLoading === item.id}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <CheckCircle2 size={16} />
-                    {actionLoading === item.id
-                      ? "Approving..."
-                      : "Approve Mapping"}
-                  </button>
+                {!item.approved && !item.rejected && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => openRejectModal(item)}
+                      disabled={Boolean(actionLoading)}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-rose-300 bg-white px-3.5 py-2 text-sm font-semibold text-rose-700 hover:border-rose-400 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50 transition"
+                    >
+                      <XCircle size={15} />
+                      Reject
+                    </button>
+
+                    <button
+                      onClick={() => handleApprove(item.id)}
+                      disabled={Boolean(actionLoading)}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 transition"
+                    >
+                      <CheckCircle2 size={16} />
+                      {actionLoading === item.id
+                        ? "Approving..."
+                        : "Approve Mapping"}
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Rejection Modal */}
+      {rejectModalMapping && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">
+                  Reject Column Mapping
+                </h3>
+                <p className="mt-1 text-xs text-slate-500">
+                  {rejectModalMapping.sourceName} (Version {rejectModalMapping.version})
+                </p>
+              </div>
+
+              <button
+                onClick={closeRejectModal}
+                disabled={Boolean(actionLoading)}
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 disabled:opacity-50"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleRejectSubmit} className="mt-4 space-y-4">
+              <div>
+                <label
+                  htmlFor="rejectionReason"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Rejection Reason <span className="text-rose-500">*</span>
+                </label>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Provide feedback on why this AI suggestion was rejected.
+                </p>
+
+                <textarea
+                  id="rejectionReason"
+                  rows={4}
+                  maxLength={1000}
+                  value={rejectionReason}
+                  onChange={(e) => {
+                    setRejectionReason(e.target.value);
+                    if (rejectionError) setRejectionError("");
+                  }}
+                  placeholder="e.g. Columns misaligned; missing order reference mapping. Please request an updated template."
+                  className="mt-2 w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-800 placeholder-slate-400 focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200"
+                  autoFocus
+                />
+                <div className="mt-1 flex justify-between text-xs text-slate-400">
+                  <span>{rejectionError && <span className="font-medium text-rose-600">{rejectionError}</span>}</span>
+                  <span>{rejectionReason.length} / 1000</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-3">
+                <button
+                  type="button"
+                  onClick={closeRejectModal}
+                  disabled={Boolean(actionLoading)}
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={Boolean(actionLoading) || !rejectionReason.trim()}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <XCircle size={16} />
+                  {actionLoading === rejectModalMapping.id
+                    ? "Rejecting..."
+                    : "Confirm Rejection"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
