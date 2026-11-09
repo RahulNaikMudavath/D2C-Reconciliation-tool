@@ -29,6 +29,21 @@ export async function generateClaims(runId) {
 
     const createdClaims = [];
 
+    console.log("CLAIM DEBUG - Run ID:", runId);
+    console.log("CLAIM DEBUG - Matches found:", matches.length);
+
+    for (const match of matches) {
+      console.log("CLAIM DEBUG - Match:", {
+        orderId: match.orderId,
+        orderNumber: match.order?.orderNumber,
+        settlementStatus: match.status,
+        freightStatus: match.freightStatus,
+        settlementDifference: match.difference?.toString(),
+        freightDifference: match.freightDifference?.toString(),
+        partnerId: match.order?.partner?.id,
+      });
+    }
+
     for (const match of matches) {
       if (!match.order.partner) {
         continue;
