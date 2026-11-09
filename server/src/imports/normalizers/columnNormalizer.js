@@ -29,6 +29,22 @@ const COLUMN_ALIASES = {
     "transaction amount",
   ],
 
+  tcsAmount: [
+    "tcs",
+    "tcs amount",
+    "tax collected at source",
+    "tax collected",
+    "tcs deducted",
+  ],
+
+  tdsAmount: [
+    "tds",
+    "tds amount",
+    "tax deducted at source",
+    "tax deduction",
+    "tds deducted",
+  ],
+
   transactionDate: [
     "transaction date",
     "payment date",
