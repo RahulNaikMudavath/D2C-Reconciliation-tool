@@ -1832,6 +1832,7 @@ export const ReconciliationMatchScalarFieldEnum = {
   actualFreightAmount: 'actualFreightAmount',
   freightDifference: 'freightDifference',
   returnRecordId: 'returnRecordId',
+  returnStatus: 'returnStatus',
   status: 'status',
   expectedAmount: 'expectedAmount',
   actualAmount: 'actualAmount',
