@@ -12,6 +12,7 @@ import {
   RefreshCw,
   History,
   ArrowRight,
+  Download,
 } from "lucide-react";
 
 import {
@@ -329,22 +330,61 @@ export default function Imports() {
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
               ["Total rows", result.totalRows],
               ["Valid rows", result.validCount],
               ["Rejected rows", result.rejectedCount],
+              ["Duplicates", result.duplicateCount ?? 0],
             ].map(([label, value]) => (
               <div key={label} className="rounded-xl bg-slate-50 p-4">
                 <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                   {label}
                 </p>
-                <p className="mt-1 text-2xl font-bold text-slate-900">
+                <p className="mt-1 text-2xl font-bold text-slate-900 font-mono">
                   {value ?? "—"}
                 </p>
               </div>
             ))}
           </div>
+
+          {result.rejectedCount > 0 && (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+              <div className="flex items-center gap-2 text-xs text-red-700">
+                <AlertCircle size={16} />
+                <span>{result.rejectedCount} row(s) were rejected during validation.</span>
+              </div>
+              <a
+                href={`/api/imports/${result.importBatchId || result.id}/rejected-csv`}
+                target="_blank"
+                rel="noreferrer"
+                download
+                className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-2xs hover:bg-red-700 transition"
+              >
+                <Download size={14} /> Download Rejected Rows (CSV)
+              </a>
+            </div>
+          )}
+
+          {result.columnMapping && Object.keys(result.columnMapping).length > 0 && (
+            <div className="mt-4 rounded-xl border border-slate-200/80 bg-slate-50 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-2">
+                Detected Column Mapping
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(result.columnMapping).map(([field, original]) => (
+                  <span
+                    key={field}
+                    className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-mono text-slate-700 shadow-2xs"
+                  >
+                    <span className="font-semibold text-blue-600">{field}</span>
+                    <span className="text-slate-400">←</span>
+                    <span className="text-slate-600">{original}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
             <span className="font-mono">
@@ -589,7 +629,19 @@ export default function Imports() {
                             )}
                           </button>
                         ) : (
-                          <span className="text-xs text-slate-400">Processed</span>
+                          <div className="flex items-center justify-end gap-2">
+                            <a
+                              href={`/api/imports/${batch.id}/rejected-csv`}
+                              target="_blank"
+                              rel="noreferrer"
+                              download
+                              title="Download Rejected Rows if any"
+                              className="inline-flex items-center gap-1 rounded-md border border-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-red-600 transition"
+                            >
+                              <Download size={11} /> Rejections
+                            </a>
+                            <span className="text-xs text-slate-400">Processed</span>
+                          </div>
                         )}
                       </td>
                     </tr>
