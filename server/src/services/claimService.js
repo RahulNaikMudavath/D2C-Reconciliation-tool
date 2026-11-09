@@ -218,6 +218,7 @@ export async function generateClaims(runId) {
               status: match.status,
               expectedAmount:
                 match.expectedAmount?.toString() ?? null,
+                
               actualAmount:
                 match.actualAmount?.toString() ?? null,
               difference:
@@ -259,7 +260,14 @@ export async function getAllClaims() {
   return prisma.claim.findMany({
     include: {
       partner: true,
-      owner: true,
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
       match: {
         include: {
           order: true,
