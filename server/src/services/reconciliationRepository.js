@@ -109,9 +109,26 @@ export async function runReconciliation() {
           };
         });
 
-        const missingReturns = returnResults.filter(
-          (item) => item.returnStatus === "RETURN_NOT_RECEIVED"
-        );
+        const latestReturnResult =
+          returnResults.length > 0
+            ? returnResults[returnResults.length - 1]
+            : null;
+
+        const returnRecordId =
+          latestReturnResult?.returnRecordId ?? null;
+
+        const returnStatus =
+          returnResults.length === 0
+            ? null
+            : returnResults.every(
+                (item) => item.returnStatus === "SETTLED"
+              )
+              ? "SETTLED"
+              : "REVIEW_REQUIRED";
+
+        const returnReviewReasons = returnResults
+          .filter((item) => item.returnReviewReason)
+          .map((item) => item.returnReviewReason);
 
         // ---------------- FREIGHT RECONCILIATION ----------------
 
