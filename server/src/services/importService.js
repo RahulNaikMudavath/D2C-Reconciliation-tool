@@ -70,10 +70,10 @@ export async function processUploadedFile({
         `Reusing approved mapping version ${approvedMapping.version}`
       );
     } else {
-      normalization = normalizeColumns(records);
+      normalization = normalizeColumns(records, importType);
       mappingSource = "DEFAULT_ALIAS_MAPPING";
 
-      console.log("No approved mapping found. Using default aliases.");
+      console.log(`Using default alias mapping for ${importType}.`);
     }
 
     // 3. Validate normalized records.
@@ -207,6 +207,9 @@ const sourceRecords = records.map((record, index) => {
       totalRows: validation.totalRows,
       validCount: validation.validCount,
       rejectedCount: validation.rejectedCount,
+      duplicateCount: validation.duplicateCount ?? 0,
+      skippedCount: validation.skippedCount ?? 0,
+      errorSummary: validation.errorSummary ?? {},
       columnMapping: normalization.columnMapping,
       unmappedHeaders: normalization.unmappedHeaders,
       rejectedRecords: validation.rejectedRecords.slice(0, 50),

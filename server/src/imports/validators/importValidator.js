@@ -1,268 +1,357 @@
-
 import Decimal from "decimal.js";
 
+/**
+ * Parses and cleans monetary/decimal values safely.
+ * Strips currency symbols (₹, $, €), commas, and whitespace.
+ *
+ * @param {any} value - Raw input.
+ * @returns {Decimal | null} Decimal instance or null if empty/invalid.
+ */
+export function parseDecimalSafe(value) {
+  if (value === null || value === undefined) return null;
+  const str = String(value).replace(/[₹$,\s]/g, "").trim();
+  if (str === "" || str.toLowerCase() === "null" || str.toLowerCase() === "nan") {
+    return null;
+  }
+  try {
+    const d = new Decimal(str);
+    return d.isFinite() ? d : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Parses date values safely across ISO, DD-MM-YYYY, YYYY-MM-DD, and slash formats.
+ *
+ * @param {any} value - Raw input date.
+ * @returns {Date | null} Parsed JavaScript Date or null if invalid/empty.
+ */
+export function parseDateSafe(value) {
+  if (!value) return null;
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value;
+  }
+
+  const str = String(value).trim();
+  if (!str) return null;
+
+  // Try direct standard parse
+  const directDate = new Date(str);
+  if (!Number.isNaN(directDate.getTime())) {
+    return directDate;
+  }
+
+  // Handle DD-MM-YYYY or DD/MM/YYYY
+  const parts = str.split(/[-/]/);
+  if (parts.length === 3) {
+    // If first part is day (<= 31) and second is month (<= 12)
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    if (!Number.isNaN(day) && !Number.isNaN(month) && !Number.isNaN(year)) {
+      const d = new Date(Date.UTC(year, month, day));
+      if (!Number.isNaN(d.getTime())) return d;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Universal validator for all ReconcileX import categories.
+ *
+ * @param {Array<Record<string, any>>} records - Array of normalized row objects.
+ * @param {object} [options]
+ * @param {string} [options.importType="ORDERS"] - Category: ORDERS, SETTLEMENTS, COD, FREIGHT, RETURNS, WAREHOUSE_RECEIPTS.
+ * @param {string} [options.duplicateKey="orderNumber"] - Unique key for intra-file duplicate detection.
+ * @returns {object} Validation result with detailed counts and error breakdown.
+ */
 export function validateImportRecords(records, options = {}) {
   const {
-    importType = "SETTLEMENTS",
-    duplicateKey = "orderNumber",
+    importType = "ORDERS",
+    duplicateKey = importType === "SETTLEMENTS" ? "settlementReference" : "orderNumber",
   } = options;
 
   const validRecords = [];
   const rejectedRecords = [];
   const seenIdentifiers = new Set();
+  const errorSummary = {};
+
+  let duplicateCount = 0;
+  let skippedCount = 0;
+
+  const addError = (errors, reason) => {
+    errors.push(reason);
+    errorSummary[reason] = (errorSummary[reason] || 0) + 1;
+  };
 
   records.forEach((record, index) => {
+    const rowNumber = index + 2; // 1-based, assuming row 1 is header
     const errors = [];
 
-    const orderNumber = String(record.orderNumber ?? "").trim();
-
-    // Common validation
-    if (!orderNumber) {
-      errors.push("Missing order number.");
+    // Check for empty row
+    const nonNullValues = Object.entries(record).filter(
+      ([k, v]) => k !== "_unmapped" && v !== null && v !== undefined && String(v).trim() !== ""
+    );
+    if (nonNullValues.length === 0) {
+      skippedCount++;
+      return; // Skip completely blank row
     }
 
-    let normalizedRecord = {
+    const orderNumber = String(record.orderNumber ?? "").trim();
+    if (!orderNumber) {
+      addError(errors, "Missing order number.");
+    }
+
+    let normalized = {
       ...record,
       orderNumber,
     };
 
-    if (importType === "FREIGHT") {
-      const courierName = String(record.courierName ?? "").trim();
-      const chargedAmount = record.chargedAmount;
-      const actualWeight = record.actualWeight;
-      const chargedAt = record.chargedAt;
-
-      if (!courierName) {
-        errors.push("Missing courier name.");
-      }
-
-      // Validate freight charge
-      let parsedAmount;
-
-      if (
-        chargedAmount === null ||
-        chargedAmount === undefined ||
-        String(chargedAmount).trim() === ""
-      ) {
-        errors.push("Missing charged amount.");
+    // =========================================================================
+    // 1. ORDERS VALIDATION
+    // =========================================================================
+    if (importType === "ORDERS") {
+      // Order Date
+      const parsedOrderDate = parseDateSafe(record.orderDate);
+      if (!parsedOrderDate) {
+        addError(errors, "Invalid or missing order date.");
       } else {
-        try {
-          parsedAmount = new Decimal(chargedAmount);
-
-          if (!parsedAmount.isFinite() || parsedAmount.isNegative()) {
-            errors.push("Charged amount must be a valid non-negative number.");
-          }
-        } catch {
-          errors.push("Invalid charged amount.");
-        }
+        normalized.orderDate = parsedOrderDate;
       }
 
-      // Validate actual shipment weight
-      let parsedWeight;
-
-      if (
-        actualWeight === null ||
-        actualWeight === undefined ||
-        String(actualWeight).trim() === ""
-      ) {
-        errors.push("Missing actual weight.");
+      // Order Value
+      const rawValue = record.orderValue ?? record.amount;
+      const parsedValue = parseDecimalSafe(rawValue);
+      if (parsedValue === null) {
+        addError(errors, "Missing or invalid order value.");
+      } else if (parsedValue.isNegative()) {
+        addError(errors, "Order value must be a non-negative amount.");
       } else {
-        try {
-          parsedWeight = new Decimal(actualWeight);
-
-          if (!parsedWeight.isFinite() || !parsedWeight.isPositive()) {
-            errors.push("Actual weight must be a valid positive number.");
-          }
-        } catch {
-          errors.push("Invalid actual weight.");
-        }
+        normalized.orderValue = parsedValue.toFixed(2);
       }
 
-      // Validate freight charge date when provided
-      let parsedChargedAt;
-
-      if (chargedAt) {
-        parsedChargedAt = new Date(chargedAt);
-
-        if (Number.isNaN(parsedChargedAt.getTime())) {
-          errors.push("Invalid freight charge date.");
-        }
-      }
-
-      normalizedRecord = {
-        ...normalizedRecord,
-        courierName,
-        chargedAmount:
-          parsedAmount?.isFinite() && !parsedAmount.isNegative()
-            ? parsedAmount.toFixed(2)
-            : chargedAmount,
-        actualWeight:
-          parsedWeight?.isFinite() && parsedWeight.isPositive()
-            ? parsedWeight.toFixed(3)
-            : actualWeight,
-        chargedAt: parsedChargedAt || chargedAt,
-      };
-    } else if (importType === "RETURNS") {
-      const returnDate = record.returnDate
-        ? new Date(record.returnDate)
-        : null;
-
-      if (!returnDate) {
-        errors.push("Missing return date.");
-      } else if (Number.isNaN(returnDate.getTime())) {
-        errors.push("Invalid return date.");
-      } else {
-        normalizedRecord.returnDate = returnDate;
-      }
-
-      normalizedRecord.returnStatus =
-        String(record.returnStatus ?? "RETURN_INITIATED")
-          .trim()
-          .toUpperCase()
-          .replace(/[\s-]+/g, "_");
-
-    } else if (importType === "WAREHOUSE_RECEIPTS") {
-      const receivedAt = record.warehouseReceivedAt
-        ? new Date(record.warehouseReceivedAt)
-        : null;
-
-      if (!receivedAt) {
-        errors.push("Missing warehouse receipt date.");
-      } else if (Number.isNaN(receivedAt.getTime())) {
-        errors.push("Invalid warehouse receipt date.");
-      } else {
-        normalizedRecord.warehouseReceivedAt = receivedAt;
-      }
-
-    } else if (importType === "ORDERS") {
-      const orderDate = record.orderDate ? new Date(record.orderDate) : null;
-      if (!orderDate || Number.isNaN(orderDate.getTime())) {
-        errors.push("Invalid or missing order date.");
-      } else {
-        normalizedRecord.orderDate = orderDate;
-      }
-
-      const orderValue = record.orderValue ?? record.amount;
-      if (
-        orderValue === null ||
-        orderValue === undefined ||
-        String(orderValue).trim() === ""
-      ) {
-        errors.push("Missing order value.");
-      } else {
-        try {
-          const parsed = new Decimal(orderValue);
-          if (!parsed.isFinite() || parsed.isNegative()) {
-            errors.push("Order value must be a valid non-negative number.");
-          } else {
-            normalizedRecord.orderValue = parsed.toFixed(2);
-          }
-        } catch {
-          errors.push("Invalid order value.");
-        }
-      }
-
-      normalizedRecord.channel = String(record.channel || "Website").trim();
-      normalizedRecord.partnerName = String(
+      // Channels & Partners
+      normalized.channel = String(record.channel || "Website").trim();
+      normalized.partnerName = String(
         record.partnerName || record.channel || "Website"
       ).trim();
-      normalizedRecord.paymentMode = String(
-        record.paymentMode || "COD"
-      ).trim();
-      normalizedRecord.deliveryStatus = String(
+      normalized.paymentMode = String(record.paymentMode || "COD").trim();
+      normalized.deliveryStatus = String(
         record.deliveryStatus || "Delivered"
       ).trim();
 
-      if (
-        record.expectedSettlementAmount !== undefined &&
-        record.expectedSettlementAmount !== null &&
-        String(record.expectedSettlementAmount).trim() !== ""
-      ) {
-        try {
-          const parsedExpected = new Decimal(record.expectedSettlementAmount);
-          if (parsedExpected.isFinite()) {
-            normalizedRecord.expectedSettlementAmount =
-              parsedExpected.toFixed(2);
-          }
-        } catch {
-          // ignore
+      // Expected Settlement Amount (optional)
+      if (record.expectedSettlementAmount !== undefined && record.expectedSettlementAmount !== null) {
+        const parsedExpected = parseDecimalSafe(record.expectedSettlementAmount);
+        if (parsedExpected !== null && !parsedExpected.isNegative()) {
+          normalized.expectedSettlementAmount = parsedExpected.toFixed(2);
         }
       }
 
+      // Settlement Due Date (optional)
       if (record.settlementDueAt) {
-        const dueDate = new Date(record.settlementDueAt);
-        if (!Number.isNaN(dueDate.getTime())) {
-          normalizedRecord.settlementDueAt = dueDate;
+        const parsedDue = parseDateSafe(record.settlementDueAt);
+        if (parsedDue) {
+          normalized.settlementDueAt = parsedDue;
         }
       }
 
-      if (
-        record.weightKg !== undefined &&
-        record.weightKg !== null &&
-        String(record.weightKg).trim() !== ""
-      ) {
-        try {
-          const parsedWeight = new Decimal(record.weightKg);
-          if (parsedWeight.isFinite() && parsedWeight.isPositive()) {
-            normalizedRecord.weightKg = parsedWeight.toFixed(3);
-          }
-        } catch {
-          // ignore
+      // Weight in KG (optional)
+      if (record.weightKg !== undefined && record.weightKg !== null) {
+        const parsedWeight = parseDecimalSafe(record.weightKg);
+        if (parsedWeight !== null && parsedWeight.isPositive()) {
+          normalized.weightKg = parsedWeight.toFixed(3);
         }
       }
-    } else {
-      // Existing settlement-style validation
-      const amount = record.amount;
-      const transactionDate = record.transactionDate;
+    }
 
-      if (
-        amount === null ||
-        amount === undefined ||
-        String(amount).trim() === ""
-      ) {
-        errors.push("Missing amount.");
+    // =========================================================================
+    // 2. SETTLEMENTS VALIDATION
+    // =========================================================================
+    else if (importType === "SETTLEMENTS") {
+      // Net Amount Received
+      const parsedAmount = parseDecimalSafe(record.amount);
+      if (parsedAmount === null) {
+        addError(errors, "Missing or invalid settlement amount.");
+      } else if (parsedAmount.isNegative()) {
+        addError(errors, "Settlement amount must be non-negative.");
       } else {
-        try {
-          const parsedAmount = new Decimal(amount);
-
-          if (!parsedAmount.isFinite() || parsedAmount.isNegative()) {
-            errors.push("Amount must be a valid non-negative number.");
-          } else {
-            normalizedRecord.amount = parsedAmount.toFixed(2);
-          }
-        } catch {
-          errors.push("Invalid amount.");
-        }
+        normalized.amount = parsedAmount.toFixed(2);
       }
 
-      if (transactionDate) {
-        const parsedDate = new Date(transactionDate);
+      // Settlement Date
+      const parsedDate = parseDateSafe(record.settlementDate || record.transactionDate);
+      normalized.settlementDate = parsedDate || new Date();
 
-        if (Number.isNaN(parsedDate.getTime())) {
-          errors.push("Invalid transaction date.");
+      // Settlement Reference (UTR / Tx ID)
+      if (record.settlementReference) {
+        normalized.settlementReference = String(record.settlementReference).trim();
+      }
+
+      // Gross Amount (optional)
+      const parsedGross = parseDecimalSafe(record.grossAmount);
+      if (parsedGross !== null) {
+        normalized.grossAmount = parsedGross.toFixed(2);
+      }
+
+      // Commission & Fees (default 0)
+      const parsedCommission = parseDecimalSafe(record.commissionAmount) || new Decimal(0);
+      normalized.commissionAmount = parsedCommission.toFixed(2);
+
+      const parsedOtherFee = parseDecimalSafe(record.otherFeeAmount) || new Decimal(0);
+      normalized.otherFeeAmount = parsedOtherFee.toFixed(2);
+
+      // TCS & TDS (Tax deductions: never classify as leakage)
+      const parsedTCS = parseDecimalSafe(record.tcsAmount) || new Decimal(0);
+      normalized.tcsAmount = Decimal.max(parsedTCS, 0).toFixed(2);
+
+      const parsedTDS = parseDecimalSafe(record.tdsAmount) || new Decimal(0);
+      normalized.tdsAmount = Decimal.max(parsedTDS, 0).toFixed(2);
+
+      if (record.partnerName) {
+        normalized.partnerName = String(record.partnerName).trim();
+      }
+    }
+
+    // =========================================================================
+    // 3. COD VALIDATION
+    // =========================================================================
+    else if (importType === "COD") {
+      const rawRemitted = record.remittedAmount ?? record.amount;
+      const parsedRemitted = parseDecimalSafe(rawRemitted);
+      if (parsedRemitted === null) {
+        addError(errors, "Missing or invalid remitted COD amount.");
+      } else if (parsedRemitted.isNegative()) {
+        addError(errors, "Remitted amount must be non-negative.");
+      } else {
+        normalized.remittedAmount = parsedRemitted.toFixed(2);
+        normalized.amount = parsedRemitted.toFixed(2);
+      }
+
+      const parsedRemitDate = parseDateSafe(record.remittanceDate || record.transactionDate);
+      if (parsedRemitDate) {
+        normalized.remittanceDate = parsedRemitDate;
+      }
+
+      if (record.courierName) {
+        normalized.courierName = String(record.courierName).trim();
+      }
+      if (record.referenceNumber) {
+        normalized.referenceNumber = String(record.referenceNumber).trim();
+      }
+    }
+
+    // =========================================================================
+    // 4. FREIGHT VALIDATION
+    // =========================================================================
+    else if (importType === "FREIGHT") {
+      const courierName = String(record.courierName ?? "").trim();
+      if (!courierName) {
+        addError(errors, "Missing courier name.");
+      }
+      normalized.courierName = courierName;
+
+      // Charged Amount
+      const parsedAmount = parseDecimalSafe(record.chargedAmount);
+      if (parsedAmount === null) {
+        addError(errors, "Missing or invalid charged freight amount.");
+      } else if (parsedAmount.isNegative()) {
+        addError(errors, "Charged freight amount must be non-negative.");
+      } else {
+        normalized.chargedAmount = parsedAmount.toFixed(2);
+      }
+
+      // Actual Weight
+      const parsedWeight = parseDecimalSafe(record.actualWeight ?? record.weightKg);
+      if (parsedWeight === null) {
+        addError(errors, "Missing or invalid actual weight.");
+      } else if (!parsedWeight.isPositive()) {
+        addError(errors, "Actual weight must be a positive number.");
+      } else {
+        normalized.actualWeight = parsedWeight.toFixed(3);
+      }
+
+      // Invoice Number & Charged Date
+      if (record.invoiceNumber) {
+        normalized.invoiceNumber = String(record.invoiceNumber).trim();
+      }
+      const parsedChargedAt = parseDateSafe(record.chargedAt);
+      if (parsedChargedAt) {
+        normalized.chargedAt = parsedChargedAt;
+      }
+    }
+
+    // =========================================================================
+    // 5. RETURNS VALIDATION
+    // =========================================================================
+    else if (importType === "RETURNS") {
+      const parsedReturnDate = parseDateSafe(record.returnDate);
+      if (!parsedReturnDate) {
+        addError(errors, "Missing or invalid return initiation date.");
+      } else {
+        normalized.returnDate = parsedReturnDate;
+      }
+
+      normalized.returnStatus = String(record.returnStatus || "RETURN_INITIATED")
+        .trim()
+        .toUpperCase()
+        .replace(/[\s-]+/g, "_");
+
+      if (record.receiptReference) {
+        normalized.receiptReference = String(record.receiptReference).trim();
+      }
+    }
+
+    // =========================================================================
+    // 6. WAREHOUSE RECEIPTS VALIDATION
+    // =========================================================================
+    else if (importType === "WAREHOUSE_RECEIPTS") {
+      const parsedReceivedAt = parseDateSafe(record.warehouseReceivedAt);
+      if (!parsedReceivedAt) {
+        addError(errors, "Missing or invalid warehouse received date.");
+      } else {
+        normalized.warehouseReceivedAt = parsedReceivedAt;
+      }
+
+      if (record.receiptReference) {
+        normalized.receiptReference = String(record.receiptReference).trim();
+      }
+      if (record.receivedQuantity) {
+        const qty = parseInt(record.receivedQuantity, 10);
+        normalized.receivedQuantity = Number.isNaN(qty) ? 1 : qty;
+      }
+      normalized.status = String(record.status || "RECEIVED")
+        .trim()
+        .toUpperCase()
+        .replace(/[\s-]+/g, "_");
+    }
+
+    // =========================================================================
+    // DUPLICATE IDENTIFIER DETECTION
+    // =========================================================================
+    if (duplicateKey && record[duplicateKey]) {
+      const identifier = String(record[duplicateKey]).trim();
+      if (identifier) {
+        if (seenIdentifiers.has(identifier)) {
+          duplicateCount++;
+          addError(errors, `Duplicate ${duplicateKey} "${identifier}" found in file.`);
+        } else {
+          seenIdentifiers.add(identifier);
         }
       }
     }
 
-    // Detect duplicates using the configured identifier
-    const identifier = String(record[duplicateKey] ?? "").trim();
-
-    if (identifier && seenIdentifiers.has(identifier)) {
-      errors.push(`Duplicate ${duplicateKey}.`);
-    }
-
-    if (identifier) {
-      seenIdentifiers.add(identifier);
-    }
-
+    // Store rejected or valid record
     if (errors.length > 0) {
       rejectedRecords.push({
-        rowNumber: index + 2,
+        rowNumber,
         record,
         errors,
       });
     } else {
-      validRecords.push(normalizedRecord);
+      validRecords.push(normalized);
     }
   });
 
@@ -270,7 +359,10 @@ export function validateImportRecords(records, options = {}) {
     totalRows: records.length,
     validCount: validRecords.length,
     rejectedCount: rejectedRecords.length,
+    duplicateCount,
+    skippedCount,
     validRecords,
     rejectedRecords,
+    errorSummary,
   };
 }
