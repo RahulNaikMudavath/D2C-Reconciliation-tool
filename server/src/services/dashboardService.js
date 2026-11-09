@@ -69,6 +69,25 @@ export async function getDashboardSummary() {
 
   const orderIds = matches.map((match) => match.orderId);
 
+  // Fetch TCS and TDS separately for matched orders.
+  const settlements = await prisma.settlement.findMany({
+    where: {
+      orderId: {
+        in: orderIds,
+      },
+    },
+    select: {
+      partnerId: true,
+      tcsAmount: true,
+      tdsAmount: true,
+      partner: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
   // 4. Fetch claims associated with eligible matches.
   const claims = await prisma.claim.findMany({
     where: {
@@ -93,6 +112,52 @@ export async function getDashboardSummary() {
     (sum, match) =>
       sum.plus(match.actualAmount ?? 0),
     new Decimal(0)
+  );
+
+  // Calculate TCS and TDS separately.
+  const totalTCS = settlements.reduce(
+    (sum, settlement) =>
+      sum.plus(settlement.tcsAmount ?? 0),
+    new Decimal(0)
+  );
+
+  const totalTDS = settlements.reduce(
+    (sum, settlement) =>
+      sum.plus(settlement.tdsAmount ?? 0),
+    new Decimal(0)
+  );
+
+  // Calculate partner-wise tax summaries.
+  const partnerTaxMap = new Map();
+
+  for (const settlement of settlements) {
+    if (!settlement.partnerId) continue;
+
+    const existing = partnerTaxMap.get(settlement.partnerId) || {
+      partnerName: settlement.partner?.name ?? "Unknown",
+      tcsAmount: new Decimal(0),
+      tdsAmount: new Decimal(0),
+    };
+
+    existing.tcsAmount = existing.tcsAmount.plus(
+      settlement.tcsAmount ?? 0
+    );
+
+    existing.tdsAmount = existing.tdsAmount.plus(
+      settlement.tdsAmount ?? 0
+    );
+
+    partnerTaxMap.set(settlement.partnerId, existing);
+  }
+
+  const partnerTaxSummary = Array.from(
+    partnerTaxMap,
+    ([partnerId, data]) => ({
+      partnerId,
+      partnerName: data.partnerName,
+      tcsAmount: data.tcsAmount.toFixed(2),
+      tdsAmount: data.tdsAmount.toFixed(2),
+    })
   );
 
   // 6. Calculate freight totals.
@@ -259,6 +324,9 @@ export async function getDashboardSummary() {
 
     totalExpected: totalExpected.toFixed(2),
     totalReceived: totalReceived.toFixed(2),
+    totalTCS: totalTCS.toFixed(2),
+    totalTDS: totalTDS.toFixed(2),
+    partnerTaxSummary,
 
     totalExpectedFreight:
       totalExpectedFreight.toFixed(2),
