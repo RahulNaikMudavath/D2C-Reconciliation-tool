@@ -125,6 +125,10 @@ export default function Reconciliation() {
 
   // Status Counts for KPI cards
   const statusCounts = useMemo(() => {
+    if (data?.statusCounts) {
+      return data.statusCounts;
+    }
+
     const counts = {
       TOTAL: (data?.results || []).length,
       SETTLED: 0,

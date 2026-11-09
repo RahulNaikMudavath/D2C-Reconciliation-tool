@@ -9,6 +9,71 @@ const COLUMN_ALIASES = {
     "order item id",
     "order reference",
   ],
+
+  channel: [
+    "channel",
+    "sales channel",
+    "platform",
+    "store",
+  ],
+
+  partnerName: [
+    "partner",
+    "partner name",
+    "partnername",
+    "marketplace",
+  ],
+
+  orderDate: [
+    "order date",
+    "order_date",
+    "orderdate",
+    "ordered at",
+    "creation date",
+  ],
+
+  deliveryStatus: [
+    "delivery status",
+    "delivery_status",
+    "deliverystatus",
+    "shipment status",
+    "order status",
+  ],
+
+  orderValue: [
+    "order value",
+    "order_value",
+    "ordervalue",
+    "order amount",
+    "total value",
+    "total amount",
+    "value",
+  ],
+
+  expectedSettlementAmount: [
+    "expected settlement amount",
+    "expected settlement",
+    "expected amount",
+    "expected_settlement_amount",
+    "net payable",
+  ],
+
+  settlementDueAt: [
+    "settlement due at",
+    "settlement due date",
+    "settlement_due_at",
+    "due date",
+    "payment due date",
+  ],
+
+  weightKg: [
+    "weight kg",
+    "weight_kg",
+    "weightkg",
+    "weight",
+    "order weight",
+  ],
+
   settlementReference: [
   "settlement reference",
   "settlement reference id",
@@ -137,6 +202,7 @@ const COLUMN_ALIASES = {
 
 function normalizeHeader(header) {
   return String(header)
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")

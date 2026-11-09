@@ -37,10 +37,60 @@ export async function getReconciliationResults(req, res, next) {
       });
     }
 
+    const totalCount = await prisma.reconciliationMatch.count({
+      where: { runId: latestRun.id },
+    });
+
+    const [statusGroup, freightGroup, returnGroup] = await Promise.all([
+      prisma.reconciliationMatch.groupBy({
+        by: ["status"],
+        _count: { id: true },
+        where: { runId: latestRun.id },
+      }),
+      prisma.reconciliationMatch.groupBy({
+        by: ["freightStatus"],
+        _count: { id: true },
+        where: { runId: latestRun.id },
+      }),
+      prisma.reconciliationMatch.groupBy({
+        by: ["returnStatus"],
+        _count: { id: true },
+        where: { runId: latestRun.id },
+      }),
+    ]);
+
+    const statusCounts = {
+      TOTAL: totalCount,
+      SETTLED: 0,
+      SHORT_PAID: 0,
+      UNPAID_PAST_DUE: 0,
+      FREIGHT_OVERCHARGED: 0,
+      RETURN_NOT_RECEIVED: 0,
+      REVIEW_REQUIRED: 0,
+    };
+
+    for (const g of statusGroup) {
+      if (g.status === "SETTLED") statusCounts.SETTLED += g._count.id;
+      if (g.status === "SHORT_PAID") statusCounts.SHORT_PAID += g._count.id;
+      if (g.status === "UNPAID_PAST_DUE") statusCounts.UNPAID_PAST_DUE += g._count.id;
+      if (g.status === "REVIEW_REQUIRED") statusCounts.REVIEW_REQUIRED += g._count.id;
+    }
+
+    for (const g of freightGroup) {
+      if (g.freightStatus === "FREIGHT_OVERCHARGED") statusCounts.FREIGHT_OVERCHARGED += g._count.id;
+      if (g.freightStatus === "REVIEW_REQUIRED") statusCounts.REVIEW_REQUIRED += g._count.id;
+    }
+
+    for (const g of returnGroup) {
+      if (g.returnStatus === "RETURN_NOT_RECEIVED") statusCounts.RETURN_NOT_RECEIVED += g._count.id;
+      if (g.returnStatus === "REVIEW_REQUIRED") statusCounts.REVIEW_REQUIRED += g._count.id;
+    }
+
     const matches = await prisma.reconciliationMatch.findMany({
       where: {
         runId: latestRun.id,
       },
+      take: 1000,
       include: {
         order: {
           select: {
@@ -66,7 +116,8 @@ export async function getReconciliationResults(req, res, next) {
       success: true,
       data: {
         runId: latestRun.id,
-        totalOrders: matches.length,
+        totalOrders: totalCount,
+        statusCounts,
         results: matches.map((match) => ({
           orderNumber: match.order.orderNumber,
           channel: match.order.channel,

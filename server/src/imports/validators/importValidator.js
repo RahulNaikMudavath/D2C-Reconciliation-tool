@@ -134,6 +134,82 @@ export function validateImportRecords(records, options = {}) {
         normalizedRecord.warehouseReceivedAt = receivedAt;
       }
 
+    } else if (importType === "ORDERS") {
+      const orderDate = record.orderDate ? new Date(record.orderDate) : null;
+      if (!orderDate || Number.isNaN(orderDate.getTime())) {
+        errors.push("Invalid or missing order date.");
+      } else {
+        normalizedRecord.orderDate = orderDate;
+      }
+
+      const orderValue = record.orderValue ?? record.amount;
+      if (
+        orderValue === null ||
+        orderValue === undefined ||
+        String(orderValue).trim() === ""
+      ) {
+        errors.push("Missing order value.");
+      } else {
+        try {
+          const parsed = new Decimal(orderValue);
+          if (!parsed.isFinite() || parsed.isNegative()) {
+            errors.push("Order value must be a valid non-negative number.");
+          } else {
+            normalizedRecord.orderValue = parsed.toFixed(2);
+          }
+        } catch {
+          errors.push("Invalid order value.");
+        }
+      }
+
+      normalizedRecord.channel = String(record.channel || "Website").trim();
+      normalizedRecord.partnerName = String(
+        record.partnerName || record.channel || "Website"
+      ).trim();
+      normalizedRecord.paymentMode = String(
+        record.paymentMode || "COD"
+      ).trim();
+      normalizedRecord.deliveryStatus = String(
+        record.deliveryStatus || "Delivered"
+      ).trim();
+
+      if (
+        record.expectedSettlementAmount !== undefined &&
+        record.expectedSettlementAmount !== null &&
+        String(record.expectedSettlementAmount).trim() !== ""
+      ) {
+        try {
+          const parsedExpected = new Decimal(record.expectedSettlementAmount);
+          if (parsedExpected.isFinite()) {
+            normalizedRecord.expectedSettlementAmount =
+              parsedExpected.toFixed(2);
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      if (record.settlementDueAt) {
+        const dueDate = new Date(record.settlementDueAt);
+        if (!Number.isNaN(dueDate.getTime())) {
+          normalizedRecord.settlementDueAt = dueDate;
+        }
+      }
+
+      if (
+        record.weightKg !== undefined &&
+        record.weightKg !== null &&
+        String(record.weightKg).trim() !== ""
+      ) {
+        try {
+          const parsedWeight = new Decimal(record.weightKg);
+          if (parsedWeight.isFinite() && parsedWeight.isPositive()) {
+            normalizedRecord.weightKg = parsedWeight.toFixed(3);
+          }
+        } catch {
+          // ignore
+        }
+      }
     } else {
       // Existing settlement-style validation
       const amount = record.amount;

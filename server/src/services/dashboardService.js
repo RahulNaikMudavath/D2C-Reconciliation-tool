@@ -75,15 +75,8 @@ export async function getDashboardSummary() {
     }),
   ]);
 
-  const orderIds = matches.map((match) => match.orderId);
-
-  // Fetch TCS and TDS separately for matched orders.
+  // Fetch TCS and TDS separately for recorded settlements.
   const settlements = await prisma.settlement.findMany({
-    where: {
-      orderId: {
-        in: orderIds,
-      },
-    },
     select: {
       partnerId: true,
       tcsAmount: true,

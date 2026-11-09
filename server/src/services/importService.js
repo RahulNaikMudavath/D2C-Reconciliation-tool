@@ -123,21 +123,80 @@ const sourceRecords = records.map((record, index) => {
 });
 
 
-    // 6. Save all rows and complete the import batch atomically.
-    await prisma.$transaction(async (tx) => {
-      await tx.sourceRecord.createMany({
-        data: sourceRecords,
+    // 6. Save all rows in chunks to handle 100k+ records smoothly.
+    const CHUNK_SIZE = 5000;
+    for (let i = 0; i < sourceRecords.length; i += CHUNK_SIZE) {
+      const chunk = sourceRecords.slice(i, i + CHUNK_SIZE);
+      await prisma.sourceRecord.createMany({
+        data: chunk,
+      });
+    }
+
+    // 7. For ORDERS imports, populate the Order table for reconciliation.
+    if (importType === "ORDERS" && validation.validRecords.length > 0) {
+      const existingPartners = await prisma.partner.findMany();
+      const partnerMap = new Map(
+        existingPartners.map((p) => [p.name.trim().toLowerCase(), p.id])
+      );
+
+      // Collect all unique partner/channel names from valid records
+      const partnerNamesToEnsure = new Set();
+      for (const rec of validation.validRecords) {
+        const name = (rec.partnerName || rec.channel || "").trim();
+        if (name) partnerNamesToEnsure.add(name);
+      }
+
+      for (const name of partnerNamesToEnsure) {
+        const key = name.toLowerCase();
+        if (!partnerMap.has(key)) {
+          const type = key.includes("website")
+            ? "DIRECT_CHANNEL"
+            : key.includes("quick")
+              ? "QUICK_COMMERCE"
+              : "MARKETPLACE";
+
+          const newPartner = await prisma.partner.create({
+            data: { name, type },
+          });
+          partnerMap.set(key, newPartner.id);
+        }
+      }
+
+      const ordersToInsert = validation.validRecords.map((rec) => {
+        const partnerName = (rec.partnerName || rec.channel || "").trim();
+        const partnerId = partnerMap.get(partnerName.toLowerCase()) ?? null;
+
+        return {
+          orderNumber: rec.orderNumber,
+          channel: rec.channel || "Website",
+          partnerId,
+          orderDate: rec.orderDate,
+          paymentMode: rec.paymentMode || "COD",
+          deliveryStatus: rec.deliveryStatus || "Delivered",
+          orderValue: rec.orderValue,
+          expectedSettlementAmount: rec.expectedSettlementAmount ?? null,
+          settlementDueAt: rec.settlementDueAt ?? null,
+          weightKg: rec.weightKg ?? null,
+        };
       });
 
-      await tx.importBatch.update({
-        where: {
-          id: importBatch.id,
-        },
-        data: {
-          rowCount: validation.totalRows,
-          status: "COMPLETED",
-        },
-      });
+      for (let i = 0; i < ordersToInsert.length; i += CHUNK_SIZE) {
+        const chunk = ordersToInsert.slice(i, i + CHUNK_SIZE);
+        await prisma.order.createMany({
+          data: chunk,
+          skipDuplicates: true,
+        });
+      }
+    }
+
+    await prisma.importBatch.update({
+      where: {
+        id: importBatch.id,
+      },
+      data: {
+        rowCount: validation.totalRows,
+        status: "COMPLETED",
+      },
     });
 
     return {
@@ -150,7 +209,7 @@ const sourceRecords = records.map((record, index) => {
       rejectedCount: validation.rejectedCount,
       columnMapping: normalization.columnMapping,
       unmappedHeaders: normalization.unmappedHeaders,
-      rejectedRecords: validation.rejectedRecords,
+      rejectedRecords: validation.rejectedRecords.slice(0, 50),
     };
   } catch (error) {
     await prisma.importBatch.update({

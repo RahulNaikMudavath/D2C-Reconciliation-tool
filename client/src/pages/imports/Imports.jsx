@@ -94,8 +94,8 @@ export default function Imports() {
       return;
     }
 
-    if (selectedFile.size > 10 * 1024 * 1024) {
-      setError("File size must not exceed 10 MB.");
+    if (selectedFile.size > 50 * 1024 * 1024) {
+      setError("File size must not exceed 50 MB.");
       return;
     }
 

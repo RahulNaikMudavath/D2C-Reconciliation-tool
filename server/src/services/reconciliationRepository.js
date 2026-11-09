@@ -405,10 +405,36 @@ export async function runReconciliation() {
       },
     });
 
+    const statusCounts = {
+      TOTAL: results.length,
+      SETTLED: 0,
+      SHORT_PAID: 0,
+      UNPAID_PAST_DUE: 0,
+      FREIGHT_OVERCHARGED: 0,
+      RETURN_NOT_RECEIVED: 0,
+      REVIEW_REQUIRED: 0,
+    };
+
+    for (const item of results) {
+      if (item.settlementResult.status === "SETTLED") statusCounts.SETTLED++;
+      if (item.settlementResult.status === "SHORT_PAID") statusCounts.SHORT_PAID++;
+      if (item.settlementResult.status === "UNPAID_PAST_DUE") statusCounts.UNPAID_PAST_DUE++;
+      if (
+        item.settlementResult.status === "REVIEW_REQUIRED" ||
+        item.freightStatus === "REVIEW_REQUIRED" ||
+        item.returnStatus === "REVIEW_REQUIRED"
+      ) {
+        statusCounts.REVIEW_REQUIRED++;
+      }
+      if (item.freightStatus === "FREIGHT_OVERCHARGED") statusCounts.FREIGHT_OVERCHARGED++;
+      if (item.returnStatus === "RETURN_NOT_RECEIVED") statusCounts.RETURN_NOT_RECEIVED++;
+    }
+
     return {
       runId: run.id,
       totalOrders: results.length,
-      results: results.map((item) => ({
+      statusCounts,
+      results: results.slice(0, 1000).map((item) => ({
         orderNumber: item.order.orderNumber,
         channel: item.order.channel,
         partnerName: item.order.partner?.name ?? "Unknown",

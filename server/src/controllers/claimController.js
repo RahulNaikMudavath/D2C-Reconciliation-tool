@@ -45,11 +45,46 @@ export async function createClaims(req, res, next) {
 
 export async function fetchClaims(req, res, next) {
   try {
-    const claims = await getAllClaims();
+    const limit = Math.min(parseInt(req.query.limit) || 1000, 5000);
+    const page = parseInt(req.query.page) || 1;
+    const skip = (page - 1) * limit;
+
+    const [totalClaims, openCount, inReviewCount, resolvedCount, totalSum, claims] = await Promise.all([
+      prisma.claim.count(),
+      prisma.claim.count({ where: { status: "OPEN" } }),
+      prisma.claim.count({ where: { status: "IN_REVIEW" } }),
+      prisma.claim.count({ where: { status: "RESOLVED" } }),
+      prisma.claim.aggregate({
+        where: { status: { in: ["OPEN", "IN_REVIEW"] } },
+        _sum: { amount: true },
+      }),
+      prisma.claim.findMany({
+        take: limit,
+        skip,
+        orderBy: { createdAt: "desc" },
+        include: {
+          partner: true,
+          owner: {
+            select: { id: true, name: true, email: true, role: true },
+          },
+          match: {
+            include: { order: true },
+          },
+        },
+      }),
+    ]);
 
     return res.status(200).json({
       success: true,
-      totalClaims: claims.length,
+      totalClaims,
+      summary: {
+        totalClaims,
+        openClaims: openCount + inReviewCount,
+        openCount,
+        inReviewCount,
+        resolvedCount,
+        openClaimValue: Number(totalSum._sum.amount || 0),
+      },
       data: claims,
     });
   } catch (error) {

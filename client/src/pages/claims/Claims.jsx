@@ -66,6 +66,7 @@ const getClaimPriority = (age, status) => {
 
 export default function Claims() {
   const [claims, setClaims] = useState([]);
+  const [summary, setSummary] = useState(null);
   const [partnerSummary, setPartnerSummary] = useState([]);
   const [loadingPartners, setLoadingPartners] = useState(false);
   const [filter, setFilter] = useState("ALL");
@@ -87,6 +88,9 @@ export default function Claims() {
       const response = await api.get("/claims");
       const loadedClaims = response.data.data || [];
       setClaims(loadedClaims);
+      if (response.data.summary) {
+        setSummary(response.data.summary);
+      }
       return loadedClaims;
     } catch (err) {
       setError(
@@ -221,6 +225,10 @@ export default function Claims() {
     (total, claim) => total + Number(claim.amount || 0),
     0
   );
+
+  const totalClaimsCount = summary?.totalClaims ?? claims.length;
+  const openClaimsCount = summary?.openClaims ?? openClaims.length;
+  const displayTotalValue = summary?.openClaimValue ?? totalValue;
 
   const escapeCsv = (val) => {
     if (val === null || val === undefined) return '""';
@@ -394,17 +402,17 @@ export default function Claims() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Claims"
-          value={claims.length}
+          value={totalClaimsCount}
           icon={<FileText size={16} />}
         />
         <StatCard
           title="Open Claims"
-          value={openClaims.length}
+          value={openClaimsCount}
           icon={<Clock size={16} />}
         />
         <StatCard
           title="Open Claim Value"
-          value={formatMoney(totalValue)}
+          value={formatMoney(displayTotalValue)}
           icon={<IndianRupee size={16} />}
         />
       </div>
@@ -631,7 +639,7 @@ export default function Claims() {
         )}
 
         <div className="border-t border-slate-100 px-5 py-4 text-xs text-slate-500">
-          Showing {filteredClaims.length} of {claims.length} claims
+          Showing {filteredClaims.length} {summary?.totalClaims > filteredClaims.length ? `(latest 1,000 of ${summary.totalClaims.toLocaleString()} total)` : `of ${claims.length}`} claims
         </div>
             </section>
 
