@@ -43,6 +43,20 @@ const statCards = [
     format: formatCurrency,
   },
   {
+    key: "totalTCS",
+    label: "Total TCS Collected",
+    icon: IndianRupee,
+    color: "emerald",
+    format: formatCurrency,
+  },
+  {
+    key: "totalTDS",
+    label: "Total TDS Deducted",
+    icon: IndianRupee,
+    color: "violet",
+    format: formatCurrency,
+  },
+  {
     key: "totalActualFreight",
     label: "Actual Freight Charged",
     icon: Truck,
@@ -394,6 +408,58 @@ export default function Dashboard() {
         ) : (
           <p className="text-sm text-slate-500">
             No partner leakage identified.
+          </p>
+        )}
+      </div>
+
+      {/* Partner-wise TCS and TDS Summary */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-slate-900">
+            Partner-wise TCS & TDS Summary
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Tax deductions reported in settlement records, shown separately
+            from financial leakage.
+          </p>
+        </div>
+
+        {summary.partnerTaxSummary?.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 text-xs uppercase text-slate-500">
+                  <th className="py-3 pr-4">Partner</th>
+                  <th className="px-4 py-3">TCS Collected</th>
+                  <th className="py-3 pl-4 text-right">TDS Deducted</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {summary.partnerTaxSummary.map((partner) => (
+                  <tr
+                    key={partner.partnerId}
+                    className="border-b border-slate-100 last:border-0"
+                  >
+                    <td className="py-4 pr-4 font-semibold text-slate-800">
+                      {partner.partnerName}
+                    </td>
+
+                    <td className="px-4 py-4 text-emerald-700">
+                      {formatCurrency(partner.tcsAmount)}
+                    </td>
+
+                    <td className="py-4 pl-4 text-right text-violet-700">
+                      {formatCurrency(partner.tdsAmount)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500">
+            No TCS or TDS settlement records available.
           </p>
         )}
       </div>
