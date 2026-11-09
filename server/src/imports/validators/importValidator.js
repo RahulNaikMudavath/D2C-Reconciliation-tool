@@ -22,10 +22,11 @@ export function parseDecimalSafe(value) {
 }
 
 /**
- * Parses date values safely across ISO, DD-MM-YYYY, YYYY-MM-DD, and slash formats.
+ * Parses date values safely across ISO, DD-MM-YYYY, DD/MM/YYYY, Excel serial, and textual dates.
+ * Enforces strict DD-MM-YYYY precedence over generic parsing to prevent US/UK day-month transposition.
  *
  * @param {any} value - Raw input date.
- * @returns {Date | null} Parsed JavaScript Date or null if invalid/empty.
+ * @returns {Date | null} Parsed JavaScript Date in UTC or null if invalid/impossible.
  */
 export function parseDateSafe(value) {
   if (!value) return null;
@@ -33,25 +34,97 @@ export function parseDateSafe(value) {
     return Number.isNaN(value.getTime()) ? null : value;
   }
 
+  // Handle Excel serial date numbers
+  if (
+    typeof value === "number" ||
+    (typeof value === "string" && /^\d{5}(\.\d+)?$/.test(value.trim()))
+  ) {
+    const num = Number(value);
+    if (!Number.isNaN(num) && num >= 25569 && num <= 2958465) {
+      const ms = Math.round((num - 25569) * 86400 * 1000);
+      const d = new Date(ms);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+  }
+
   const str = String(value).trim();
   if (!str) return null;
 
-  // Try direct standard parse
-  const directDate = new Date(str);
-  if (!Number.isNaN(directDate.getTime())) {
-    return directDate;
+  // 1. Detect explicitly formatted ISO dates: YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss...
+  const isoMatch = str.match(
+    /^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(?:Z|([+-]\d{2}:?\d{2}))?)?$/
+  );
+  if (isoMatch) {
+    const year = parseInt(isoMatch[1], 10);
+    const month = parseInt(isoMatch[2], 10);
+    const day = parseInt(isoMatch[3], 10);
+
+    if (
+      year < 1900 ||
+      year > 2100 ||
+      month < 1 ||
+      month > 12 ||
+      day < 1 ||
+      day > 31
+    ) {
+      return null;
+    }
+
+    const d = new Date(Date.UTC(year, month - 1, day));
+    if (
+      d.getUTCFullYear() !== year ||
+      d.getUTCMonth() !== month - 1 ||
+      d.getUTCDate() !== day
+    ) {
+      return null;
+    }
+
+    if (isoMatch[4] !== undefined) {
+      const fullDate = new Date(str);
+      return Number.isNaN(fullDate.getTime()) ? d : fullDate;
+    }
+
+    return d;
   }
 
-  // Handle DD-MM-YYYY or DD/MM/YYYY
-  const parts = str.split(/[-/]/);
-  if (parts.length === 3) {
-    // If first part is day (<= 31) and second is month (<= 12)
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const year = parseInt(parts[2], 10);
-    if (!Number.isNaN(day) && !Number.isNaN(month) && !Number.isNaN(year)) {
-      const d = new Date(Date.UTC(year, month, day));
-      if (!Number.isNaN(d.getTime())) return d;
+  // 2. Detect DD-MM-YYYY or DD/MM/YYYY BEFORE any generic Date constructor call
+  const ddmmyyyyMatch = str.match(
+    /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})(?:[T\s](\d{2}):(\d{2}):(\d{2}))?$/
+  );
+  if (ddmmyyyyMatch) {
+    const day = parseInt(ddmmyyyyMatch[1], 10);
+    const month = parseInt(ddmmyyyyMatch[2], 10);
+    const year = parseInt(ddmmyyyyMatch[3], 10);
+
+    if (
+      year < 1900 ||
+      year > 2100 ||
+      month < 1 ||
+      month > 12 ||
+      day < 1 ||
+      day > 31
+    ) {
+      return null;
+    }
+
+    const d = new Date(Date.UTC(year, month - 1, day));
+    // Validate calendar overflow to reject impossible dates like 31-02-2026
+    if (
+      d.getUTCFullYear() !== year ||
+      d.getUTCMonth() !== month - 1 ||
+      d.getUTCDate() !== day
+    ) {
+      return null;
+    }
+
+    return d;
+  }
+
+  // 3. Fallback: only for textual month representations (e.g. "03-Nov-2026", "Nov 3, 2026")
+  if (/[a-zA-Z]/.test(str)) {
+    const textDate = new Date(str);
+    if (!Number.isNaN(textDate.getTime())) {
+      return textDate;
     }
   }
 
