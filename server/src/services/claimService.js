@@ -29,21 +29,6 @@ export async function generateClaims(runId) {
 
     const createdClaims = [];
 
-    console.log("CLAIM DEBUG - Run ID:", runId);
-    console.log("CLAIM DEBUG - Matches found:", matches.length);
-
-    for (const match of matches) {
-      console.log("CLAIM DEBUG - Match:", {
-        orderId: match.orderId,
-        orderNumber: match.order?.orderNumber,
-        settlementStatus: match.status,
-        freightStatus: match.freightStatus,
-        settlementDifference: match.difference?.toString(),
-        freightDifference: match.freightDifference?.toString(),
-        partnerId: match.order?.partner?.id,
-      });
-    }
-
     for (const match of matches) {
       if (!match.order.partner) {
         continue;
@@ -88,32 +73,23 @@ export async function generateClaims(runId) {
           }
         } else {
           // Support older claims without a components array.
-          if (evidence.freight?.status === "FREIGHT_OVERCHARGED") {
+          const freightStatus =
+            evidence.freight?.status ?? evidence.status;
+
+          const settlementStatus =
+            evidence.settlement?.status ?? evidence.status;
+
+          if (freightStatus === "FREIGHT_OVERCHARGED") {
             previouslyClaimed.FREIGHT =
               previouslyClaimed.FREIGHT.plus(previousClaim.amount);
           } else if (
-            ["SHORT_PAID", "UNPAID_PAST_DUE"].includes(
-              evidence.settlement?.status
-            )
+            ["SHORT_PAID", "UNPAID_PAST_DUE"].includes(settlementStatus)
           ) {
             previouslyClaimed.SETTLEMENT =
               previouslyClaimed.SETTLEMENT.plus(previousClaim.amount);
           }
         }
       }
-
-      console.log("CLAIM DEBUG - Order:", match.order.orderNumber);
-      console.log(
-        "CLAIM DEBUG - Previous claims:",
-        previousClaims.map((claim) => ({
-          amount: claim.amount.toString(),
-          evidence: claim.evidence,
-        }))
-      );
-      console.log("CLAIM DEBUG - Previously claimed:", {
-        settlement: previouslyClaimed.SETTLEMENT.toString(),
-        freight: previouslyClaimed.FREIGHT.toString(),
-      });
 
       const candidateComponents = [];
 
@@ -165,22 +141,6 @@ export async function generateClaims(runId) {
           });
         }
       }
-
-      console.log(
-        "CLAIM DEBUG - Candidate components:",
-        candidateComponents.map((item) => ({
-          type: item.type,
-          amount: item.amount.toString(),
-        }))
-      );
-
-      console.log(
-        "CLAIM DEBUG - New components:",
-        newComponents.map((item) => ({
-          type: item.type,
-          amount: item.amount.toString(),
-        }))
-      );
 
       if (newComponents.length === 0) {
         continue;
