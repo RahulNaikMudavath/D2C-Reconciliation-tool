@@ -287,6 +287,11 @@ export async function runReconciliation() {
           difference: item.freightDifference,
         },
 
+        return: {
+          recordId: item.returnRecordId,
+          status: item.returnStatus,
+        },
+
         reviewReason: item.reviewReason,
       })),
     };
