@@ -70,32 +70,17 @@ export async function getDashboardSummary() {
   const orderIds = matches.map((match) => match.orderId);
 
   // 4. Fetch claims associated with eligible matches.
-  const claims = orderIds.length > 0
-    ? await prisma.claim.findMany({
-        where: {
-          match: {
-            orderId: {
-              in: orderIds,
-            },
-            runId: latestRun.id,
-            OR: [
-              {
-                status: {
-                  in: ["SHORT_PAID", "UNPAID_PAST_DUE"],
-                },
-              },
-              {
-                freightStatus: "FREIGHT_OVERCHARGED",
-              },
-            ],
-          },
-        },
-        select: {
-          amount: true,
-          status: true,
-        },
-      })
-    : [];
+  const claims = await prisma.claim.findMany({
+    where: {
+      status: {
+        in: ["OPEN", "IN_REVIEW"],
+      },
+    },
+    select: {
+      amount: true,
+      status: true,
+    },
+  });
 
   // 5. Calculate settlement totals.
   const totalExpected = matches.reduce(
