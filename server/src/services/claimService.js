@@ -4,7 +4,6 @@ import Decimal from "decimal.js";
 
 export async function generateClaims(runId) {
   return prisma.$transaction(async (tx) => {
-    // Find matches eligible for settlement or freight recovery.
     const matches = await tx.reconciliationMatch.findMany({
       where: {
         runId,
@@ -34,69 +33,119 @@ export async function generateClaims(runId) {
     const createdClaims = [];
 
     for (const match of matches) {
-      // Prevent duplicate active claims for the same order.
-      const existingActiveClaim = await tx.claim.findFirst({
-        where: {
-          status: {
-            in: ["OPEN", "IN_REVIEW"],
-          },
-          match: {
-            orderId: match.orderId,
-          },
-        },
-      });
-
-      if (existingActiveClaim) {
-        continue;
-      }
-
       if (!match.order.partner) {
         continue;
       }
 
-      // Build independent recovery components.
-      const components = [];
+      // Load historical claims for this order.
+      const previousClaims = await tx.claim.findMany({
+        where: {
+          match: {
+            orderId: match.orderId,
+          },
+        },
+        select: {
+          amount: true,
+          evidence: true,
+        },
+      });
 
+      // Track amounts already claimed separately by component.
+      const previouslyClaimed = {
+        SETTLEMENT: new Decimal(0),
+        FREIGHT: new Decimal(0),
+      };
+
+      for (const previousClaim of previousClaims) {
+        const evidence = previousClaim.evidence ?? {};
+        const oldComponents = Array.isArray(evidence.components)
+          ? evidence.components
+          : [];
+
+        if (oldComponents.length > 0) {
+          for (const component of oldComponents) {
+            if (
+              Object.hasOwn(previouslyClaimed, component.type) &&
+              component.amount !== undefined
+            ) {
+              previouslyClaimed[component.type] =
+                previouslyClaimed[component.type].plus(
+                  component.amount
+                );
+            }
+          }
+        } else {
+          // Support older claims without a components array.
+          if (evidence.freight?.status === "FREIGHT_OVERCHARGED") {
+            previouslyClaimed.FREIGHT =
+              previouslyClaimed.FREIGHT.plus(previousClaim.amount);
+          } else if (
+            ["SHORT_PAID", "UNPAID_PAST_DUE"].includes(
+              evidence.settlement?.status
+            )
+          ) {
+            previouslyClaimed.SETTLEMENT =
+              previouslyClaimed.SETTLEMENT.plus(previousClaim.amount);
+          }
+        }
+      }
+
+      const candidateComponents = [];
+
+      // Settlement recovery component.
       const settlementEligible = [
         "SHORT_PAID",
         "UNPAID_PAST_DUE",
       ].includes(match.status);
 
       if (settlementEligible && match.difference !== null) {
-        const settlementAmount = new Decimal(
-          match.difference.toString()
-        );
+        const amount = new Decimal(match.difference.toString());
 
-        if (settlementAmount.greaterThan(0)) {
-          components.push({
+        if (amount.greaterThan(0)) {
+          candidateComponents.push({
             type: "SETTLEMENT",
-            amount: settlementAmount,
+            amount,
             description: match.status.replaceAll("_", " "),
           });
         }
       }
 
+      // Freight recovery component.
       if (match.freightStatus === "FREIGHT_OVERCHARGED") {
-        const freightAmount = new Decimal(
+        const amount = new Decimal(
           match.freightDifference?.toString() ?? "0"
         );
 
-        if (freightAmount.greaterThan(0)) {
-          components.push({
+        if (amount.greaterThan(0)) {
+          candidateComponents.push({
             type: "FREIGHT",
-            amount: freightAmount,
+            amount,
             description: "FREIGHT OVERCHARGED",
           });
         }
       }
 
-      // Do not create zero-value claims.
-      if (components.length === 0) {
+      // Only claim the portion that has not already been claimed.
+      const newComponents = [];
+
+      for (const component of candidateComponents) {
+        const previousAmount = previouslyClaimed[component.type];
+
+        const remainingAmount = component.amount.minus(previousAmount);
+
+        if (remainingAmount.greaterThan(0)) {
+          newComponents.push({
+            ...component,
+            amount: remainingAmount,
+          });
+        }
+      }
+
+      if (newComponents.length === 0) {
         continue;
       }
 
-      // One claim per match: combine eligible recovery amounts.
-      const totalClaimAmount = components.reduce(
+      const totalClaimAmount = newComponents.reduce(
         (total, component) => total.plus(component.amount),
         new Decimal(0)
       );
@@ -109,13 +158,17 @@ export async function generateClaims(runId) {
       const claim = await tx.claim.create({
         data: {
           claimNumber,
-          description: components
-            .map((component) => component.description)
-            .join(" + ") + ` for order ${match.order.orderNumber}`,
+          description:
+            newComponents
+              .map((component) => component.description)
+              .join(" + ") +
+            ` for order ${match.order.orderNumber}`,
+
           amount: totalClaimAmount.toFixed(2),
           status: "OPEN",
           partnerId: match.order.partner.id,
           matchId: match.id,
+
           evidence: {
             orderNumber: match.order.orderNumber,
             reconciliationRunId: runId,
@@ -140,7 +193,7 @@ export async function generateClaims(runId) {
                 match.freightDifference?.toString() ?? null,
             },
 
-            components: components.map((component) => ({
+            components: newComponents.map((component) => ({
               type: component.type,
               amount: component.amount.toFixed(2),
               description: component.description,
