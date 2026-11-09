@@ -190,12 +190,15 @@ export async function runReconciliation() {
         const reviewReasons = [
           settlementResult.reviewReason,
           ...freightReviewReasons,
+          ...returnReviewReasons,
         ].filter(Boolean);
 
         return {
           order,
           settlementResult,
           settlements: selectedSettlements,
+          returnRecordId,
+          returnStatus,
           actualAmount: hasSettlements
             ? formatMoney(actualAmount)
             : null,
