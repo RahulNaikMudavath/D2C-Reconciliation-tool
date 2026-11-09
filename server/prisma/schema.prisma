@@ -104,33 +104,31 @@ model SourceRecord {
   @@index([importBatchId, rowNumber])
 }
 
-
 model ColumnMapping {
-  id            String    @id @default(uuid())
-  sourceName    String
-  version       Int
-  mapping       Json
+  id         String @id @default(uuid())
+  sourceName String
+  version    Int
+  mapping    Json
 
-  approved      Boolean   @default(false)
-  approvedAt    DateTime?
-  approvedById  String?
+  approved     Boolean   @default(false)
+  approvedAt   DateTime?
+  approvedById String?
 
-  rejected      Boolean   @default(false)
-  rejectedAt    DateTime?
-  rejectedById  String?
+  rejected        Boolean   @default(false)
+  rejectedAt      DateTime?
+  rejectedById    String?
   rejectionReason String?
 
-  createdAt     DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   importBatchId String
   importBatch   ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
 
-  approvedBy    User? @relation("ColumnMappingApprover", fields: [approvedById], references: [id], onDelete: SetNull)
-  rejectedBy    User? @relation("ColumnMappingRejector", fields: [rejectedById], references: [id], onDelete: SetNull)
+  approvedBy User? @relation("ColumnMappingApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  rejectedBy User? @relation("ColumnMappingRejector", fields: [rejectedById], references: [id], onDelete: SetNull)
 
   @@unique([sourceName, version])
 }
-
 
 model Order {
   id          String @id @default(uuid())
@@ -282,28 +280,28 @@ model ReconciliationRun {
 }
 
 model ReconciliationMatch {
-  id              String               @id @default(uuid())
-  runId           String
-  orderId         String
+  id                    String                @id @default(uuid())
+  runId                 String
+  orderId               String
   // Freight reconciliation results
   freightStatus         ReconciliationStatus?
-  expectedFreightAmount Decimal? @db.Decimal(14, 2)
-  actualFreightAmount   Decimal? @db.Decimal(14, 2)
-  freightDifference     Decimal? @db.Decimal(14, 2)
-  returnRecordId  String?
-  status          ReconciliationStatus
-  expectedAmount Decimal? @db.Decimal(14, 2)
-  actualAmount   Decimal? @db.Decimal(14, 2)
-  difference     Decimal? @db.Decimal(14, 2)
-  reviewReason String?
-  createdAt       DateTime             @default(now())
+  expectedFreightAmount Decimal?              @db.Decimal(14, 2)
+  actualFreightAmount   Decimal?              @db.Decimal(14, 2)
+  freightDifference     Decimal?              @db.Decimal(14, 2)
+  returnRecordId        String?
+  status                ReconciliationStatus
+  expectedAmount        Decimal?              @db.Decimal(14, 2)
+  actualAmount          Decimal?              @db.Decimal(14, 2)
+  difference            Decimal?              @db.Decimal(14, 2)
+  reviewReason          String?
+  createdAt             DateTime              @default(now())
 
-  run           ReconciliationRun @relation(fields: [runId], references: [id])
-  order         Order             @relation(fields: [orderId], references: [id])
-  settlements   MatchSettlement[]
+  run            ReconciliationRun @relation(fields: [runId], references: [id])
+  order          Order             @relation(fields: [orderId], references: [id])
+  settlements    MatchSettlement[]
   freightCharges FreightCharge[]
-  returnRecord  ReturnRecord?     @relation(fields: [returnRecordId], references: [id])
-  claims        Claim[]
+  returnRecord   ReturnRecord?     @relation(fields: [returnRecordId], references: [id])
+  claims         Claim[]
 
   @@unique([runId, orderId])
   @@index([status, orderId])

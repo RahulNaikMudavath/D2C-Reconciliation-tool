@@ -4,13 +4,20 @@ import Decimal from "decimal.js";
 
 export async function generateClaims(runId) {
   return prisma.$transaction(async (tx) => {
-    // Find eligible reconciliation matches.
+    // Find matches eligible for settlement or freight recovery.
     const matches = await tx.reconciliationMatch.findMany({
       where: {
         runId,
-        status: {
-          in: ["SHORT_PAID", "UNPAID_PAST_DUE"],
-        },
+        OR: [
+          {
+            status: {
+              in: ["SHORT_PAID", "UNPAID_PAST_DUE"],
+            },
+          },
+          {
+            freightStatus: "FREIGHT_OVERCHARGED",
+          },
+        ],
         claims: {
           none: {},
         },
@@ -42,9 +49,57 @@ export async function generateClaims(runId) {
       if (existingActiveClaim) {
         continue;
       }
+
       if (!match.order.partner) {
         continue;
       }
+
+      // Build independent recovery components.
+      const components = [];
+
+      const settlementEligible = [
+        "SHORT_PAID",
+        "UNPAID_PAST_DUE",
+      ].includes(match.status);
+
+      if (settlementEligible && match.difference !== null) {
+        const settlementAmount = new Decimal(
+          match.difference.toString()
+        );
+
+        if (settlementAmount.greaterThan(0)) {
+          components.push({
+            type: "SETTLEMENT",
+            amount: settlementAmount,
+            description: match.status.replaceAll("_", " "),
+          });
+        }
+      }
+
+      if (match.freightStatus === "FREIGHT_OVERCHARGED") {
+        const freightAmount = new Decimal(
+          match.freightDifference?.toString() ?? "0"
+        );
+
+        if (freightAmount.greaterThan(0)) {
+          components.push({
+            type: "FREIGHT",
+            amount: freightAmount,
+            description: "FREIGHT OVERCHARGED",
+          });
+        }
+      }
+
+      // Do not create zero-value claims.
+      if (components.length === 0) {
+        continue;
+      }
+
+      // One claim per match: combine eligible recovery amounts.
+      const totalClaimAmount = components.reduce(
+        (total, component) => total.plus(component.amount),
+        new Decimal(0)
+      );
 
       const claimNumber = `RX-CLM-${randomUUID()
         .replaceAll("-", "")
@@ -54,19 +109,44 @@ export async function generateClaims(runId) {
       const claim = await tx.claim.create({
         data: {
           claimNumber,
-          description:
-            `${match.status.replaceAll("_", " ")} for order ${match.order.orderNumber}`,
-          amount: match.difference,
+          description: components
+            .map((component) => component.description)
+            .join(" + ") + ` for order ${match.order.orderNumber}`,
+          amount: totalClaimAmount.toFixed(2),
           status: "OPEN",
           partnerId: match.order.partner.id,
           matchId: match.id,
           evidence: {
             orderNumber: match.order.orderNumber,
             reconciliationRunId: runId,
-            expectedAmount: match.expectedAmount.toString(),
-            actualAmount: match.actualAmount?.toString() ?? null,
-            difference: match.difference.toString(),
-            status: match.status,
+
+            settlement: {
+              status: match.status,
+              expectedAmount:
+                match.expectedAmount?.toString() ?? null,
+              actualAmount:
+                match.actualAmount?.toString() ?? null,
+              difference:
+                match.difference?.toString() ?? null,
+            },
+
+            freight: {
+              status: match.freightStatus,
+              expectedAmount:
+                match.expectedFreightAmount?.toString() ?? null,
+              actualAmount:
+                match.actualFreightAmount?.toString() ?? null,
+              difference:
+                match.freightDifference?.toString() ?? null,
+            },
+
+            components: components.map((component) => ({
+              type: component.type,
+              amount: component.amount.toFixed(2),
+              description: component.description,
+            })),
+
+            totalClaimAmount: totalClaimAmount.toFixed(2),
           },
         },
       });

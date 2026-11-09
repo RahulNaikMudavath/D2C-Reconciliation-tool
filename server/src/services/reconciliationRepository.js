@@ -1,16 +1,18 @@
 
 import prisma from "../config/database.js";
 import { reconcileSettlement } from "./reconciliationService.js";
+import { reconcileFreight } from "./freightReconciliationService.js";
 import { toMoney, formatMoney } from "../utils/money.js";
-import {
-  calculateExpectedSettlement,
-} from "./rateCardService.js";
+import { calculateExpectedSettlement } from "./rateCardService.js";
+
+const FREIGHT_THRESHOLD = toMoney(10);
 
 export async function runReconciliation() {
-  // 1. Fetch orders and their settlement records.
+  // 1. Fetch orders with their settlement and freight records.
   const orders = await prisma.order.findMany({
     include: {
       settlements: true,
+      freightCharges: true,
     },
     orderBy: {
       orderDate: "asc",
@@ -29,21 +31,20 @@ export async function runReconciliation() {
   });
 
   try {
-    // 3. Calculate and prepare a result for each order.
+    // 3. Calculate settlement and freight results for each order.
     const results = await Promise.all(
       orders.map(async (order) => {
-        // Prefer imported settlements when available.
+        // ---------------- SETTLEMENT RECONCILIATION ----------------
+
         const importedSettlements = order.settlements.filter(
           (settlement) => settlement.importBatchId !== null
         );
 
-        // Otherwise, retain existing seed/demo settlements.
         const selectedSettlements =
           importedSettlements.length > 0
             ? importedSettlements
             : order.settlements;
 
-        // Aggregate selected payments using Decimal.js.
         const actualAmount = selectedSettlements.reduce(
           (total, settlement) =>
             total.plus(toMoney(settlement.amountReceived)),
@@ -52,7 +53,6 @@ export async function runReconciliation() {
 
         const hasSettlements = selectedSettlements.length > 0;
 
-        // Calculate expected settlement using the applicable rate card.
         const rateCardResult = order.partnerId
           ? await calculateExpectedSettlement({
               partnerId: order.partnerId,
@@ -62,41 +62,126 @@ export async function runReconciliation() {
             })
           : { success: false };
 
-        // Use rate-card calculation when available.
-        // Otherwise retain the existing expected settlement amount.
         const expectedAmount = rateCardResult.success
           ? rateCardResult.expectedSettlementAmount
           : order.expectedSettlementAmount;
 
-        const result = reconcileSettlement({
+        const settlementResult = reconcileSettlement({
           expectedAmount,
           actualAmount: hasSettlements ? actualAmount : null,
           dueDate: order.settlementDueAt,
         });
 
+        // ---------------- FREIGHT RECONCILIATION ----------------
+
+        const freightResults = await Promise.all(
+          order.freightCharges.map((charge) =>
+            reconcileFreight({
+              partnerId: order.partnerId,
+              channel: order.channel,
+              courierName: charge.courierName,
+              chargedAmount: charge.chargedAmount,
+              actualWeight: charge.actualWeight,
+              orderDate: order.orderDate,
+            })
+          )
+        );
+
+        const hasFreightCharges = order.freightCharges.length > 0;
+
+        const allFreightRatesFound =
+          hasFreightCharges &&
+          freightResults.every(
+            (item) => item.expectedFreight !== null
+          );
+
+        const actualFreight = order.freightCharges.reduce(
+          (total, charge) =>
+            total.plus(toMoney(charge.chargedAmount)),
+          toMoney(0)
+        );
+
+        const expectedFreight = allFreightRatesFound
+          ? freightResults.reduce(
+              (total, item) =>
+                total.plus(toMoney(item.expectedFreight)),
+              toMoney(0)
+            )
+          : null;
+
+        const freightDifference = allFreightRatesFound
+          ? actualFreight.minus(expectedFreight)
+          : null;
+
+        let freightStatus = null;
+
+        if (hasFreightCharges) {
+          if (!allFreightRatesFound) {
+            freightStatus = "REVIEW_REQUIRED";
+          } else if (freightDifference.greaterThan(FREIGHT_THRESHOLD)) {
+            freightStatus = "FREIGHT_OVERCHARGED";
+          } else {
+            freightStatus = "SETTLED";
+          }
+        }
+
+        const freightReviewReasons = freightResults
+          .filter((item) => item.reviewReason)
+          .map((item) => item.reviewReason);
+
+        const reviewReasons = [
+          settlementResult.reviewReason,
+          ...freightReviewReasons,
+        ].filter(Boolean);
+
         return {
           order,
-          result,
+          settlementResult,
           settlements: selectedSettlements,
           actualAmount: hasSettlements
             ? formatMoney(actualAmount)
             : null,
+          freightStatus,
+          expectedFreightAmount:
+            allFreightRatesFound
+              ? formatMoney(expectedFreight)
+              : null,
+          actualFreightAmount: hasFreightCharges
+            ? formatMoney(actualFreight)
+            : null,
+          freightDifference:
+            allFreightRatesFound
+              ? formatMoney(freightDifference)
+              : null,
+          reviewReason:
+            reviewReasons.length > 0
+              ? reviewReasons.join(" ")
+              : null,
         };
       })
     );
 
-    // 4. Save matches and settlement links atomically.
+    // 4. Save settlement matches, freight results and settlement links atomically.
     await prisma.$transaction(async (tx) => {
       for (const item of results) {
         const match = await tx.reconciliationMatch.create({
           data: {
             runId: run.id,
             orderId: item.order.id,
-            status: item.result.status,
-            expectedAmount: item.result.expectedAmount,
+
+            // Settlement results remain independent.
+            status: item.settlementResult.status,
+            expectedAmount: item.settlementResult.expectedAmount,
             actualAmount: item.actualAmount,
-            difference: item.result.difference,
-            reviewReason: item.result.reviewReason,
+            difference: item.settlementResult.difference,
+
+            // Freight results are stored separately.
+            freightStatus: item.freightStatus,
+            expectedFreightAmount: item.expectedFreightAmount,
+            actualFreightAmount: item.actualFreightAmount,
+            freightDifference: item.freightDifference,
+
+            reviewReason: item.reviewReason,
           },
         });
 
@@ -125,9 +210,19 @@ export async function runReconciliation() {
     return {
       runId: run.id,
       totalOrders: results.length,
-      results: results.map(({ order, result }) => ({
-        orderNumber: order.orderNumber,
-        ...result,
+      results: results.map((item) => ({
+        orderNumber: item.order.orderNumber,
+
+        settlement: item.settlementResult,
+
+        freight: {
+          status: item.freightStatus,
+          expectedAmount: item.expectedFreightAmount,
+          actualAmount: item.actualFreightAmount,
+          difference: item.freightDifference,
+        },
+
+        reviewReason: item.reviewReason,
       })),
     };
   } catch (error) {
