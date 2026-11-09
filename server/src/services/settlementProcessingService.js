@@ -110,16 +110,30 @@ export async function processSettlementImport(importBatchId) {
         }
 
         // 7. Create the actual settlement record.
-await tx.settlement.create({
-  data: {
-    orderId: order.id,
-    partnerId: order.partnerId,
-    importBatchId: batch.id,
-    referenceNumber,
-    amountReceived: amount,
-    settlementDate: new Date(transactionDate),
-  },
-});
+        const tcsAmount = Number(normalized.tcsAmount ?? 0);
+        const tdsAmount = Number(normalized.tdsAmount ?? 0);
+
+        if (
+          !Number.isFinite(tcsAmount) ||
+          !Number.isFinite(tdsAmount) ||
+          tcsAmount < 0 ||
+          tdsAmount < 0
+        ) {
+          throw new Error("Invalid TCS or TDS amount.");
+        }
+
+        await tx.settlement.create({
+          data: {
+            orderId: order.id,
+            partnerId: order.partnerId,
+            importBatchId: batch.id,
+            referenceNumber,
+            amountReceived: amount,
+            tcsAmount,
+            tdsAmount,
+            settlementDate: new Date(transactionDate),
+          },
+        });
 
         // 8. Mark the source record as processed.
         await tx.sourceRecord.update({
