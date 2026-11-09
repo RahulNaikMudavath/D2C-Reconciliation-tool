@@ -102,6 +102,38 @@ export function validateImportRecords(records, options = {}) {
             : actualWeight,
         chargedAt: parsedChargedAt || chargedAt,
       };
+    } else if (importType === "RETURNS") {
+      const returnDate = record.returnDate
+        ? new Date(record.returnDate)
+        : null;
+
+      if (!returnDate) {
+        errors.push("Missing return date.");
+      } else if (Number.isNaN(returnDate.getTime())) {
+        errors.push("Invalid return date.");
+      } else {
+        normalizedRecord.returnDate = returnDate;
+      }
+
+      normalizedRecord.returnStatus =
+        String(record.returnStatus ?? "RETURN_INITIATED")
+          .trim()
+          .toUpperCase()
+          .replace(/[\s-]+/g, "_");
+
+    } else if (importType === "WAREHOUSE_RECEIPTS") {
+      const receivedAt = record.warehouseReceivedAt
+        ? new Date(record.warehouseReceivedAt)
+        : null;
+
+      if (!receivedAt) {
+        errors.push("Missing warehouse receipt date.");
+      } else if (Number.isNaN(receivedAt.getTime())) {
+        errors.push("Invalid warehouse receipt date.");
+      } else {
+        normalizedRecord.warehouseReceivedAt = receivedAt;
+      }
+
     } else {
       // Existing settlement-style validation
       const amount = record.amount;

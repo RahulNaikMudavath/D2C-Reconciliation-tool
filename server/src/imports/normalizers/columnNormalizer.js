@@ -5,6 +5,7 @@ const COLUMN_ALIASES = {
     "order_id",
     "order number",
     "order_number",
+    "ordernumber",
     "order item id",
     "order reference",
   ],
@@ -105,6 +106,7 @@ const COLUMN_ALIASES = {
 
   returnDate: [
     "return date",
+    "returndate",
     "date of return",
     "return initiated date",
     "pickup date",
@@ -112,12 +114,13 @@ const COLUMN_ALIASES = {
 
   returnStatus: [
     "return status",
-    "status",
+    "returnstatus",
     "refund status",
   ],
 
   warehouseReceivedAt: [
     "warehouse received at",
+    "warehousereceivedat",
     "warehouse received date",
     "received date",
     "return received date",
