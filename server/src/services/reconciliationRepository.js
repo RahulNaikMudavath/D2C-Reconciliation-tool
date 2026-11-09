@@ -73,6 +73,46 @@ export async function runReconciliation() {
           dueDate: order.settlementDueAt,
         });
 
+        // ---------------- RETURN RECONCILIATION ----------------
+
+        const returnResults = order.returns.map((returnRecord) => {
+          const normalizedStatus = String(returnRecord.status || "")
+            .trim()
+            .toUpperCase()
+            .replace(/[\s-]+/g, "_");
+
+          let returnStatus = null;
+          let returnReviewReason = null;
+
+          if (returnRecord.warehouseReceivedAt) {
+            returnStatus = "SETTLED";
+          } else if (
+            ["RECEIVED", "WAREHOUSE_RECEIVED", "COMPLETED"].includes(
+              normalizedStatus
+            )
+          ) {
+            returnStatus = "REVIEW_REQUIRED";
+            returnReviewReason =
+              `Return ${returnRecord.id} is marked received but has no warehouse receipt timestamp.`;
+          } else {
+            // No receipt timestamp: keep pending until a receipt deadline
+            // is available. Do not falsely mark it as missing.
+            returnStatus = "REVIEW_REQUIRED";
+            returnReviewReason =
+              `Return ${returnRecord.id} is awaiting warehouse receipt verification.`;
+          }
+
+          return {
+            returnRecordId: returnRecord.id,
+            returnStatus,
+            returnReviewReason,
+          };
+        });
+
+        const missingReturns = returnResults.filter(
+          (item) => item.returnStatus === "RETURN_NOT_RECEIVED"
+        );
+
         // ---------------- FREIGHT RECONCILIATION ----------------
 
         const freightResults = await Promise.all(
