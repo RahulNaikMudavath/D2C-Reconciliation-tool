@@ -414,6 +414,8 @@ export async function getDashboardSummary() {
     },
   };
 
+  const unreconciledOrdersCount = Math.max(0, totalOrders - matches.length);
+
   // 14. Return dashboard summary.
   return {
     activeRun: {
@@ -425,6 +427,7 @@ export async function getDashboardSummary() {
     totalOrders,
     totalImportedRecords,
     totalMatches: matches.length,
+    unreconciledOrdersCount,
 
     totalExpected: totalExpected.toFixed(2),
     totalReceived: totalReceived.toFixed(2),
