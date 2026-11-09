@@ -105,15 +105,19 @@ export async function generateClaims(runId) {
     const candidateComponents = [];
 
     // Settlement recovery component.
-    const settlementEligible = [
-      "SHORT_PAID",
-      "UNPAID_PAST_DUE",
-    ].includes(match.status);
+    // RULE: Claims must only be generated for genuine, confirmed underpayments with imported remittance (actualAmount !== null).
+    // Missing remittances (REVIEW_REQUIRED / pending settlements) are NOT eligible for financial recovery claims.
+    const hasImportedSettlement = match.actualAmount !== null;
+    const settlementEligible =
+      (match.status === "SHORT_PAID" || match.status === "UNPAID_PAST_DUE") &&
+      hasImportedSettlement &&
+      match.reviewReason !== "Settlement remittance file not yet imported";
 
     if (settlementEligible && match.difference !== null) {
       const amount = new Decimal(match.difference.toString());
 
-      if (amount.greaterThan(0)) {
+      // Respect the ₹10 financial discrepancy tolerance threshold
+      if (amount.greaterThan(10)) {
         candidateComponents.push({
           type: "SETTLEMENT",
           amount,
@@ -123,12 +127,14 @@ export async function generateClaims(runId) {
     }
 
     // Freight recovery component.
-    if (match.freightStatus === "FREIGHT_OVERCHARGED") {
+    // RULE: Only confirmed freight overcharges exceeding the ₹10 threshold are eligible.
+    if (match.freightStatus === "FREIGHT_OVERCHARGED" && match.freightDifference !== null) {
       const amount = new Decimal(
-        match.freightDifference?.toString() ?? "0"
+        match.freightDifference.toString()
       );
 
-      if (amount.greaterThan(0)) {
+      // Respect the ₹10 financial discrepancy tolerance threshold
+      if (amount.greaterThan(10)) {
         candidateComponents.push({
           type: "FREIGHT",
           amount,
@@ -443,4 +449,121 @@ export async function getPartnerClaimsSummary() {
     openClaimValue: item.openClaimValue.toFixed(2),
     resolvedClaimValue: item.resolvedClaimValue.toFixed(2),
   }));
+}
+
+/**
+ * Safely and auditably invalidates claims that were generated solely because
+ * settlement remittance data was missing (e.g. before the false-leakage fix).
+ *
+ * Rules:
+ * - Does NOT delete any claims.
+ * - Does NOT mark genuine freight or confirmed underpayment claims as resolved.
+ * - Preserves historical evidence and appends explicit invalidation audit metadata.
+ * - Logs the batch invalidation in AuditLog.
+ */
+export async function invalidateFalseSettlementClaims({ userId = null, runId = null } = {}) {
+  // 1. Get the latest completed reconciliation run if not specified
+  let effectiveRun = null;
+  if (runId) {
+    effectiveRun = await prisma.reconciliationRun.findUnique({
+      where: { id: runId },
+    });
+  } else {
+    effectiveRun = await prisma.reconciliationRun.findFirst({
+      where: { status: "COMPLETED" },
+      orderBy: { completedAt: "desc" },
+    });
+  }
+
+  // 2. Identify false claims: claims in OPEN or IN_REVIEW state generated for orders
+  // with NO imported settlements and marked UNPAID PAST DUE.
+  const falseClaims = await prisma.claim.findMany({
+    where: {
+      status: { in: ["OPEN", "IN_REVIEW"] },
+      description: { contains: "UNPAID PAST DUE" },
+      match: {
+        order: {
+          settlements: { none: {} },
+        },
+      },
+    },
+    select: {
+      id: true,
+      amount: true,
+    },
+  });
+
+  if (falseClaims.length === 0) {
+    return {
+      invalidatedCount: 0,
+      invalidatedAmount: "0.00",
+      message: "No false settlement claims found to invalidate.",
+    };
+  }
+
+  let totalInvalidatedAmount = new Decimal(0);
+  for (const c of falseClaims) {
+    totalInvalidatedAmount = totalInvalidatedAmount.plus(c.amount?.toString() ?? "0");
+  }
+
+  // 3. Atomically update status to REJECTED and append invalidation evidence in PostgreSQL
+  const invalidationReason =
+    "Settlement remittance file not yet imported. Ineligible for financial recovery claim per reconciliation audit.";
+
+  await prisma.$executeRawUnsafe(`
+    UPDATE "Claim"
+    SET "status" = 'REJECTED',
+        "evidence" = jsonb_set(
+          coalesce("evidence", '{}'::jsonb),
+          '{invalidation}',
+          jsonb_build_object(
+            'invalidated', true,
+            'invalidationReason', '${invalidationReason}',
+            'invalidatedAt', NOW()::text,
+            'previousStatus', "status"::text
+          )
+        ),
+        "updatedAt" = NOW()
+    WHERE "status" IN ('OPEN', 'IN_REVIEW')
+      AND "description" LIKE '%UNPAID PAST DUE%'
+      AND "matchId" IN (
+        SELECT m."id" FROM "ReconciliationMatch" m
+        JOIN "Order" o ON m."orderId" = o."id"
+        LEFT JOIN "Settlement" s ON s."orderId" = o."id"
+        WHERE s."id" IS NULL
+      )
+  `);
+
+  // 4. Create an immutable AuditLog record for this batch action
+  let auditUserId = userId;
+  if (!auditUserId) {
+    const defaultUser = await prisma.user.findFirst({
+      where: { role: { in: ["FINANCE_EXECUTIVE", "CO_FOUNDER"] } },
+    });
+    auditUserId = defaultUser?.id;
+  }
+
+  if (auditUserId) {
+    await prisma.auditLog.create({
+      data: {
+        action: "CLAIMS_AUTO_INVALIDATED",
+        entity: "Claim",
+        entityId: "BATCH_INVALIDATION",
+        userId: auditUserId,
+        details: {
+          reason: invalidationReason,
+          invalidatedCount: falseClaims.length,
+          invalidatedAmount: totalInvalidatedAmount.toFixed(2),
+          reconciliationRunId: effectiveRun?.id ?? null,
+        },
+      },
+    });
+  }
+
+  return {
+    success: true,
+    invalidatedCount: falseClaims.length,
+    invalidatedAmount: totalInvalidatedAmount.toFixed(2),
+    reconciliationRunId: effectiveRun?.id ?? null,
+  };
 }

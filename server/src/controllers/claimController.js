@@ -4,6 +4,7 @@ import {
   updateClaimStatus,
   assignClaimOwner,
   getPartnerClaimsSummary,
+  invalidateFalseSettlementClaims,
 } from "../services/claimService.js";
 import { updateClaimStatusSchema } from "../validators/claimValidator.js";
 import { assignClaimSchema } from "../validators/assignClaimValidator.js";
@@ -48,17 +49,22 @@ export async function fetchClaims(req, res, next) {
     const limit = Math.min(parseInt(req.query.limit) || 1000, 5000);
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * limit;
+    const statusFilter = req.query.status;
 
-    const [totalClaims, openCount, inReviewCount, resolvedCount, totalSum, claims] = await Promise.all([
+    const whereClause = statusFilter ? { status: statusFilter } : {};
+
+    const [totalClaims, openCount, inReviewCount, resolvedCount, rejectedCount, totalSum, claims] = await Promise.all([
       prisma.claim.count(),
       prisma.claim.count({ where: { status: "OPEN" } }),
       prisma.claim.count({ where: { status: "IN_REVIEW" } }),
       prisma.claim.count({ where: { status: "RESOLVED" } }),
+      prisma.claim.count({ where: { status: "REJECTED" } }),
       prisma.claim.aggregate({
         where: { status: { in: ["OPEN", "IN_REVIEW"] } },
         _sum: { amount: true },
       }),
       prisma.claim.findMany({
+        where: whereClause,
         take: limit,
         skip,
         orderBy: { createdAt: "desc" },
@@ -83,9 +89,27 @@ export async function fetchClaims(req, res, next) {
         openCount,
         inReviewCount,
         resolvedCount,
+        rejectedCount,
         openClaimValue: Number(totalSum._sum.amount || 0),
       },
       data: claims,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function invalidateFalseClaimsHandler(req, res, next) {
+  try {
+    const result = await invalidateFalseSettlementClaims({
+      userId: req.user?.id,
+      runId: req.body?.runId,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "False claims invalidation audit completed.",
+      data: result,
     });
   } catch (error) {
     next(error);

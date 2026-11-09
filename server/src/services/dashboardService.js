@@ -102,11 +102,17 @@ export async function getDashboardSummary() {
     },
   });
 
-  // 4. Fetch claims associated with eligible matches.
+  // 4. Fetch valid active claims, strictly excluding claims generated without settlement records.
   const claims = await prisma.claim.findMany({
     where: {
       status: {
         in: ["OPEN", "IN_REVIEW"],
+      },
+      NOT: {
+        AND: [
+          { description: { contains: "UNPAID PAST DUE" } },
+          { match: { order: { settlements: { none: {} } } } },
+        ],
       },
     },
     select: {

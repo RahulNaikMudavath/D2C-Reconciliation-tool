@@ -6,6 +6,7 @@ import {
   assignClaim,
   fetchPartnerClaimsSummary,
   exportClaimsCSV,
+  invalidateFalseClaimsHandler,
 } from "../controllers/claimController.js";
 import { fetchFinanceTeam } from "../controllers/teamController.js";
 import {
@@ -41,6 +42,13 @@ router.post(
   authenticate,
   authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
   createClaims
+);
+
+router.post(
+  "/invalidate-false-claims",
+  authenticate,
+  authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
+  invalidateFalseClaimsHandler
 );
 
 router.get(
