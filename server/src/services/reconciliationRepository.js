@@ -4,6 +4,7 @@ import { toMoney, formatMoney } from "../utils/money.js";
 import { randomUUID } from "node:crypto";
 
 const FREIGHT_THRESHOLD = toMoney(10);
+const RETURN_SLA_DAYS = 7; // Configurable business rule: in-transit returns exceeding 7 days without warehouse receipt are classified as lost/overdue.
 const BULK_CHUNK_SIZE = 5000;
 
 // High-speed in-memory rate card matchers
@@ -166,6 +167,7 @@ export async function runReconciliation() {
         expectedAmount,
         actualAmount: hasSettlements ? actualAmount : null,
         dueDate: order.settlementDueAt,
+        hasSettlementRecord: hasSettlements,
       });
 
       // ---------------- RETURN RECONCILIATION ----------------
@@ -200,14 +202,14 @@ export async function runReconciliation() {
                 )
               : 0;
 
-          if (ageInDays > 7) {
+          if (ageInDays > RETURN_SLA_DAYS) {
             returnStatus = "RETURN_NOT_RECEIVED";
             returnReviewReason =
-              `Return ${returnRecord.id} was initiated ${ageInDays} days ago but has not reached the warehouse.`;
+              `Return ${returnRecord.id} was initiated ${ageInDays} days ago (exceeding ${RETURN_SLA_DAYS}-day SLA) but has not reached the warehouse.`;
           } else {
             returnStatus = "REVIEW_REQUIRED";
             returnReviewReason =
-              `Return ${returnRecord.id} is in transit (${ageInDays}d elapsed) awaiting warehouse receipt.`;
+              `Return ${returnRecord.id} is in transit (${ageInDays}d elapsed within ${RETURN_SLA_DAYS}-day SLA) awaiting warehouse receipt.`;
           }
         }
 
