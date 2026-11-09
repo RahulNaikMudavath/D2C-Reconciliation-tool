@@ -7,6 +7,8 @@ import {
   FileCheck,
   TrendingDown,
   RefreshCw,
+  Truck,
+  Wallet,
 } from "lucide-react";
 
 import { getDashboardSummary } from "../../services/dashboardService";
@@ -41,9 +43,30 @@ const statCards = [
     format: formatCurrency,
   },
   {
-    key: "moneyAtRisk",
-    label: "Money at Risk",
+    key: "totalActualFreight",
+    label: "Actual Freight Charged",
+    icon: Truck,
+    color: "blue",
+    format: formatCurrency,
+  },
+  {
+    key: "totalExpectedFreight",
+    label: "Expected Freight (Matched Rates)",
+    icon: Wallet,
+    color: "violet",
+    format: formatCurrency,
+  },
+  {
+    key: "freightMoneyAtRisk",
+    label: "Freight Money at Risk",
     icon: AlertTriangle,
+    color: "red",
+    format: formatCurrency,
+  },
+  {
+    key: "moneyAtRisk",
+    label: "Combined Money at Risk",
+    icon: TrendingDown,
     color: "red",
     format: formatCurrency,
   },
@@ -71,7 +94,7 @@ export default function Dashboard() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        "Unable to load dashboard data. Please try again."
+          "Unable to load dashboard data. Please try again."
       );
     } finally {
       setLoading(false);
@@ -86,7 +109,10 @@ export default function Dashboard() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="mx-auto mb-3 animate-spin text-blue-600" size={28} />
+          <RefreshCw
+            className="mx-auto mb-3 animate-spin text-blue-600"
+            size={28}
+          />
           <p className="text-slate-500">Loading financial data...</p>
         </div>
       </div>
@@ -109,6 +135,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      {/* Dashboard Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm font-medium text-blue-600">
@@ -118,7 +145,7 @@ export default function Dashboard() {
             Dashboard
           </h1>
           <p className="mt-2 text-slate-500">
-            Monitor settlements, discrepancies and financial recovery.
+            Monitor settlements, freight discrepancies and financial recovery.
           </p>
         </div>
 
@@ -131,7 +158,8 @@ export default function Dashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      {/* Financial Summary Cards */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {statCards.map((card) => {
           const Icon = card.icon;
 
@@ -140,7 +168,7 @@ export default function Dashboard() {
               key={card.key}
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-medium text-slate-500">
                   {card.label}
                 </p>
@@ -158,9 +186,12 @@ export default function Dashboard() {
         })}
       </div>
 
+      {/* Operational Summary */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <p className="text-sm font-medium text-slate-500">Total Matches</p>
+          <p className="text-sm font-medium text-slate-500">
+            Total Matches
+          </p>
           <h2 className="mt-2 text-3xl font-bold text-slate-900">
             {summary.totalMatches}
           </h2>
@@ -170,33 +201,38 @@ export default function Dashboard() {
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <p className="text-sm font-medium text-slate-500">Open Claims</p>
+          <p className="text-sm font-medium text-slate-500">
+            Open Claims
+          </p>
           <h2 className="mt-2 text-3xl font-bold text-slate-900">
             {summary.openClaims}
           </h2>
           <p className="mt-2 text-sm text-slate-500">
-            Claims awaiting action in the latest reconciliation run
+            Claims currently awaiting action across all runs
           </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <p className="text-sm font-medium text-slate-500">Open Claim Value</p>
+          <p className="text-sm font-medium text-slate-500">
+            Open Claim Value
+          </p>
           <h2 className="mt-2 text-3xl font-bold text-slate-900">
             {formatCurrency(summary.totalClaimValue)}
           </h2>
           <p className="mt-2 text-sm text-slate-500">
-            Value of currently eligible open claims
+            Total value of currently open and in-review claims
           </p>
         </div>
       </div>
 
+      {/* Settlement and Freight Status */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-lg font-bold text-slate-900">
-            Reconciliation Status
+            Settlement Reconciliation Status
           </h2>
           <p className="mt-1 text-sm text-slate-500">
-            Breakdown of the latest reconciliation run
+            Settlement results from the latest reconciliation run
           </p>
 
           <div className="mt-6 space-y-5">
@@ -238,40 +274,128 @@ export default function Dashboard() {
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <div className="mb-5 flex items-center gap-2">
-            <TrendingDown className="text-red-500" size={20} />
+            <Truck className="text-blue-600" size={20} />
             <h2 className="text-lg font-bold text-slate-900">
-              Partner Leakage
+              Freight Reconciliation Status
             </h2>
           </div>
 
-          {summary.partnerLeakage?.length > 0 ? (
-            <div className="space-y-4">
-              {summary.partnerLeakage.map((partner) => (
-                <div
-                  key={partner.partnerId}
-                  className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4 last:border-0"
-                >
-                  <div>
-                    <p className="font-semibold text-slate-800">
-                      {partner.partnerName}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      Outstanding discrepancy
-                    </p>
-                  </div>
+          <p className="mb-5 text-sm text-slate-500">
+            Courier charges evaluated against applicable rate cards
+          </p>
 
-                  <p className="font-bold text-red-600">
-                    {formatCurrency(partner.amountAtRisk)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-slate-500">
-              No partner leakage identified.
+          <div className="space-y-5">
+            {Object.entries(summary.freightStatusBreakdown || {}).map(
+              ([status, count]) => {
+                const freightTotal = Object.values(
+                  summary.freightStatusBreakdown || {}
+                ).reduce((total, value) => total + value, 0);
+
+                const percentage = freightTotal
+                  ? (count / freightTotal) * 100
+                  : 0;
+
+                return (
+                  <div key={status}>
+                    <div className="mb-2 flex justify-between gap-3 text-sm">
+                      <span className="font-medium text-slate-700">
+                        {status.replaceAll("_", " ")}
+                      </span>
+                      <span className="text-slate-500">
+                        {count} orders
+                      </span>
+                    </div>
+
+                    <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className={`h-full rounded-full ${
+                          status === "FREIGHT_OVERCHARGED"
+                            ? "bg-red-500"
+                            : status === "REVIEW_REQUIRED"
+                              ? "bg-amber-500"
+                              : "bg-emerald-500"
+                        }`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              }
+            )}
+
+            {Object.keys(summary.freightStatusBreakdown || {}).length ===
+              0 && (
+              <p className="text-sm text-slate-500">
+                No freight reconciliation results available yet.
+              </p>
+            )}
+          </div>
+
+          <div className="mt-6 rounded-xl bg-amber-50 p-4">
+            <p className="text-sm font-semibold text-amber-800">
+              Rate-card review required
             </p>
-          )}
+            <p className="mt-1 text-sm text-amber-700">
+              Orders marked REVIEW REQUIRED need an applicable courier rate
+              card or manual verification before their freight exposure can
+              be determined.
+            </p>
+          </div>
         </div>
+      </div>
+
+      {/* Partner Leakage */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <div className="mb-5 flex items-center gap-2">
+          <TrendingDown className="text-red-500" size={20} />
+          <h2 className="text-lg font-bold text-slate-900">
+            Partner-wise Financial Leakage
+          </h2>
+        </div>
+
+        {summary.partnerLeakage?.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 text-xs uppercase text-slate-500">
+                  <th className="py-3 pr-4">Partner</th>
+                  <th className="py-3 px-4">Settlement Risk</th>
+                  <th className="py-3 px-4">Freight Risk</th>
+                  <th className="py-3 pl-4 text-right">Total Risk</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {summary.partnerLeakage.map((partner) => (
+                  <tr
+                    key={partner.partnerId}
+                    className="border-b border-slate-100 last:border-0"
+                  >
+                    <td className="py-4 pr-4 font-semibold text-slate-800">
+                      {partner.partnerName}
+                    </td>
+
+                    <td className="px-4 py-4 text-slate-600">
+                      {formatCurrency(partner.settlementRisk)}
+                    </td>
+
+                    <td className="px-4 py-4 text-slate-600">
+                      {formatCurrency(partner.freightRisk)}
+                    </td>
+
+                    <td className="py-4 pl-4 text-right font-bold text-red-600">
+                      {formatCurrency(partner.amountAtRisk)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500">
+            No partner leakage identified.
+          </p>
+        )}
       </div>
     </div>
   );
