@@ -242,6 +242,10 @@ export async function runReconciliation() {
             actualFreightAmount: item.actualFreightAmount,
             freightDifference: item.freightDifference,
 
+            // Return results are stored separately.
+            returnRecordId: item.returnRecordId,
+            returnStatus: item.returnStatus,
+
             reviewReason: item.reviewReason,
           },
         });
