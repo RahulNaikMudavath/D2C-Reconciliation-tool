@@ -8,6 +8,7 @@ import {
   Clock,
   IndianRupee,
   Plus,
+  Download,
 } from "lucide-react";
 import api from "../../services/api";
 
@@ -221,17 +222,127 @@ export default function Claims() {
     0
   );
 
+  const escapeCsv = (val) => {
+    if (val === null || val === undefined) return '""';
+    const str = String(val).replace(/"/g, '""');
+    return `"${str}"`;
+  };
+
+  const downloadCSV = (content, filename) => {
+    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportClaims = (claimsList, customFilename) => {
+    const targetClaims = claimsList || filteredClaims;
+    if (!targetClaims || targetClaims.length === 0) {
+      setError("No claims available to export.");
+      return;
+    }
+
+    const headers = [
+      "Claim ID",
+      "Partner",
+      "Channel",
+      "Order Number",
+      "Order Date",
+      "Order Value (INR)",
+      "Claim Amount (INR)",
+      "Status",
+      "Age (Days)",
+      "Priority",
+      "Assigned Owner",
+      "Owner Email",
+      "Discrepancy Components",
+      "Evidence Summary",
+      "Created At",
+    ];
+
+    const rows = targetClaims.map((claim) => {
+      const evidence = claim.evidence ?? {};
+      const components = Array.isArray(evidence.components)
+        ? evidence.components
+            .map((c) => `${c.type}: INR ${c.amount} (${c.description})`)
+            .join(" | ")
+        : "";
+
+      const order = claim.match?.order;
+      const orderDate = order?.orderDate
+        ? new Date(order.orderDate).toLocaleDateString("en-IN")
+        : "";
+      const createdAt = claim.createdAt
+        ? new Date(claim.createdAt).toLocaleString("en-IN")
+        : "";
+
+      const age = getClaimAge(claim.createdAt);
+      const priority = getClaimPriority(age, claim.status).label;
+
+      return [
+        escapeCsv(claim.id),
+        escapeCsv(claim.partner?.name ?? "Unknown"),
+        escapeCsv(order?.channel ?? ""),
+        escapeCsv(order?.orderNumber ?? ""),
+        escapeCsv(orderDate),
+        escapeCsv(
+          order?.orderValue ? Number(order.orderValue).toFixed(2) : ""
+        ),
+        escapeCsv(Number(claim.amount).toFixed(2)),
+        escapeCsv(claim.status),
+        escapeCsv(age),
+        escapeCsv(priority),
+        escapeCsv(claim.owner?.name ?? "Unassigned"),
+        escapeCsv(claim.owner?.email ?? ""),
+        escapeCsv(components),
+        escapeCsv(claim.match?.reviewReason ?? components),
+        escapeCsv(createdAt),
+      ].join(",");
+    });
+
+    const csvContent = [headers.join(","), ...rows].join("\r\n");
+    const dateStr = new Date().toISOString().split("T")[0];
+    const filename =
+      customFilename || `ReconcileX_Claims_Evidence_${dateStr}.csv`;
+    downloadCSV(csvContent, filename);
+  };
+
+  const exportPartnerClaims = (partnerId, partnerName) => {
+    const partnerClaims = claims.filter(
+      (claim) =>
+        claim.partnerId === partnerId || claim.partner?.id === partnerId
+    );
+    const cleanName = (partnerName || "Partner").replace(/\s+/g, "_");
+    const dateStr = new Date().toISOString().split("T")[0];
+    handleExportClaims(
+      partnerClaims,
+      `ReconcileX_Claims_${cleanName}_${dateStr}.csv`
+    );
+  };
+
+  const downloadSingleClaimDossier = (claim) => {
+    handleExportClaims(
+      [claim],
+      `ReconcileX_Claim_${claim.id.slice(0, 8)}_${claim.match?.order?.orderNumber || "Dispute"}.csv`
+    );
+  };
+
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+    <div className="mx-auto max-w-7xl space-y-5">
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600">
             Dispute Management
           </p>
-          <h1 className="mt-1 text-3xl font-extrabold text-slate-900">
+          <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-slate-900">
             Claims & Disputes
           </h1>
-          <p className="mt-1 text-slate-500">
+          <p className="mt-0.5 text-xs text-slate-500">
             Track and resolve marketplace underpayments and settlement disputes.
           </p>
         </div>
@@ -240,61 +351,70 @@ export default function Claims() {
           <button
             onClick={fetchClaims}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-50"
           >
-            <RefreshCw size={16} />
+            <RefreshCw size={14} />
             Refresh
+          </button>
+
+          <button
+            onClick={() => handleExportClaims(filteredClaims)}
+            disabled={claims.length === 0}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-50 transition"
+          >
+            <Download size={14} />
+            Export Evidence (CSV)
           </button>
 
           <button
             onClick={generateClaims}
             disabled={generating}
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs hover:bg-blue-700 disabled:opacity-50"
           >
-            <Plus size={17} />
+            <Plus size={15} />
             {generating ? "Generating..." : "Generate Claims"}
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          <AlertCircle size={18} />
+        <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+          <AlertCircle size={16} />
           {error}
         </div>
       )}
 
       {message && (
-        <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700">
-          <CheckCircle2 size={18} />
+        <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 p-3 text-xs text-green-700">
+          <CheckCircle2 size={16} />
           {message}
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Claims"
           value={claims.length}
-          icon={<FileText size={21} />}
+          icon={<FileText size={16} />}
         />
         <StatCard
           title="Open Claims"
           value={openClaims.length}
-          icon={<Clock size={21} />}
+          icon={<Clock size={16} />}
         />
         <StatCard
           title="Open Claim Value"
           value={formatMoney(totalValue)}
-          icon={<IndianRupee size={21} />}
+          icon={<IndianRupee size={16} />}
         />
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="mb-5">
-          <h2 className="text-lg font-bold text-slate-900">
+      <section className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-2xs">
+        <div className="mb-3">
+          <h2 className="text-sm font-bold text-slate-900">
             Partner-wise Claims Summary
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-0.5 text-xs text-slate-500">
             Compare outstanding disputes and resolved claims across partners.
           </p>
         </div>
@@ -309,36 +429,51 @@ export default function Claims() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[750px] text-left text-sm">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+            <table className="w-full min-w-[750px] text-left text-xs">
+              <thead className="bg-slate-50/80 text-[11px] font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-200">
                 <tr>
-                  <th className="px-4 py-3">Partner</th>
-                  <th className="px-4 py-3">Total Claims</th>
-                  <th className="px-4 py-3">Open</th>
-                  <th className="px-4 py-3">Resolved</th>
-                  <th className="px-4 py-3">Total Value</th>
-                  <th className="px-4 py-3">Open Value</th>
+                  <th className="px-3.5 py-2.5">Partner</th>
+                  <th className="px-3.5 py-2.5">Total Claims</th>
+                  <th className="px-3.5 py-2.5">Open</th>
+                  <th className="px-3.5 py-2.5">Resolved</th>
+                  <th className="px-3.5 py-2.5">Total Value</th>
+                  <th className="px-3.5 py-2.5">Open Value</th>
+                  <th className="px-3.5 py-2.5 text-right">Evidence Dossier</th>
                 </tr>
               </thead>
 
               <tbody className="divide-y divide-slate-100">
                 {partnerSummary.map((partner) => (
-                  <tr key={partner.partnerId} className="hover:bg-slate-50">
-                    <td className="px-4 py-4 font-semibold text-slate-800">
+                  <tr key={partner.partnerId} className="hover:bg-slate-50/70">
+                    <td className="px-3.5 py-2.5 font-semibold text-slate-800">
                       {partner.partnerName}
                     </td>
-                    <td className="px-4 py-4">{partner.totalClaims}</td>
-                    <td className="px-4 py-4 font-semibold text-red-600">
+                    <td className="px-3.5 py-2.5 font-mono">{partner.totalClaims}</td>
+                    <td className="px-3.5 py-2.5 font-semibold text-red-600 font-mono">
                       {partner.openClaims}
                     </td>
-                    <td className="px-4 py-4 text-green-700">
+                    <td className="px-3.5 py-2.5 text-green-700 font-mono">
                       {partner.resolvedClaims}
                     </td>
-                    <td className="px-4 py-4 font-semibold">
+                    <td className="px-3.5 py-2.5 font-semibold font-mono">
                       {formatMoney(partner.totalClaimValue)}
                     </td>
-                    <td className="px-4 py-4 font-bold text-red-600">
+                    <td className="px-3.5 py-2.5 font-bold text-red-600 font-mono">
                       {formatMoney(partner.openClaimValue)}
+                    </td>
+                    <td className="px-3.5 py-2.5 text-right">
+                      <button
+                        onClick={() =>
+                          exportPartnerClaims(
+                            partner.partnerId,
+                            partner.partnerName
+                          )
+                        }
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition"
+                      >
+                        <Download size={12} />
+                        Export
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -348,13 +483,13 @@ export default function Claims() {
         )}
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-col justify-between gap-3 border-b border-slate-100 p-5 sm:flex-row sm:items-center">
+      <section className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-2xs">
+        <div className="flex flex-col justify-between gap-2.5 border-b border-slate-100 p-3.5 sm:flex-row sm:items-center">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">
+            <h2 className="text-sm font-bold text-slate-900">
               Claims Register
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-500">
               Review claims generated from reconciliation discrepancies.
             </p>
           </div>
@@ -362,7 +497,7 @@ export default function Claims() {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+            className="rounded-lg border border-slate-200/80 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 outline-none focus:border-blue-500"
           >
             <option value="ALL">All statuses</option>
             <option value="OPEN">Open</option>
@@ -373,33 +508,33 @@ export default function Claims() {
 
         {loading ? (
           <div className="p-12 text-center text-slate-500">
-            <RefreshCw className="mx-auto mb-3 animate-spin" size={25} />
-            Loading claims...
+            <RefreshCw className="mx-auto mb-2 animate-spin text-blue-600" size={20} />
+            <span className="text-xs font-medium">Loading claims...</span>
           </div>
         ) : filteredClaims.length === 0 ? (
           <div className="p-12 text-center">
-            <FileText className="mx-auto mb-3 text-slate-300" size={36} />
-            <h3 className="font-semibold text-slate-800">
+            <FileText className="mx-auto mb-2 text-slate-300" size={30} />
+            <h3 className="text-xs font-semibold text-slate-800">
               No claims found
             </h3>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-500">
               Generate claims from your latest reconciliation run.
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[850px] text-left text-sm">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+            <table className="w-full min-w-[850px] text-left text-xs">
+              <thead className="bg-slate-50/80 text-[11px] font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-200">
                 <tr>
-                  <th className="px-5 py-4">Claim</th>
-                  <th className="px-5 py-4">Order</th>
-                  <th className="px-5 py-4">Partner</th>
-                  <th className="px-5 py-4">Amount</th>
-                  <th className="px-5 py-4">Owner</th>
-                  <th className="px-5 py-4">Age</th>
-                  <th className="px-5 py-4">Priority</th>
-                  <th className="px-5 py-4">Status</th>
-                  <th className="px-5 py-4">Update</th>
+                  <th className="px-3.5 py-2.5">Claim</th>
+                  <th className="px-3.5 py-2.5">Order</th>
+                  <th className="px-3.5 py-2.5">Partner</th>
+                  <th className="px-3.5 py-2.5">Amount</th>
+                  <th className="px-3.5 py-2.5">Owner</th>
+                  <th className="px-3.5 py-2.5">Age</th>
+                  <th className="px-3.5 py-2.5">Priority</th>
+                  <th className="px-3.5 py-2.5">Status</th>
+                  <th className="px-3.5 py-2.5">Update</th>
                 </tr>
               </thead>
 
@@ -411,37 +546,37 @@ export default function Claims() {
                     "—";
 
                   return (
-                    <tr key={claim.id} className="hover:bg-slate-50">
-                      <td className="px-5 py-4">
+                    <tr key={claim.id} className="hover:bg-slate-50/70">
+                      <td className="px-3.5 py-2.5">
                         <button
-  type="button"
-  onClick={() => setSelectedClaim(claim)}
-  className="font-semibold text-blue-600 hover:text-blue-800 hover:underline"
->
-  {claim.claimNumber}
-</button>
-                        <p className="mt-1 text-xs text-slate-500">
+                          type="button"
+                          onClick={() => setSelectedClaim(claim)}
+                          className="font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                          {claim.claimNumber}
+                        </button>
+                        <p className="mt-0.5 text-[11px] text-slate-500">
                           {claim.description}
                         </p>
                       </td>
 
-                      <td className="px-5 py-4 font-medium text-slate-700">
+                      <td className="px-3.5 py-2.5 font-medium text-slate-700">
                         {orderNumber}
                       </td>
 
-                      <td className="px-5 py-4 text-slate-700">
+                      <td className="px-3.5 py-2.5 text-slate-700">
                         {claim.partner?.name || "—"}
                       </td>
 
-                      <td className="px-5 py-4 font-bold text-slate-900">
+                      <td className="px-3.5 py-2.5 font-bold font-mono text-slate-900">
                         {formatMoney(claim.amount)}
                       </td>
 
-                      <td className="px-5 py-4 text-slate-600">
+                      <td className="px-3.5 py-2.5 text-slate-600">
                         {claim.owner?.name || "Unassigned"}
                       </td>
-                      <td className="px-5 py-4">
-                        <span className="font-semibold text-slate-700">
+                      <td className="px-3.5 py-2.5">
+                        <span className="font-semibold text-slate-700 font-mono">
                           {getClaimAge(claim.createdAt)} days
                         </span>
                       </td>
@@ -638,7 +773,15 @@ export default function Claims() {
               </p>
             </div>
 
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6 flex flex-wrap justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => downloadSingleClaimDossier(selectedClaim)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
+              >
+                <Download size={15} />
+                Download Dispute Dossier
+              </button>
               <button
                 onClick={() => setSelectedClaim(null)}
                 className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
@@ -655,14 +798,14 @@ export default function Claims() {
 
 function StatCard({ title, value, icon }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-slate-500">{title}</p>
-        <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
+        <p className="text-xs font-semibold text-slate-500">{title}</p>
+        <div className="rounded-lg bg-blue-50 p-1.5 text-blue-600">
           {icon}
         </div>
       </div>
-      <p className="mt-4 text-2xl font-extrabold text-slate-900">
+      <p className="mt-1.5 text-xl font-bold font-mono text-slate-900">
         {value}
       </p>
     </div>

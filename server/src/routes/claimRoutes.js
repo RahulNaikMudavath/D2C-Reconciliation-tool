@@ -5,6 +5,7 @@ import {
   changeClaimStatus,
   assignClaim,
   fetchPartnerClaimsSummary,
+  exportClaimsCSV,
 } from "../controllers/claimController.js";
 import { fetchFinanceTeam } from "../controllers/teamController.js";
 import {
@@ -26,6 +27,13 @@ router.get(
   authenticate,
   authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
   fetchPartnerClaimsSummary
+);
+
+router.get(
+  "/export",
+  authenticate,
+  authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
+  exportClaimsCSV
 );
 
 router.post(

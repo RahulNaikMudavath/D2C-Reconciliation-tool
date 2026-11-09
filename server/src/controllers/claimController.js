@@ -160,3 +160,114 @@ export async function fetchPartnerClaimsSummary(req, res, next) {
     next(error);
   }
 }
+
+export async function exportClaimsCSV(req, res, next) {
+  try {
+    const { partnerId, status } = req.query;
+
+    const where = {};
+    if (partnerId) where.partnerId = partnerId;
+    if (status && status !== "ALL") where.status = status;
+
+    const claims = await prisma.claim.findMany({
+      where,
+      include: {
+        partner: true,
+        owner: {
+          select: { name: true, email: true },
+        },
+        match: {
+          include: {
+            order: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Helper to escape CSV values
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const headers = [
+      "Claim ID",
+      "Partner Name",
+      "Channel",
+      "Order Number",
+      "Order Date",
+      "Order Value (INR)",
+      "Claim Amount (INR)",
+      "Status",
+      "Age (Days)",
+      "Assigned Owner",
+      "Owner Email",
+      "Discrepancy Components",
+      "Evidence Summary",
+      "Generated At",
+    ];
+
+    const rows = claims.map((claim) => {
+      const evidence = claim.evidence ?? {};
+      const components = Array.isArray(evidence.components)
+        ? evidence.components
+            .map(
+              (c) =>
+                `${c.type}: INR ${c.amount} (${c.description})`
+            )
+            .join(" | ")
+        : "";
+
+      const order = claim.match?.order;
+      const orderDate = order?.orderDate
+        ? new Date(order.orderDate).toISOString().split("T")[0]
+        : "";
+      const generatedAt = claim.createdAt
+        ? new Date(claim.createdAt).toISOString()
+        : "";
+
+      const createdDate = new Date(claim.createdAt);
+      const ageDays = Math.max(
+        0,
+        Math.floor(
+          (Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24)
+        )
+      );
+
+      return [
+        escapeCsv(claim.id),
+        escapeCsv(claim.partner?.name ?? "Unknown"),
+        escapeCsv(order?.channel ?? ""),
+        escapeCsv(order?.orderNumber ?? ""),
+        escapeCsv(orderDate),
+        escapeCsv(
+          order?.orderValue ? Number(order.orderValue).toFixed(2) : ""
+        ),
+        escapeCsv(Number(claim.amount).toFixed(2)),
+        escapeCsv(claim.status),
+        escapeCsv(ageDays),
+        escapeCsv(claim.owner?.name ?? "Unassigned"),
+        escapeCsv(claim.owner?.email ?? ""),
+        escapeCsv(components),
+        escapeCsv(claim.match?.reviewReason ?? components),
+        escapeCsv(generatedAt),
+      ].join(",");
+    });
+
+    const csvContent = [headers.join(","), ...rows].join("\r\n");
+
+    const dateStr = new Date().toISOString().split("T")[0];
+    const filename = `ReconcileX_Claims_Evidence_${dateStr}.csv`;
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${filename}"`
+    );
+
+    return res.status(200).send(csvContent);
+  } catch (error) {
+    next(error);
+  }
+}
