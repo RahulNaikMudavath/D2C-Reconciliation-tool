@@ -8,6 +8,8 @@ const ALLOWED_FIELDS_BY_TYPE = {
     "transactionDate",
     "paymentMode",
     "status",
+    "tcsAmount",
+    "tdsAmount",
   ],
   FREIGHT: [
     "orderNumber",
@@ -61,6 +63,20 @@ const COLUMN_ALIASES = {
     "status",
     "payment status",
     "transaction status",
+  ],
+  tcsAmount: [
+    "tcs",
+    "tcs amount",
+    "tax collected at source",
+    "tax collected",
+    "tcs deducted",
+  ],
+  tdsAmount: [
+    "tds",
+    "tds amount",
+    "tax deducted at source",
+    "tax deduction",
+    "tds deducted",
   ],
   courierName: [
     "courier",
