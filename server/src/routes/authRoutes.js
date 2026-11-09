@@ -45,6 +45,8 @@ router.get(
     });
   }
 );
-router.post("/setup-cofounder", setupCofounder);
+if (process.env.NODE_ENV !== "production") {
+  router.post("/setup-cofounder", setupCofounder);
+}
 
 export default router;
