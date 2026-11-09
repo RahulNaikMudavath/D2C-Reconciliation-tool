@@ -288,13 +288,16 @@ model ReconciliationMatch {
   expectedFreightAmount Decimal?              @db.Decimal(14, 2)
   actualFreightAmount   Decimal?              @db.Decimal(14, 2)
   freightDifference     Decimal?              @db.Decimal(14, 2)
-  returnRecordId        String?
-  status                ReconciliationStatus
-  expectedAmount        Decimal?              @db.Decimal(14, 2)
-  actualAmount          Decimal?              @db.Decimal(14, 2)
-  difference            Decimal?              @db.Decimal(14, 2)
-  reviewReason          String?
-  createdAt             DateTime              @default(now())
+
+  returnRecordId String?
+  returnStatus   ReconciliationStatus?
+
+  status         ReconciliationStatus
+  expectedAmount Decimal?             @db.Decimal(14, 2)
+  actualAmount   Decimal?             @db.Decimal(14, 2)
+  difference     Decimal?             @db.Decimal(14, 2)
+  reviewReason   String?
+  createdAt      DateTime             @default(now())
 
   run            ReconciliationRun @relation(fields: [runId], references: [id])
   order          Order             @relation(fields: [orderId], references: [id])
