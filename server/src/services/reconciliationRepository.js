@@ -13,6 +13,7 @@ export async function runReconciliation() {
     include: {
       settlements: true,
       freightCharges: true,
+      returns: true,
     },
     orderBy: {
       orderDate: "asc",
