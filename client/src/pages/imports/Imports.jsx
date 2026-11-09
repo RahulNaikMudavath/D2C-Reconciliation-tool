@@ -254,7 +254,7 @@ export default function Imports() {
               </p>
 
               <p className="mt-2 text-sm text-slate-500">
-                Supported formats: CSV, XLSX · Maximum size: 10 MB
+                Supported formats: CSV, XLSX · Maximum size: 50 MB
               </p>
             </button>
           ) : (
