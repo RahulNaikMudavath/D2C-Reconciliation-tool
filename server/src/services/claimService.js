@@ -102,6 +102,19 @@ export async function generateClaims(runId) {
         }
       }
 
+      console.log("CLAIM DEBUG - Order:", match.order.orderNumber);
+      console.log(
+        "CLAIM DEBUG - Previous claims:",
+        previousClaims.map((claim) => ({
+          amount: claim.amount.toString(),
+          evidence: claim.evidence,
+        }))
+      );
+      console.log("CLAIM DEBUG - Previously claimed:", {
+        settlement: previouslyClaimed.SETTLEMENT.toString(),
+        freight: previouslyClaimed.FREIGHT.toString(),
+      });
+
       const candidateComponents = [];
 
       // Settlement recovery component.
@@ -152,6 +165,22 @@ export async function generateClaims(runId) {
           });
         }
       }
+
+      console.log(
+        "CLAIM DEBUG - Candidate components:",
+        candidateComponents.map((item) => ({
+          type: item.type,
+          amount: item.amount.toString(),
+        }))
+      );
+
+      console.log(
+        "CLAIM DEBUG - New components:",
+        newComponents.map((item) => ({
+          type: item.type,
+          amount: item.amount.toString(),
+        }))
+      );
 
       if (newComponents.length === 0) {
         continue;
