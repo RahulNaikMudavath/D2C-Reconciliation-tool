@@ -17,9 +17,6 @@ export async function generateClaims(runId) {
             freightStatus: "FREIGHT_OVERCHARGED",
           },
         ],
-        claims: {
-          none: {},
-        },
       },
       include: {
         order: {
