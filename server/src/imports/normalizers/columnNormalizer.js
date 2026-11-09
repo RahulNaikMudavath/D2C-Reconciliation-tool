@@ -102,6 +102,34 @@ const COLUMN_ALIASES = {
     "freight date",
     "invoice date",
   ],
+
+  returnDate: [
+    "return date",
+    "date of return",
+    "return initiated date",
+    "pickup date",
+  ],
+
+  returnStatus: [
+    "return status",
+    "status",
+    "refund status",
+  ],
+
+  warehouseReceivedAt: [
+    "warehouse received at",
+    "warehouse received date",
+    "received date",
+    "return received date",
+    "receipt date",
+  ],
+
+  receiptReference: [
+    "receipt reference",
+    "receipt id",
+    "warehouse receipt id",
+    "scan id",
+  ],
 };
 
 function normalizeHeader(header) {
