@@ -147,16 +147,16 @@ export default function ColumnMappings() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-indigo-600" />
-            <h1 className="text-2xl font-bold text-slate-900">
+            <Sparkles className="h-5 w-5 text-indigo-600" />
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               AI Column Mapping
             </h1>
           </div>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-0.5 text-xs text-slate-500">
             Review AI-generated column suggestions and manage approvals.
           </p>
         </div>
@@ -164,41 +164,41 @@ export default function ColumnMappings() {
         <button
           onClick={loadMappings}
           disabled={loading}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-50"
         >
           <RefreshCw
-            size={16}
+            size={14}
             className={loading ? "animate-spin" : ""}
           />
           Refresh
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Total Mappings</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs">
+          <p className="text-xs font-semibold text-slate-500">Total Mappings</p>
+          <p className="mt-1 text-xl font-bold font-mono text-slate-900">
             {stats.total}
           </p>
         </div>
 
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
-          <p className="text-sm font-medium text-amber-700">Pending Review</p>
-          <p className="mt-2 text-3xl font-bold text-amber-900">
+        <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3.5 shadow-2xs">
+          <p className="text-xs font-semibold text-amber-700">Pending Review</p>
+          <p className="mt-1 text-xl font-bold font-mono text-amber-900">
             {stats.pending}
           </p>
         </div>
 
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
-          <p className="text-sm font-medium text-emerald-700">Approved</p>
-          <p className="mt-2 text-3xl font-bold text-emerald-900">
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3.5 shadow-2xs">
+          <p className="text-xs font-semibold text-emerald-700">Approved</p>
+          <p className="mt-1 text-xl font-bold font-mono text-emerald-900">
             {stats.approved}
           </p>
         </div>
 
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-5 shadow-sm">
-          <p className="text-sm font-medium text-rose-700">Rejected</p>
-          <p className="mt-2 text-3xl font-bold text-rose-900">
+        <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3.5 shadow-2xs">
+          <p className="text-xs font-semibold text-rose-700">Rejected</p>
+          <p className="mt-1 text-xl font-bold font-mono text-rose-900">
             {stats.rejected}
           </p>
         </div>

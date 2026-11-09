@@ -179,23 +179,23 @@ export default function Imports() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto max-w-5xl space-y-5">
       {/* Page Header */}
       <div>
-        <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600">
           Data Pipeline
         </p>
-        <h1 className="mt-1 text-3xl font-extrabold text-slate-900">
+        <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-slate-900">
           Import Files
         </h1>
-        <p className="mt-1 text-slate-500">
+        <p className="mt-0.5 text-xs text-slate-500">
           Upload partner statements and financial records for batch processing and automated reconciliation.
         </p>
       </div>
 
       {/* Upload Card */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <h2 className="text-lg font-bold text-slate-900">
+      <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-2xs">
+        <h2 className="text-sm font-bold text-slate-900">
           Upload Financial Data
         </h2>
         <p className="mt-1 text-sm text-slate-500">
