@@ -28,9 +28,36 @@ try {
   }
 
   const rowsToReset = [
-    { rowNumber: 2, orderNumber: "RX-1001", settlementReference: "TXN-001", amount: "700", transactionDate: "2026-11-01", status: "Partial" },
-    { rowNumber: 3, orderNumber: "RX-1001", settlementReference: "TXN-002", amount: "709", transactionDate: "2026-11-02", status: "Settled" },
-    { rowNumber: 4, orderNumber: "RX-1002", settlementReference: "TXN-003", amount: "1372", transactionDate: "2026-11-03", status: "Settled" },
+    {
+      rowNumber: 2,
+      orderNumber: "RX-1001",
+      settlementReference: "TXN-001",
+      amount: "700",
+      tcsAmount: "7",
+      tdsAmount: "2",
+      transactionDate: "2026-11-01",
+      status: "Partial",
+    },
+    {
+      rowNumber: 3,
+      orderNumber: "RX-1001",
+      settlementReference: "TXN-002",
+      amount: "709",
+      tcsAmount: "7.09",
+      tdsAmount: "2.50",
+      transactionDate: "2026-11-02",
+      status: "Settled",
+    },
+    {
+      rowNumber: 4,
+      orderNumber: "RX-1002",
+      settlementReference: "TXN-003",
+      amount: "1372",
+      tcsAmount: "13.72",
+      tdsAmount: "4",
+      transactionDate: "2026-11-03",
+      status: "Settled",
+    },
   ];
 
   for (const item of rowsToReset) {
@@ -42,6 +69,8 @@ try {
           orderNumber: item.orderNumber,
           settlementReference: item.settlementReference,
           amount: item.amount,
+          tcsAmount: item.tcsAmount,
+          tdsAmount: item.tdsAmount,
           transactionDate: item.transactionDate,
           status: item.status,
           validationStatus: "VALID",
