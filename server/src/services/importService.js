@@ -132,60 +132,217 @@ const sourceRecords = records.map((record, index) => {
       });
     }
 
-    // 7. For ORDERS imports, populate the Order table for reconciliation.
-    if (importType === "ORDERS" && validation.validRecords.length > 0) {
-      const existingPartners = await prisma.partner.findMany();
-      const partnerMap = new Map(
-        existingPartners.map((p) => [p.name.trim().toLowerCase(), p.id])
-      );
+    // 7. Populate domain tables for supported import categories in high-speed chunks
+    if (validation.validRecords.length > 0) {
+      if (importType === "ORDERS") {
+        const existingPartners = await prisma.partner.findMany();
+        const partnerMap = new Map(
+          existingPartners.map((p) => [p.name.trim().toLowerCase(), p.id])
+        );
 
-      // Collect all unique partner/channel names from valid records
-      const partnerNamesToEnsure = new Set();
-      for (const rec of validation.validRecords) {
-        const name = (rec.partnerName || rec.channel || "").trim();
-        if (name) partnerNamesToEnsure.add(name);
-      }
-
-      for (const name of partnerNamesToEnsure) {
-        const key = name.toLowerCase();
-        if (!partnerMap.has(key)) {
-          const type = key.includes("website")
-            ? "DIRECT_CHANNEL"
-            : key.includes("quick")
-              ? "QUICK_COMMERCE"
-              : "MARKETPLACE";
-
-          const newPartner = await prisma.partner.create({
-            data: { name, type },
-          });
-          partnerMap.set(key, newPartner.id);
+        // Collect all unique partner/channel names from valid records
+        const partnerNamesToEnsure = new Set();
+        for (const rec of validation.validRecords) {
+          const name = (rec.partnerName || rec.channel || "").trim();
+          if (name) partnerNamesToEnsure.add(name);
         }
-      }
 
-      const ordersToInsert = validation.validRecords.map((rec) => {
-        const partnerName = (rec.partnerName || rec.channel || "").trim();
-        const partnerId = partnerMap.get(partnerName.toLowerCase()) ?? null;
+        for (const name of partnerNamesToEnsure) {
+          const key = name.toLowerCase();
+          if (!partnerMap.has(key)) {
+            const type = key.includes("website")
+              ? "DIRECT_CHANNEL"
+              : key.includes("quick")
+                ? "QUICK_COMMERCE"
+                : "MARKETPLACE";
 
-        return {
-          orderNumber: rec.orderNumber,
-          channel: rec.channel || "Website",
-          partnerId,
-          orderDate: rec.orderDate,
-          paymentMode: rec.paymentMode || "COD",
-          deliveryStatus: rec.deliveryStatus || "Delivered",
-          orderValue: rec.orderValue,
-          expectedSettlementAmount: rec.expectedSettlementAmount ?? null,
-          settlementDueAt: rec.settlementDueAt ?? null,
-          weightKg: rec.weightKg ?? null,
-        };
-      });
+            const newPartner = await prisma.partner.create({
+              data: { name, type },
+            });
+            partnerMap.set(key, newPartner.id);
+          }
+        }
 
-      for (let i = 0; i < ordersToInsert.length; i += CHUNK_SIZE) {
-        const chunk = ordersToInsert.slice(i, i + CHUNK_SIZE);
-        await prisma.order.createMany({
-          data: chunk,
-          skipDuplicates: true,
+        const ordersToInsert = validation.validRecords.map((rec) => {
+          const partnerName = (rec.partnerName || rec.channel || "").trim();
+          const partnerId = partnerMap.get(partnerName.toLowerCase()) ?? null;
+
+          return {
+            orderNumber: rec.orderNumber,
+            channel: rec.channel || "Website",
+            partnerId,
+            orderDate: rec.orderDate,
+            paymentMode: rec.paymentMode || "COD",
+            deliveryStatus: rec.deliveryStatus || "Delivered",
+            orderValue: rec.orderValue,
+            expectedSettlementAmount: rec.expectedSettlementAmount ?? null,
+            settlementDueAt: rec.settlementDueAt ?? null,
+            weightKg: rec.weightKg ?? null,
+          };
         });
+
+        for (let i = 0; i < ordersToInsert.length; i += CHUNK_SIZE) {
+          const chunk = ordersToInsert.slice(i, i + CHUNK_SIZE);
+          await prisma.order.createMany({
+            data: chunk,
+            skipDuplicates: true,
+          });
+        }
+      } else if (importType === "SETTLEMENTS" || importType === "COD") {
+        const orderNumbers = [...new Set(validation.validRecords.map((r) => r.orderNumber))];
+        const orderMap = new Map();
+
+        for (let i = 0; i < orderNumbers.length; i += CHUNK_SIZE) {
+          const chunk = orderNumbers.slice(i, i + CHUNK_SIZE);
+          const foundOrders = await prisma.order.findMany({
+            where: { orderNumber: { in: chunk } },
+            select: { id: true, orderNumber: true, partnerId: true },
+          });
+          for (const o of foundOrders) {
+            orderMap.set(o.orderNumber, o);
+          }
+        }
+
+        const settlementsToInsert = [];
+        for (const rec of validation.validRecords) {
+          const order = orderMap.get(rec.orderNumber);
+          if (order) {
+            settlementsToInsert.push({
+              orderId: order.id,
+              partnerId: order.partnerId || null,
+              importBatchId: importBatch.id,
+              referenceNumber: rec.settlementReference || rec.referenceNumber || null,
+              amountReceived: rec.amount || rec.remittedAmount,
+              grossAmount: rec.grossAmount ?? null,
+              commissionAmount: rec.commissionAmount ?? 0,
+              otherFeeAmount: rec.otherFeeAmount ?? 0,
+              tcsAmount: rec.tcsAmount ?? 0,
+              tdsAmount: rec.tdsAmount ?? 0,
+              settlementDate: rec.settlementDate || rec.remittanceDate || new Date(),
+            });
+          }
+        }
+
+        for (let i = 0; i < settlementsToInsert.length; i += CHUNK_SIZE) {
+          const chunk = settlementsToInsert.slice(i, i + CHUNK_SIZE);
+          await prisma.settlement.createMany({
+            data: chunk,
+            skipDuplicates: true,
+          });
+        }
+      } else if (importType === "FREIGHT") {
+        const orderNumbers = [...new Set(validation.validRecords.map((r) => r.orderNumber))];
+        const orderMap = new Map();
+
+        for (let i = 0; i < orderNumbers.length; i += CHUNK_SIZE) {
+          const chunk = orderNumbers.slice(i, i + CHUNK_SIZE);
+          const foundOrders = await prisma.order.findMany({
+            where: { orderNumber: { in: chunk } },
+            select: { id: true, orderNumber: true },
+          });
+          for (const o of foundOrders) {
+            orderMap.set(o.orderNumber, o.id);
+          }
+        }
+
+        const freightToInsert = [];
+        for (const rec of validation.validRecords) {
+          const orderId = orderMap.get(rec.orderNumber);
+          if (orderId) {
+            freightToInsert.push({
+              orderId,
+              courierName: rec.courierName,
+              chargedAmount: rec.chargedAmount,
+              actualWeight: rec.actualWeight,
+              invoiceNumber: rec.invoiceNumber || null,
+              chargedAt: rec.chargedAt || new Date(),
+            });
+          }
+        }
+
+        for (let i = 0; i < freightToInsert.length; i += CHUNK_SIZE) {
+          const chunk = freightToInsert.slice(i, i + CHUNK_SIZE);
+          await prisma.freightCharge.createMany({
+            data: chunk,
+            skipDuplicates: true,
+          });
+        }
+      } else if (importType === "RETURNS") {
+        const orderNumbers = [...new Set(validation.validRecords.map((r) => r.orderNumber))];
+        const orderMap = new Map();
+
+        for (let i = 0; i < orderNumbers.length; i += CHUNK_SIZE) {
+          const chunk = orderNumbers.slice(i, i + CHUNK_SIZE);
+          const foundOrders = await prisma.order.findMany({
+            where: { orderNumber: { in: chunk } },
+            select: { id: true, orderNumber: true },
+          });
+          for (const o of foundOrders) {
+            orderMap.set(o.orderNumber, o.id);
+          }
+        }
+
+        const returnsToInsert = [];
+        for (const rec of validation.validRecords) {
+          const orderId = orderMap.get(rec.orderNumber);
+          if (orderId) {
+            returnsToInsert.push({
+              orderId,
+              returnDate: rec.returnDate,
+              status: rec.returnStatus || "RETURN_INITIATED",
+              warehouseReceivedAt: null,
+            });
+          }
+        }
+
+        for (let i = 0; i < returnsToInsert.length; i += CHUNK_SIZE) {
+          const chunk = returnsToInsert.slice(i, i + CHUNK_SIZE);
+          await prisma.returnRecord.createMany({
+            data: chunk,
+            skipDuplicates: true,
+          });
+        }
+      } else if (importType === "WAREHOUSE_RECEIPTS") {
+        const orderNumbers = [...new Set(validation.validRecords.map((r) => r.orderNumber))];
+        const orderMap = new Map();
+
+        for (let i = 0; i < orderNumbers.length; i += CHUNK_SIZE) {
+          const chunk = orderNumbers.slice(i, i + CHUNK_SIZE);
+          const foundOrders = await prisma.order.findMany({
+            where: { orderNumber: { in: chunk } },
+            select: { id: true, orderNumber: true },
+          });
+          for (const o of foundOrders) {
+            orderMap.set(o.orderNumber, o.id);
+          }
+        }
+
+        for (const rec of validation.validRecords) {
+          const orderId = orderMap.get(rec.orderNumber);
+          if (orderId) {
+            const existingReturn = await prisma.returnRecord.findFirst({
+              where: { orderId, warehouseReceivedAt: null },
+            });
+            if (existingReturn) {
+              await prisma.returnRecord.update({
+                where: { id: existingReturn.id },
+                data: {
+                  warehouseReceivedAt: rec.warehouseReceivedAt,
+                  status: "RECEIVED",
+                },
+              });
+            } else {
+              await prisma.returnRecord.create({
+                data: {
+                  orderId,
+                  returnDate: rec.warehouseReceivedAt,
+                  status: rec.status || "RECEIVED",
+                  warehouseReceivedAt: rec.warehouseReceivedAt,
+                },
+              });
+            }
+          }
+        }
       }
     }
 

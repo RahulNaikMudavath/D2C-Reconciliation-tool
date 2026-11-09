@@ -237,3 +237,64 @@ export async function rejectMapping(req, res, next) {
     next(error);
   }
 }
+
+export async function exportRejectedCSV(req, res, next) {
+  try {
+    const { batchId } = req.params;
+
+    const batch = await prisma.importBatch.findUnique({
+      where: { id: batchId },
+    });
+
+    if (!batch) {
+      return res.status(404).json({
+        success: false,
+        message: "Import batch not found.",
+      });
+    }
+
+    const allRecords = await prisma.sourceRecord.findMany({
+      where: { importBatchId: batchId },
+      orderBy: { rowNumber: "asc" },
+    });
+
+    const rejectedRecords = allRecords.filter(
+      (r) => r.normalizedData?.validationStatus === "REJECTED"
+    );
+
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const headers = ["Row Number", "Order Number", "Rejection Reasons", "Raw Data"];
+    const rows = rejectedRecords.map((r) => {
+      const normalized = r.normalizedData || {};
+      const errors = Array.isArray(normalized.errors)
+        ? normalized.errors.join(" | ")
+        : String(normalized.errors || "Validation error");
+      const orderNo = normalized.orderNumber || "";
+      const raw = JSON.stringify(r.rawData);
+
+      return [
+        escapeCsv(r.rowNumber),
+        escapeCsv(orderNo),
+        escapeCsv(errors),
+        escapeCsv(raw),
+      ].join(",");
+    });
+
+    const csvContent = [headers.join(","), ...rows].join("\r\n");
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="Rejected_Rows_${batch.fileName.replace(/[^a-zA-Z0-9_-]/g, "_")}.csv"`
+    );
+
+    return res.status(200).send(csvContent);
+  } catch (error) {
+    next(error);
+  }
+}

@@ -5,6 +5,7 @@ import {
   suggestMappings,
   approveMapping,
   rejectMapping,
+  exportRejectedCSV,
 } from "../controllers/importController.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 import {
@@ -41,6 +42,13 @@ router.patch(
   authenticate,
   authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
   rejectMapping
+);
+
+router.get(
+  "/:batchId/rejected-csv",
+  authenticate,
+  authorizeRoles("FINANCE_EXECUTIVE", "CO_FOUNDER"),
+  exportRejectedCSV
 );
 
 export default router;
