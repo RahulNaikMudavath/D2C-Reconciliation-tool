@@ -12,16 +12,28 @@ export async function getDashboardSummary() {
     },
     select: {
       id: true,
+      startedAt: true,
+      completedAt: true,
+      status: true,
     },
   });
 
   // 2. Return a safe empty dashboard when no run exists.
   if (!latestRun) {
+    const [totalOrders, totalImportedRecords] = await Promise.all([
+      prisma.order.count(),
+      prisma.sourceRecord.count(),
+    ]);
+
     return {
-      totalOrders: await prisma.order.count(),
+      activeRun: null,
+      totalOrders,
+      totalImportedRecords,
       totalMatches: 0,
       totalExpected: "0.00",
       totalReceived: "0.00",
+      pendingSettlementAmount: "0.00",
+      pendingSettlementOrders: 0,
       totalExpectedFreight: "0.00",
       totalActualFreight: "0.00",
       settlementMoneyAtRisk: "0.00",
@@ -41,9 +53,10 @@ export async function getDashboardSummary() {
     };
   }
 
-  // 3. Fetch reconciliation matches and orders.
-  const [totalOrders, matches] = await Promise.all([
+  // 3. Fetch reconciliation matches, orders, and total source records.
+  const [totalOrders, totalImportedRecords, matches] = await Promise.all([
     prisma.order.count(),
+    prisma.sourceRecord.count(),
 
     prisma.reconciliationMatch.findMany({
       where: {
@@ -210,6 +223,14 @@ export async function getDashboardSummary() {
       },
       new Decimal(0)
     );
+
+  // 8b. Calculate pending / unimported settlements (never count as money at risk)
+  const pendingMatches = matches.filter((m) => m.actualAmount === null);
+  const pendingSettlementOrders = pendingMatches.length;
+  const pendingSettlementAmount = pendingMatches.reduce(
+    (sum, m) => sum.plus(m.expectedAmount ?? 0),
+    new Decimal(0)
+  );
 
   // 9. Combined financial exposure.
   const moneyAtRisk = settlementMoneyAtRisk.plus(
@@ -389,27 +410,30 @@ export async function getDashboardSummary() {
 
   // 14. Return dashboard summary.
   return {
+    activeRun: {
+      id: latestRun.id,
+      startedAt: latestRun.startedAt,
+      completedAt: latestRun.completedAt,
+      status: latestRun.status,
+    },
     totalOrders,
+    totalImportedRecords,
     totalMatches: matches.length,
 
     totalExpected: totalExpected.toFixed(2),
     totalReceived: totalReceived.toFixed(2),
+    pendingSettlementOrders,
+    pendingSettlementAmount: pendingSettlementAmount.toFixed(2),
+
     totalTCS: totalTCS.toFixed(2),
     totalTDS: totalTDS.toFixed(2),
     partnerTaxSummary,
 
-    totalExpectedFreight:
-      totalExpectedFreight.toFixed(2),
+    totalExpectedFreight: totalExpectedFreight.toFixed(2),
+    totalActualFreight: totalActualFreight.toFixed(2),
 
-    totalActualFreight:
-      totalActualFreight.toFixed(2),
-
-    settlementMoneyAtRisk:
-      settlementMoneyAtRisk.toFixed(2),
-
-    freightMoneyAtRisk:
-      freightMoneyAtRisk.toFixed(2),
-
+    settlementMoneyAtRisk: settlementMoneyAtRisk.toFixed(2),
+    freightMoneyAtRisk: freightMoneyAtRisk.toFixed(2),
     moneyAtRisk: moneyAtRisk.toFixed(2),
 
     openClaims: openClaims.length,

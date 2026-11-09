@@ -164,13 +164,27 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <button
-          onClick={fetchDashboard}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50 transition"
-        >
-          <RefreshCw size={14} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          {summary?.activeRun && (
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 shadow-2xs">
+              <span className="text-[11px] font-medium text-slate-400">Run:</span>
+              <span className="font-mono font-semibold text-slate-800">
+                {summary.activeRun.id.slice(0, 8)}
+              </span>
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
+                {summary.activeRun.status}
+              </span>
+            </div>
+          )}
+
+          <button
+            onClick={fetchDashboard}
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50 transition"
+          >
+            <RefreshCw size={14} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Financial Summary Cards */}
