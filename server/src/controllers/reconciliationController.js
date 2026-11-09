@@ -48,6 +48,7 @@ export async function getReconciliationResults(req, res, next) {
             channel: true,
             orderDate: true,
             orderValue: true,
+            weightKg: true,
             partner: {
               select: {
                 name: true,
@@ -72,10 +73,46 @@ export async function getReconciliationResults(req, res, next) {
           partnerName: match.order.partner?.name ?? "Unknown",
           orderDate: match.order.orderDate,
           orderValue: match.order.orderValue.toString(),
+          weightKg: match.order.weightKg?.toString() ?? null,
+
+          // Settlement
           status: match.status,
           expectedAmount: match.expectedAmount?.toString() ?? null,
           actualAmount: match.actualAmount?.toString() ?? null,
           difference: match.difference?.toString() ?? null,
+          settlement: {
+            status: match.status,
+            expectedAmount: match.expectedAmount?.toString() ?? null,
+            actualAmount: match.actualAmount?.toString() ?? null,
+            difference: match.difference?.toString() ?? null,
+          },
+
+          // Freight
+          freightStatus: match.freightStatus,
+          expectedFreightAmount:
+            match.expectedFreightAmount?.toString() ?? null,
+          actualFreightAmount:
+            match.actualFreightAmount?.toString() ?? null,
+          freightDifference:
+            match.freightDifference?.toString() ?? null,
+          freight: {
+            status: match.freightStatus,
+            expectedAmount:
+              match.expectedFreightAmount?.toString() ?? null,
+            actualAmount:
+              match.actualFreightAmount?.toString() ?? null,
+            difference:
+              match.freightDifference?.toString() ?? null,
+          },
+
+          // Return
+          returnStatus: match.returnStatus,
+          returnRecordId: match.returnRecordId,
+          return: {
+            recordId: match.returnRecordId,
+            status: match.returnStatus,
+          },
+
           reviewReason: match.reviewReason,
         })),
       },
