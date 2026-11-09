@@ -32,6 +32,12 @@ export async function getDashboardSummary() {
       statusBreakdown: {},
       freightStatusBreakdown: {},
       partnerLeakage: [],
+      agingBreakdown: {
+        "0_7": { label: "0–7 Days", count: 0, amount: "0.00" },
+        "8_15": { label: "8–15 Days", count: 0, amount: "0.00" },
+        "16_30": { label: "16–30 Days", count: 0, amount: "0.00" },
+        "30_plus": { label: "30+ Days", count: 0, amount: "0.00" },
+      },
     };
   }
 
@@ -55,6 +61,8 @@ export async function getDashboardSummary() {
         freightDifference: true,
         order: {
           select: {
+            orderDate: true,
+            settlementDueAt: true,
             partner: {
               select: {
                 id: true,
@@ -250,8 +258,14 @@ export async function getDashboardSummary() {
     {}
   );
 
-  // 13. Partner-wise combined leakage.
+  // 13. Partner-wise combined leakage and Aging Breakdown.
   const partnerMap = new Map();
+  const agingTotals = {
+    "0_7": { count: 0, amount: new Decimal(0) },
+    "8_15": { count: 0, amount: new Decimal(0) },
+    "16_30": { count: 0, amount: new Decimal(0) },
+    "30_plus": { count: 0, amount: new Decimal(0) },
+  };
 
   for (const match of matches) {
     const partner = match.order.partner;
@@ -281,10 +295,18 @@ export async function getDashboardSummary() {
       );
     }
 
+    const totalOrderRisk = settlementRisk.plus(freightRisk);
+
     const existing = partnerMap.get(partner.id) || {
       name: partner.name,
       settlementRisk: new Decimal(0),
       freightRisk: new Decimal(0),
+      aging: {
+        "0_7": new Decimal(0),
+        "8_15": new Decimal(0),
+        "16_30": new Decimal(0),
+        "30_plus": new Decimal(0),
+      },
     };
 
     existing.settlementRisk =
@@ -292,6 +314,32 @@ export async function getDashboardSummary() {
 
     existing.freightRisk =
       existing.freightRisk.plus(freightRisk);
+
+    if (totalOrderRisk.greaterThan(0)) {
+      const refDate =
+        match.order.settlementDueAt || match.order.orderDate;
+      const ageDays = refDate
+        ? Math.max(
+            0,
+            Math.floor(
+              (Date.now() - new Date(refDate).getTime()) /
+                (1000 * 60 * 60 * 24)
+            )
+          )
+        : 0;
+
+      let bucket = "0_7";
+      if (ageDays > 30) bucket = "30_plus";
+      else if (ageDays > 15) bucket = "16_30";
+      else if (ageDays > 7) bucket = "8_15";
+
+      agingTotals[bucket].count++;
+      agingTotals[bucket].amount =
+        agingTotals[bucket].amount.plus(totalOrderRisk);
+
+      existing.aging[bucket] =
+        existing.aging[bucket].plus(totalOrderRisk);
+    }
 
     partnerMap.set(partner.id, existing);
   }
@@ -309,6 +357,12 @@ export async function getDashboardSummary() {
         settlementRisk: data.settlementRisk.toFixed(2),
         freightRisk: data.freightRisk.toFixed(2),
         amountAtRisk: totalRisk.toFixed(2),
+        aging: {
+          "0_7": data.aging["0_7"].toFixed(2),
+          "8_15": data.aging["8_15"].toFixed(2),
+          "16_30": data.aging["16_30"].toFixed(2),
+          "30_plus": data.aging["30_plus"].toFixed(2),
+        },
       };
     }
   ).sort((a, b) =>
@@ -316,6 +370,29 @@ export async function getDashboardSummary() {
       a.amountAtRisk
     )
   );
+
+  const agingBreakdown = {
+    "0_7": {
+      label: "0–7 Days",
+      count: agingTotals["0_7"].count,
+      amount: agingTotals["0_7"].amount.toFixed(2),
+    },
+    "8_15": {
+      label: "8–15 Days",
+      count: agingTotals["8_15"].count,
+      amount: agingTotals["8_15"].amount.toFixed(2),
+    },
+    "16_30": {
+      label: "16–30 Days",
+      count: agingTotals["16_30"].count,
+      amount: agingTotals["16_30"].amount.toFixed(2),
+    },
+    "30_plus": {
+      label: "30+ Days",
+      count: agingTotals["30_plus"].count,
+      amount: agingTotals["30_plus"].amount.toFixed(2),
+    },
+  };
 
   // 14. Return dashboard summary.
   return {
@@ -348,5 +425,6 @@ export async function getDashboardSummary() {
     statusBreakdown,
     freightStatusBreakdown,
     partnerLeakage,
+    agingBreakdown,
   };
 }
