@@ -1,4 +1,5 @@
 import { generateAIResponse } from "./geminiService.js";
+import { COLUMN_ALIASES_BY_TYPE } from "../imports/normalizers/columnNormalizer.js";
 
 const ALLOWED_FIELDS_BY_TYPE = {
   ORDERS: [
@@ -199,22 +200,29 @@ function getHeuristicMappings(
 ) {
   const usedFields = new Set();
   const suggestions = [];
+  const typeAliases = COLUMN_ALIASES_BY_TYPE[importType] || {};
 
   for (const header of headers) {
-    const normalized = String(header)
+    const rawStr = String(header).trim();
+    const normalized = rawStr
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, " ")
       .trim();
 
-    // 1. Try exact match first
+    // 1. Try exact match first against type-specific aliases or generic aliases
     let matchedField = null;
     let confidence = 0.98;
 
-    for (const [field, aliases] of Object.entries(COLUMN_ALIASES).filter(([field]) =>
-      allowedFields.includes(field)
-    )) {
+    for (const field of allowedFields) {
       if (usedFields.has(field)) continue;
-      if (aliases.some((alias) => normalized === alias)) {
+
+      const aliases = typeAliases[field] || COLUMN_ALIASES[field] || [];
+      const isAliasMatch = aliases.some((alias) => {
+        const normAlias = alias.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+        return normalized === normAlias;
+      });
+
+      if (isAliasMatch || normalized.replace(/\s+/g, "") === field.toLowerCase()) {
         matchedField = field;
         break;
       }
@@ -223,16 +231,16 @@ function getHeuristicMappings(
     // 2. If no exact match, try substring match
     if (!matchedField) {
       confidence = 0.85;
-      for (const [field, aliases] of Object.entries(COLUMN_ALIASES).filter(([field]) =>
-        allowedFields.includes(field)
-      )) {
+      for (const field of allowedFields) {
         if (usedFields.has(field)) continue;
-        if (
-          aliases.some(
-            (alias) =>
-              normalized.includes(alias) || alias.includes(normalized)
-          )
-        ) {
+
+        const aliases = typeAliases[field] || COLUMN_ALIASES[field] || [];
+        const isSubMatch = aliases.some((alias) => {
+          const normAlias = alias.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+          return normAlias.length >= 3 && (normalized.includes(normAlias) || normAlias.includes(normalized));
+        });
+
+        if (isSubMatch) {
           matchedField = field;
           break;
         }

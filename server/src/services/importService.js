@@ -6,6 +6,8 @@ import {
   normalizeColumnsWithApprovedMapping,
 } from "../imports/normalizers/columnNormalizer.js";
 import { validateImportRecords } from "../imports/validators/importValidator.js";
+import { suggestColumnMappings } from "./aiMappingService.js";
+import { saveColumnMappingSuggestions } from "./columnMappingPersistenceService.js";
 
 export async function processUploadedFile({
   file,
@@ -74,6 +76,25 @@ export async function processUploadedFile({
       mappingSource = "DEFAULT_ALIAS_MAPPING";
 
       console.log(`Using default alias mapping for ${importType}.`);
+
+      // Generate and persist AI Column Mapping suggestions for review
+      try {
+        const rawHeaders = Object.keys(records[0] || {});
+        if (rawHeaders.length > 0) {
+          const aiMapping = await suggestColumnMappings(rawHeaders, importType);
+          if (aiMapping?.suggestions?.length > 0) {
+            await saveColumnMappingSuggestions({
+              importBatchId: importBatch.id,
+              suggestions: aiMapping.suggestions,
+            });
+          }
+        }
+      } catch (mappingErr) {
+        console.warn(
+          "Could not generate AI column mapping suggestions:",
+          mappingErr.message
+        );
+      }
     }
 
     // 3. Validate normalized records.
