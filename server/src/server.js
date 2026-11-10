@@ -17,8 +17,8 @@ async function startServer() {
 
     console.log("PostgreSQL connected successfully!");
 
-    serverInstance = app.listen(PORT, () => {
-      console.log(`ReconcileX API running on http://localhost:${PORT}`);
+    serverInstance = app.listen(PORT, "0.0.0.0", () => {
+      console.log(`ReconcileX API running on http://0.0.0.0:${PORT}`);
     });
 
     serverInstance.on("error", (error) => {

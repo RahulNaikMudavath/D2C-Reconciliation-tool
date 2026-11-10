@@ -10,6 +10,12 @@ const daysFromNow = (days) =>
 export async function seedDatabase() {
   console.log("=== SEEDING RECONCILEX REALISTIC D2C DATASET ===");
 
+  const existingOrders = await prisma.order.count();
+  if (existingOrders > 0 && process.env.FORCE_SEED !== "true") {
+    console.log(`✓ Database already seeded (${existingOrders} orders found). Skipping redundant seed to boot instantly.`);
+    return;
+  }
+
   // 1. Clean up legacy operational data instantly via TRUNCATE CASCADE
   console.log("1. Cleaning up operational data via fast TRUNCATE CASCADE...");
   await prisma.$executeRawUnsafe(`
