@@ -90,8 +90,13 @@ function calculateFastExpectedFreight(rateCard, weightKg, chargedAmount) {
 }
 
 export async function runReconciliation() {
-  // 1. Fetch all orders with relations.
+  // 1. Fetch all orders with relations (excluding ephemeral test orders).
   const orders = await prisma.order.findMany({
+    where: {
+      NOT: {
+        orderNumber: { startsWith: "TEST-" },
+      },
+    },
     include: {
       partner: true,
       settlements: true,
@@ -380,17 +385,27 @@ export async function runReconciliation() {
       }
     }
 
+    // Verify order IDs in matchesToInsert exist to prevent FK race conditions if orders are deleted concurrently
+    const activeOrderIds = new Set(
+      (await prisma.order.findMany({ select: { id: true } })).map((o) => o.id)
+    );
+    const validMatches = matchesToInsert.filter((m) => activeOrderIds.has(m.orderId));
+    const validMatchIds = new Set(validMatches.map((m) => m.id));
+    const validSettlementLinks = settlementLinksToInsert.filter((s) =>
+      validMatchIds.has(s.reconciliationMatchId)
+    );
+
     // Insert matches in 5,000-row bulk chunks
-    for (let i = 0; i < matchesToInsert.length; i += BULK_CHUNK_SIZE) {
-      const chunk = matchesToInsert.slice(i, i + BULK_CHUNK_SIZE);
+    for (let i = 0; i < validMatches.length; i += BULK_CHUNK_SIZE) {
+      const chunk = validMatches.slice(i, i + BULK_CHUNK_SIZE);
       await prisma.reconciliationMatch.createMany({
         data: chunk,
       });
     }
 
     // Insert settlement links in 5,000-row bulk chunks
-    for (let i = 0; i < settlementLinksToInsert.length; i += BULK_CHUNK_SIZE) {
-      const chunk = settlementLinksToInsert.slice(i, i + BULK_CHUNK_SIZE);
+    for (let i = 0; i < validSettlementLinks.length; i += BULK_CHUNK_SIZE) {
+      const chunk = validSettlementLinks.slice(i, i + BULK_CHUNK_SIZE);
       await prisma.matchSettlement.createMany({
         data: chunk,
       });
@@ -475,7 +490,22 @@ export async function runReconciliation() {
       })),
     };
   } catch (error) {
-    // If saving fails, record the failed run.
+    // If saving fails, clean up any partial matches created in this run to keep database consistent
+    await prisma.matchSettlement.deleteMany({
+      where: {
+        reconciliationMatch: {
+          runId: run.id,
+        },
+      },
+    }).catch(() => {});
+
+    await prisma.reconciliationMatch.deleteMany({
+      where: {
+        runId: run.id,
+      },
+    }).catch(() => {});
+
+    // Record the failed run.
     await prisma.reconciliationRun.update({
       where: {
         id: run.id,
@@ -484,7 +514,7 @@ export async function runReconciliation() {
         status: "FAILED",
         completedAt: new Date(),
       },
-    });
+    }).catch(() => {});
 
     throw error;
   }
