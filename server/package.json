@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "test": "jest --passWithNoTests",
+    "test": "node test/column_mapping_dates.test.mjs && node test/claims_integrity.test.mjs",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate"
