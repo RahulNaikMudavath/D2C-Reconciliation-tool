@@ -175,33 +175,65 @@ export default function ColumnMappings() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs">
+        <button
+          type="button"
+          onClick={() => setStatus("ALL")}
+          className={`cursor-pointer rounded-xl border p-3.5 text-left transition shadow-2xs ${
+            status === "ALL"
+              ? "border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20"
+              : "border-slate-200/80 bg-white hover:border-slate-300"
+          }`}
+        >
           <p className="text-xs font-semibold text-slate-500">Total Mappings</p>
           <p className="mt-1 text-xl font-bold font-mono text-slate-900">
             {stats.total}
           </p>
-        </div>
+        </button>
 
-        <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3.5 shadow-2xs">
+        <button
+          type="button"
+          onClick={() => setStatus("PENDING")}
+          className={`cursor-pointer rounded-xl border p-3.5 text-left transition shadow-2xs ${
+            status === "PENDING"
+              ? "border-amber-500 bg-amber-100/70 ring-2 ring-amber-500/20"
+              : "border-amber-200 bg-amber-50/70 hover:border-amber-300"
+          }`}
+        >
           <p className="text-xs font-semibold text-amber-700">Pending Review</p>
           <p className="mt-1 text-xl font-bold font-mono text-amber-900">
             {stats.pending}
           </p>
-        </div>
+        </button>
 
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3.5 shadow-2xs">
+        <button
+          type="button"
+          onClick={() => setStatus("APPROVED")}
+          className={`cursor-pointer rounded-xl border p-3.5 text-left transition shadow-2xs ${
+            status === "APPROVED"
+              ? "border-emerald-500 bg-emerald-100/70 ring-2 ring-emerald-500/20"
+              : "border-emerald-200 bg-emerald-50/70 hover:border-emerald-300"
+          }`}
+        >
           <p className="text-xs font-semibold text-emerald-700">Approved</p>
           <p className="mt-1 text-xl font-bold font-mono text-emerald-900">
             {stats.approved}
           </p>
-        </div>
+        </button>
 
-        <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3.5 shadow-2xs">
+        <button
+          type="button"
+          onClick={() => setStatus("REJECTED")}
+          className={`cursor-pointer rounded-xl border p-3.5 text-left transition shadow-2xs ${
+            status === "REJECTED"
+              ? "border-rose-500 bg-rose-100/70 ring-2 ring-rose-500/20"
+              : "border-rose-200 bg-rose-50/70 hover:border-rose-300"
+          }`}
+        >
           <p className="text-xs font-semibold text-rose-700">Rejected</p>
           <p className="mt-1 text-xl font-bold font-mono text-rose-900">
             {stats.rejected}
           </p>
-        </div>
+        </button>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -246,13 +278,45 @@ export default function ColumnMappings() {
         </div>
       ) : mappings.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
-          <FileSpreadsheet className="mx-auto h-10 w-10 text-slate-400" />
-          <h3 className="mt-3 font-semibold text-slate-800">
-            No mappings found
-          </h3>
-          <p className="mt-1 text-sm text-slate-500">
-            AI-generated mappings will appear here after file uploads.
-          </p>
+          {status === "PENDING" && stats.total > 0 ? (
+            <>
+              <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-500" />
+              <h3 className="mt-3 font-semibold text-slate-800">
+                All caught up! No pending reviews
+              </h3>
+              <p className="mt-1 text-sm text-slate-500">
+                All {stats.total} column mappings have already been reviewed ({stats.approved} approved, {stats.rejected} rejected).
+              </p>
+              <div className="mt-4 flex justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setStatus("ALL")}
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 cursor-pointer"
+                >
+                  View All Mappings ({stats.total})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatus("APPROVED")}
+                  className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 cursor-pointer"
+                >
+                  View Approved ({stats.approved})
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <FileSpreadsheet className="mx-auto h-10 w-10 text-slate-400" />
+              <h3 className="mt-3 font-semibold text-slate-800">
+                No mappings found
+              </h3>
+              <p className="mt-1 text-sm text-slate-500">
+                {status === "ALL"
+                  ? "AI-generated mappings will appear here after file uploads."
+                  : `No ${status.toLowerCase()} column mappings found.`}
+              </p>
+            </>
+          )}
         </div>
       ) : (
         <div className="space-y-5">
