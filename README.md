@@ -1,5 +1,10 @@
 # ReconcileX – Intelligent D2C Financial Reconciliation Platform
 
+**Live Production App:** [https://reconcilex.onrender.com](https://reconcilex.onrender.com)  
+**GitHub Repository:** [https://github.com/RahulNaikMudavath/D2C-Reconciliation-tool](https://github.com/RahulNaikMudavath/D2C-Reconciliation-tool)  
+**Deployment Guide:** [deployment.md](./deployment.md)  
+**Technical Design Document:** [TECHNICAL_DESIGN.md](./TECHNICAL_DESIGN.md)  
+
 ReconcileX is a financial reconciliation platform designed for Direct-to-Consumer (D2C) businesses. It helps finance teams identify settlement discrepancies, freight overcharges, missing return receipts and potential financial leakages across sales and logistics partners.
 
 The platform combines automated reconciliation, configurable rate cards, AI-assisted column mapping, claims management and financial reporting in one dashboard.
