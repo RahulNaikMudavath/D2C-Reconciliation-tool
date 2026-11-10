@@ -7,7 +7,7 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../../generated/prisma/client.js";
+import { PrismaClient } from "../../generated/prisma/client.ts";
 
 const isCloudDb = Boolean(
   process.env.NODE_ENV === "production" ||

@@ -11,7 +11,7 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:seed": "node src/seed.js",
     "db:studio": "prisma studio",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate && node -e \"import('node:fs').then(fs => fs.writeFileSync('generated/prisma/client.js', 'export * from \\\"./client.ts\\\";\\nexport { PrismaClient } from \\\"./client.ts\\\";\\n'))\""
   },
   "prisma": {
     "seed": "node src/seed.js"
