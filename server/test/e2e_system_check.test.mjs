@@ -204,3 +204,4 @@ runE2ESystemCheck()
     await prisma.$disconnect();
     process.exit(0);
   });
+

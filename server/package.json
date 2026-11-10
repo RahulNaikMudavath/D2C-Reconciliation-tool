@@ -7,9 +7,14 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "test": "node test/column_mapping_dates.test.mjs && node test/claims_integrity.test.mjs && node test/e2e_system_check.test.mjs",
-    "db:migrate": "prisma migrate dev",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "node src/seed.js",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate"
+  },
+  "prisma": {
+    "seed": "node src/seed.js"
   },
   "keywords": [],
   "author": "",

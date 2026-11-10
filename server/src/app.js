@@ -3,6 +3,11 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import path from "node:path";
+import fs from "node:fs";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 import authRoutes from "./routes/authRoutes.js";
 import reconciliationRoutes from "./routes/reconciliationRoutes.js";
@@ -21,12 +26,25 @@ import returnProcessingRoutes from "./routes/returnProcessingRoutes.js";
 const app = express();
 
 // Security headers
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
-// Allow requests from our React frontend
+// Allow requests from our React frontend or cloud deployments
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) {
+        return callback(null, true);
+      }
+      if (origin.includes("localhost") || origin.includes("onrender.com")) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );
@@ -67,6 +85,22 @@ app.use("/api/freight-processing", freightProcessingRoutes);
 app.use("/api/return-processing", returnProcessingRoutes);
 app.use("/api/column-mappings", columnMappingRoutes);
 app.use("/api/rate-cards", rateCardRoutes);
+
+// Serve compiled React frontend in production / when built
+const clientDistPath = path.resolve(__dirname, "../../client/dist");
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+
+  app.use((req, res, next) => {
+    if (req.method === "GET" && !req.path.startsWith("/api")) {
+      const indexPath = path.join(clientDistPath, "index.html");
+      if (fs.existsSync(indexPath)) {
+        return res.sendFile(indexPath);
+      }
+    }
+    next();
+  });
+}
 
 // Handle unknown routes
 app.use((req, res) => {

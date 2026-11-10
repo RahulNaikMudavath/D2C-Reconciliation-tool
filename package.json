@@ -1,0 +1,15 @@
+{
+  "name": "reconcilex",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:client": "npm --prefix client install && npm --prefix client run build",
+    "build:server": "npm --prefix server install && cd server && npx prisma generate",
+    "build": "npm run build:client && npm run build:server",
+    "db:migrate": "cd server && npm run db:migrate",
+    "db:seed": "cd server && npm run db:seed",
+    "start": "cd server && npm run db:migrate && npm run db:seed && npm start",
+    "test": "cd server && npm test"
+  }
+}

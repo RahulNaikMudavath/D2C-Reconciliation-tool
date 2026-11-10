@@ -2,6 +2,7 @@
 
 **Project:** D2C Home Brand's Order, Payment and Return Reconciliation Tool  
 **GitHub Repository:** [https://github.com/RahulNaikMudavath/D2C-Reconciliation-tool](https://github.com/RahulNaikMudavath/D2C-Reconciliation-tool)  
+**Live Application URL:** [https://reconcilex.onrender.com](https://reconcilex.onrender.com)  
 **File:** `deployment.md`  
 
 ---
@@ -91,19 +92,23 @@ npm run dev
 
 ---
 
-## 4. How the Application Is Deployed
+## 4. How the Application Is Deployed Live on Render
 
-ReconcileX is architected as a decoupled, 12-factor cloud-native application:
+ReconcileX includes an automated Infrastructure-as-Code Blueprint (`render.yaml`) that configures both a managed PostgreSQL database and a unified Node.js full-stack web service on [Render](https://render.com).
 
-### A. Production Container Deployment (Docker & Docker Compose)
-* **Web Client (`client`):** Multi-stage Docker build with Node.js compiling static assets into an optimized production bundle, served by an Nginx reverse-proxy container handling SPA routing (`try_files $uri /index.html`).
-* **API Service (`server`):** Node.js container executing Express 5 behind Helmet security middleware and CORS protections, connecting to PostgreSQL via Prisma ORM connection pooling.
-* **Database (`postgres`):** PostgreSQL 16 container with persistent volume mounts for enterprise durability.
+### Live App Details
+* **Live Web App:** [https://reconcilex.onrender.com](https://reconcilex.onrender.com)
+* **Automated CI/CD:** Auto-Deploy is enabled (`autoDeploy: true`). Every push to the `main` branch immediately triggers an automatic rebuild and zero-downtime deployment.
 
-### B. Cloud Platform Deployment (e.g. AWS / Render / Railway / Supabase)
-1. **Managed PostgreSQL:** Hosted on AWS RDS or Supabase. Migrations are executed in the CI/CD pipeline using `npx prisma migrate deploy`.
-2. **Backend API Service:** Containerized web service on Render/Railway. Health checks query `/api/health`.
-3. **Frontend Static CDN:** Static assets deployed to Vercel, Netlify, or Cloudflare Pages with single-page application rewrite rules.
+### 2-Minute 1-Click Render Deployment Instructions
+1. Navigate to **[dashboard.render.com](https://dashboard.render.com)** and log in with GitHub.
+2. Click **New +** in the top navigation bar and select **Blueprint**.
+3. Connect and select repository: `RahulNaikMudavath/D2C-Reconciliation-tool`.
+4. Render automatically parses `render.yaml` and provisions:
+   - **Database (`reconcilex-db`):** Managed PostgreSQL instance with auto-injected `DATABASE_URL`.
+   - **Web Service (`reconcilex`):** Node.js runtime executing `npm run build` (builds the React client and Prisma client) and `npm start` (runs `prisma migrate deploy`, database seeding, and serves the unified Express + React SPA).
+5. (Optional) In the Render dashboard for the `reconcilex` web service, add your `GEMINI_API_KEY` under Environment Variables for live Gemini AI Column Mapping suggestions.
+6. Click **Apply Blueprint**. Render builds and provisions the live service in ~3 minutes.
 
 ---
 
@@ -120,7 +125,10 @@ node test/column_mapping_dates.test.mjs
 # 2. Run Claims Integrity & False-Claim Invalidation Suite
 node test/claims_integrity.test.mjs
 
-# 3. Run 100,000-Record Ingestion Benchmark
+# 3. Run Full End-to-End System Health Check
+node test/e2e_system_check.test.mjs
+
+# 4. Run 100,000-Record Ingestion Benchmark
 cd ..
 node scripts/benchmark_100k.mjs
 ```
