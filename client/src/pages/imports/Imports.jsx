@@ -100,6 +100,21 @@ export default function Imports() {
       return;
     }
 
+    const lowerName = selectedFile.name.toLowerCase();
+    if (lowerName.includes("order")) {
+      setImportType("ORDERS");
+    } else if (lowerName.includes("settle") || lowerName.includes("payout")) {
+      setImportType("SETTLEMENTS");
+    } else if (lowerName.includes("freight") || lowerName.includes("courier") || lowerName.includes("shipping")) {
+      setImportType("FREIGHT");
+    } else if (lowerName.includes("return") || lowerName.includes("rto")) {
+      setImportType("RETURNS");
+    } else if (lowerName.includes("cod")) {
+      setImportType("COD");
+    } else if (lowerName.includes("warehouse") || lowerName.includes("inward") || lowerName.includes("receipt")) {
+      setImportType("WAREHOUSE_RECEIPTS");
+    }
+
     setFile(selectedFile);
   };
 
