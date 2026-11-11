@@ -22,7 +22,28 @@ export async function processSettlementImport(importBatchId) {
     throw new Error("This import batch is not a settlement or COD file.");
   }
 
-  // 2. Fetch all unprocessed source records.
+  // 2. Check if settlements were already created during initial ingestion
+  const existingSettlementsCount = await prisma.settlement.count({
+    where: { importBatchId },
+  });
+
+  if (existingSettlementsCount > 0) {
+    await prisma.sourceRecord.updateMany({
+      where: { importBatchId, processed: false },
+      data: { processed: true },
+    });
+
+    return {
+      totalRecords: existingSettlementsCount,
+      processedCount: existingSettlementsCount,
+      rejectedCount: 0,
+      skippedCount: 0,
+      alreadyProcessed: true,
+      message: `${existingSettlementsCount} settlements already created and staged in database.`,
+    };
+  }
+
+  // 3. Fetch all unprocessed source records.
   const sourceRecords = await prisma.sourceRecord.findMany({
     where: {
       importBatchId,
