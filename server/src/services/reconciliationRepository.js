@@ -4,10 +4,9 @@ import { toMoney, formatMoney } from "../utils/money.js";
 import { randomUUID } from "node:crypto";
 
 const FREIGHT_THRESHOLD = toMoney(10);
-const RETURN_SLA_DAYS = 7; // Configurable business rule: in-transit returns exceeding 7 days without warehouse receipt are classified as lost/overdue.
-const BULK_CHUNK_SIZE = 5000;
+const RETURN_SLA_DAYS = 7;
+const ORDER_BATCH_SIZE = 2500;
 
-// High-speed in-memory rate card matchers
 function matchChannelRateCard(cards, partnerId, channel, orderDate) {
   const targetTime = orderDate ? new Date(orderDate).getTime() : Date.now();
   return cards.find((card) => {
@@ -90,29 +89,18 @@ function calculateFastExpectedFreight(rateCard, weightKg, chargedAmount) {
 }
 
 export async function runReconciliation() {
-  // 1. Fetch all orders with relations (excluding ephemeral test orders).
-  const orders = await prisma.order.findMany({
+  const totalOrdersCount = await prisma.order.count({
     where: {
       NOT: {
         orderNumber: { startsWith: "TEST-" },
       },
     },
-    include: {
-      partner: true,
-      settlements: true,
-      freightCharges: true,
-      returns: true,
-    },
-    orderBy: {
-      orderDate: "asc",
-    },
   });
 
-  if (orders.length === 0) {
+  if (totalOrdersCount === 0) {
     throw new Error("No orders found for reconciliation.");
   }
 
-  // 2. Pre-fetch all rate cards ONCE to avoid N*2 SQL queries in loop
   const [channelRateCards, courierRateCards] = await Promise.all([
     prisma.channelRateCard.findMany({
       orderBy: { effectiveFrom: "desc" },
@@ -122,296 +110,300 @@ export async function runReconciliation() {
     }),
   ]);
 
-  // 3. Start a new reconciliation run.
   const run = await prisma.reconciliationRun.create({
     data: {
       status: "PROCESSING",
     },
   });
 
+  const statusCounts = {
+    TOTAL: totalOrdersCount,
+    SETTLED: 0,
+    SHORT_PAID: 0,
+    UNPAID_PAST_DUE: 0,
+    FREIGHT_OVERCHARGED: 0,
+    RETURN_NOT_RECEIVED: 0,
+    REVIEW_REQUIRED: 0,
+  };
+
+  const sampleResults = [];
+
   try {
-    // 4. Calculate settlement, freight, and returns synchronously in memory.
-    const results = orders.map((order) => {
-      // ---------------- SETTLEMENT RECONCILIATION ----------------
-      const importedSettlements = order.settlements.filter(
-        (settlement) => settlement.importBatchId !== null
-      );
-
-      const selectedSettlements =
-        importedSettlements.length > 0
-          ? importedSettlements
-          : order.settlements;
-
-      const actualAmount = selectedSettlements.reduce(
-        (total, settlement) =>
-          total.plus(toMoney(settlement.amountReceived)),
-        toMoney(0)
-      );
-
-      const hasSettlements = selectedSettlements.length > 0;
-
-      const channelCard = order.partnerId
-        ? matchChannelRateCard(
-            channelRateCards,
-            order.partnerId,
-            order.channel,
-            order.orderDate
-          )
-        : null;
-
-      const rateCardResult = calculateFastExpectedSettlement(
-        channelCard,
-        order.orderValue
-      );
-
-      const expectedAmount = rateCardResult.success
-        ? rateCardResult.expectedSettlementAmount
-        : order.expectedSettlementAmount;
-
-      const settlementResult = reconcileSettlement({
-        expectedAmount,
-        actualAmount: hasSettlements ? actualAmount : null,
-        dueDate: order.settlementDueAt,
-        hasSettlementRecord: hasSettlements,
+    for (let skip = 0; skip < totalOrdersCount; skip += ORDER_BATCH_SIZE) {
+      const orders = await prisma.order.findMany({
+        where: {
+          NOT: {
+            orderNumber: { startsWith: "TEST-" },
+          },
+        },
+        include: {
+          partner: true,
+          settlements: true,
+          freightCharges: true,
+          returns: true,
+        },
+        orderBy: {
+          id: "asc",
+        },
+        skip,
+        take: ORDER_BATCH_SIZE,
       });
 
-      // ---------------- RETURN RECONCILIATION ----------------
-      const returnResults = order.returns.map((returnRecord) => {
-        const normalizedStatus = String(returnRecord.status || "")
-          .trim()
-          .toUpperCase()
-          .replace(/[\s-]+/g, "_");
+      const batchMatches = [];
+      const batchSettlementLinks = [];
 
-        let returnStatus = null;
-        let returnReviewReason = null;
+      for (const order of orders) {
+        const importedSettlements = order.settlements.filter(
+          (s) => s.importBatchId !== null
+        );
+        const selectedSettlements =
+          importedSettlements.length > 0
+            ? importedSettlements
+            : order.settlements;
 
-        if (returnRecord.warehouseReceivedAt) {
-          returnStatus = "SETTLED";
-        } else if (
-          ["RECEIVED", "WAREHOUSE_RECEIVED", "COMPLETED"].includes(
-            normalizedStatus
-          )
-        ) {
-          returnStatus = "REVIEW_REQUIRED";
-          returnReviewReason =
-            `Return ${returnRecord.id} is marked received by courier but lacks warehouse scan.`;
-        } else {
-          const returnDate = returnRecord.returnDate
-            ? new Date(returnRecord.returnDate)
-            : null;
+        const actualAmount = selectedSettlements.reduce(
+          (total, s) => total.plus(toMoney(s.amountReceived)),
+          toMoney(0)
+        );
+        const hasSettlements = selectedSettlements.length > 0;
 
-          const ageInDays =
-            returnDate && !Number.isNaN(returnDate.getTime())
-              ? Math.floor(
-                  (Date.now() - returnDate.getTime()) / (1000 * 60 * 60 * 24)
-                )
-              : 0;
+        const channelCard = order.partnerId
+          ? matchChannelRateCard(
+              channelRateCards,
+              order.partnerId,
+              order.channel,
+              order.orderDate
+            )
+          : null;
 
-          if (ageInDays > RETURN_SLA_DAYS) {
-            returnStatus = "RETURN_NOT_RECEIVED";
-            returnReviewReason =
-              `Return ${returnRecord.id} was initiated ${ageInDays} days ago (exceeding ${RETURN_SLA_DAYS}-day SLA) but has not reached the warehouse.`;
-          } else {
+        const rateCardResult = calculateFastExpectedSettlement(
+          channelCard,
+          order.orderValue
+        );
+
+        const expectedAmount = rateCardResult.success
+          ? rateCardResult.expectedSettlementAmount
+          : order.expectedSettlementAmount;
+
+        const settlementResult = reconcileSettlement({
+          expectedAmount,
+          actualAmount: hasSettlements ? actualAmount : null,
+          dueDate: order.settlementDueAt,
+          hasSettlementRecord: hasSettlements,
+        });
+
+        // Return reconciliation
+        const returnResults = order.returns.map((returnRecord) => {
+          const normalizedStatus = String(returnRecord.status || "")
+            .trim()
+            .toUpperCase()
+            .replace(/[\s-]+/g, "_");
+
+          let returnStatus = null;
+          let returnReviewReason = null;
+
+          if (returnRecord.warehouseReceivedAt) {
+            returnStatus = "SETTLED";
+          } else if (
+            ["RECEIVED", "WAREHOUSE_RECEIVED", "COMPLETED"].includes(
+              normalizedStatus
+            )
+          ) {
             returnStatus = "REVIEW_REQUIRED";
-            returnReviewReason =
-              `Return ${returnRecord.id} is in transit (${ageInDays}d elapsed within ${RETURN_SLA_DAYS}-day SLA) awaiting warehouse receipt.`;
+            returnReviewReason = `Return ${returnRecord.id} is marked received by courier but lacks warehouse scan.`;
+          } else {
+            const returnDate = returnRecord.returnDate
+              ? new Date(returnRecord.returnDate)
+              : null;
+            const ageInDays =
+              returnDate && !Number.isNaN(returnDate.getTime())
+                ? Math.floor(
+                    (Date.now() - returnDate.getTime()) / (1000 * 60 * 60 * 24)
+                  )
+                : 0;
+
+            if (ageInDays > RETURN_SLA_DAYS) {
+              returnStatus = "RETURN_NOT_RECEIVED";
+              returnReviewReason = `Return ${returnRecord.id} was initiated ${ageInDays} days ago (exceeding ${RETURN_SLA_DAYS}-day SLA) but has not reached the warehouse.`;
+            } else {
+              returnStatus = "REVIEW_REQUIRED";
+              returnReviewReason = `Return ${returnRecord.id} is in transit (${ageInDays}d elapsed within ${RETURN_SLA_DAYS}-day SLA) awaiting warehouse receipt.`;
+            }
+          }
+
+          return {
+            returnRecordId: returnRecord.id,
+            returnStatus,
+            returnReviewReason,
+          };
+        });
+
+        const latestReturnResult =
+          returnResults.length > 0
+            ? returnResults[returnResults.length - 1]
+            : null;
+        const returnRecordId = latestReturnResult?.returnRecordId ?? null;
+        const returnStatus =
+          returnResults.length === 0
+            ? null
+            : returnResults.some(
+                (item) => item.returnStatus === "RETURN_NOT_RECEIVED"
+              )
+            ? "RETURN_NOT_RECEIVED"
+            : returnResults.every((item) => item.returnStatus === "SETTLED")
+            ? "SETTLED"
+            : "REVIEW_REQUIRED";
+
+        const returnReviewReasons = returnResults
+          .filter((item) => item.returnReviewReason)
+          .map((item) => item.returnReviewReason);
+
+        // Freight reconciliation
+        const freightResults = order.freightCharges.map((charge) => {
+          const card = matchCourierRateCard(
+            courierRateCards,
+            order.partnerId,
+            order.channel,
+            charge.courierName,
+            charge.actualWeight,
+            order.orderDate
+          );
+          return calculateFastExpectedFreight(
+            card,
+            charge.actualWeight,
+            charge.chargedAmount
+          );
+        });
+
+        const hasFreightCharges = order.freightCharges.length > 0;
+        const allFreightRatesFound =
+          hasFreightCharges &&
+          freightResults.every((item) => item.expectedFreight !== null);
+
+        const actualFreight = order.freightCharges.reduce(
+          (total, charge) => total.plus(toMoney(charge.chargedAmount)),
+          toMoney(0)
+        );
+        const expectedFreight = allFreightRatesFound
+          ? freightResults.reduce(
+              (total, item) => total.plus(toMoney(item.expectedFreight)),
+              toMoney(0)
+            )
+          : null;
+
+        const freightDifference = allFreightRatesFound
+          ? actualFreight.minus(expectedFreight)
+          : null;
+
+        let freightStatus = null;
+        if (hasFreightCharges) {
+          if (!allFreightRatesFound) {
+            freightStatus = "REVIEW_REQUIRED";
+          } else if (freightDifference.greaterThan(FREIGHT_THRESHOLD)) {
+            freightStatus = "FREIGHT_OVERCHARGED";
+          } else {
+            freightStatus = "SETTLED";
           }
         }
 
-        return {
-          returnRecordId: returnRecord.id,
-          returnStatus,
-          returnReviewReason,
-        };
-      });
+        const freightReviewReasons = freightResults
+          .filter((item) => item.reviewReason)
+          .map((item) => item.reviewReason);
 
-      const latestReturnResult =
-        returnResults.length > 0
-          ? returnResults[returnResults.length - 1]
-          : null;
+        const reviewReasons = [
+          settlementResult.reviewReason,
+          ...freightReviewReasons,
+          ...returnReviewReasons,
+        ].filter(Boolean);
 
-      const returnRecordId =
-        latestReturnResult?.returnRecordId ?? null;
+        const finalReviewReason =
+          reviewReasons.length > 0 ? reviewReasons.join(" | ") : null;
 
-      const returnStatus =
-        returnResults.length === 0
-          ? null
-          : returnResults.some(
-              (item) => item.returnStatus === "RETURN_NOT_RECEIVED"
-            )
-          ? "RETURN_NOT_RECEIVED"
-          : returnResults.every(
-              (item) => item.returnStatus === "SETTLED"
-            )
-          ? "SETTLED"
-          : "REVIEW_REQUIRED";
-
-      const returnReviewReasons = returnResults
-        .filter((item) => item.returnReviewReason)
-        .map((item) => item.returnReviewReason);
-
-      // ---------------- FREIGHT RECONCILIATION ----------------
-      const freightResults = order.freightCharges.map((charge) => {
-        const card = matchCourierRateCard(
-          courierRateCards,
-          order.partnerId,
-          order.channel,
-          charge.courierName,
-          charge.actualWeight,
-          order.orderDate
-        );
-
-        return calculateFastExpectedFreight(
-          card,
-          charge.actualWeight,
-          charge.chargedAmount
-        );
-      });
-
-      const hasFreightCharges = order.freightCharges.length > 0;
-
-      const allFreightRatesFound =
-        hasFreightCharges &&
-        freightResults.every(
-          (item) => item.expectedFreight !== null
-        );
-
-      const actualFreight = order.freightCharges.reduce(
-        (total, charge) =>
-          total.plus(toMoney(charge.chargedAmount)),
-        toMoney(0)
-      );
-
-      const expectedFreight = allFreightRatesFound
-        ? freightResults.reduce(
-            (total, item) =>
-              total.plus(toMoney(item.expectedFreight)),
-            toMoney(0)
-          )
-        : null;
-
-      const freightDifference = allFreightRatesFound
-        ? actualFreight.minus(expectedFreight)
-        : null;
-
-      let freightStatus = null;
-
-      if (hasFreightCharges) {
-        if (!allFreightRatesFound) {
-          freightStatus = "REVIEW_REQUIRED";
-        } else if (freightDifference.greaterThan(FREIGHT_THRESHOLD)) {
-          freightStatus = "FREIGHT_OVERCHARGED";
-        } else {
-          freightStatus = "SETTLED";
+        if (settlementResult.status === "SETTLED") statusCounts.SETTLED++;
+        if (settlementResult.status === "SHORT_PAID") statusCounts.SHORT_PAID++;
+        if (settlementResult.status === "UNPAID_PAST_DUE") statusCounts.UNPAID_PAST_DUE++;
+        if (
+          settlementResult.status === "REVIEW_REQUIRED" ||
+          freightStatus === "REVIEW_REQUIRED" ||
+          returnStatus === "REVIEW_REQUIRED"
+        ) {
+          statusCounts.REVIEW_REQUIRED++;
         }
-      }
+        if (freightStatus === "FREIGHT_OVERCHARGED") statusCounts.FREIGHT_OVERCHARGED++;
+        if (returnStatus === "RETURN_NOT_RECEIVED") statusCounts.RETURN_NOT_RECEIVED++;
 
-      const freightReviewReasons = freightResults
-        .filter((item) => item.reviewReason)
-        .map((item) => item.reviewReason);
+        const matchId = randomUUID();
+        batchMatches.push({
+          id: matchId,
+          runId: run.id,
+          orderId: order.id,
+          status: settlementResult.status,
+          expectedAmount: settlementResult.expectedAmount,
+          actualAmount: hasSettlements ? actualAmount : null,
+          difference: settlementResult.difference,
+          freightStatus,
+          expectedFreightAmount: expectedFreight ? formatMoney(expectedFreight) : null,
+          actualFreightAmount: hasFreightCharges ? formatMoney(actualFreight) : null,
+          freightDifference: freightDifference ? formatMoney(freightDifference) : null,
+          returnRecordId,
+          returnStatus,
+          reviewReason: finalReviewReason,
+        });
 
-      const reviewReasons = [
-        settlementResult.reviewReason,
-        ...freightReviewReasons,
-        ...returnReviewReasons,
-      ].filter(Boolean);
+        if (selectedSettlements.length > 0) {
+          for (const s of selectedSettlements) {
+            batchSettlementLinks.push({
+              reconciliationMatchId: matchId,
+              settlementId: s.id,
+            });
+          }
+        }
 
-      return {
-        order,
-        settlementResult,
-        settlements: selectedSettlements,
-        returnRecordId,
-        returnStatus,
-        actualAmount: hasSettlements
-          ? formatMoney(actualAmount)
-          : null,
-        freightStatus,
-        expectedFreightAmount:
-          allFreightRatesFound
-            ? formatMoney(expectedFreight)
-            : null,
-        actualFreightAmount: hasFreightCharges
-          ? formatMoney(actualFreight)
-          : null,
-        freightDifference:
-          allFreightRatesFound
-            ? formatMoney(freightDifference)
-            : null,
-        reviewReason:
-          reviewReasons.length > 0
-            ? reviewReasons.join(" ")
-            : null,
-      };
-    });
-
-    // 5. High-speed bulk persistence using pre-generated UUIDs and createMany chunks
-    const matchesToInsert = [];
-    const settlementLinksToInsert = [];
-
-    for (const item of results) {
-      const matchId = randomUUID();
-
-      matchesToInsert.push({
-        id: matchId,
-        runId: run.id,
-        orderId: item.order.id,
-
-        // Settlement results
-        status: item.settlementResult.status,
-        expectedAmount: item.settlementResult.expectedAmount,
-        actualAmount: item.actualAmount,
-        difference: item.settlementResult.difference,
-
-        // Freight results
-        freightStatus: item.freightStatus,
-        expectedFreightAmount: item.expectedFreightAmount,
-        actualFreightAmount: item.actualFreightAmount,
-        freightDifference: item.freightDifference,
-
-        // Return results
-        returnRecordId: item.returnRecordId,
-        returnStatus: item.returnStatus,
-
-        reviewReason: item.reviewReason,
-      });
-
-      if (item.settlements.length > 0) {
-        for (const settlement of item.settlements) {
-          settlementLinksToInsert.push({
-            reconciliationMatchId: matchId,
-            settlementId: settlement.id,
+        if (sampleResults.length < 1000) {
+          sampleResults.push({
+            orderNumber: order.orderNumber,
+            channel: order.channel,
+            partnerName: order.partner?.name ?? "Unknown",
+            orderDate: order.orderDate,
+            orderValue: order.orderValue?.toString(),
+            weightKg: order.weightKg?.toString() ?? null,
+            status: settlementResult.status,
+            expectedAmount: settlementResult.expectedAmount,
+            actualAmount: hasSettlements ? actualAmount.toString() : null,
+            difference: settlementResult.difference,
+            settlement: settlementResult,
+            freightStatus,
+            expectedFreightAmount: expectedFreight ? formatMoney(expectedFreight) : null,
+            actualFreightAmount: hasFreightCharges ? formatMoney(actualFreight) : null,
+            freightDifference: freightDifference ? formatMoney(freightDifference) : null,
+            freight: {
+              status: freightStatus,
+              expectedAmount: expectedFreight ? formatMoney(expectedFreight) : null,
+              actualAmount: hasFreightCharges ? formatMoney(actualFreight) : null,
+              difference: freightDifference ? formatMoney(freightDifference) : null,
+            },
+            returnStatus,
+            returnRecordId,
+            return: {
+              recordId: returnRecordId,
+              status: returnStatus,
+            },
+            reviewReason: finalReviewReason,
           });
         }
       }
-    }
 
-    // Verify order IDs in matchesToInsert exist to prevent FK race conditions if orders are deleted concurrently
-    const activeOrderIds = new Set(
-      (await prisma.order.findMany({ select: { id: true } })).map((o) => o.id)
-    );
-    const validMatches = matchesToInsert.filter((m) => activeOrderIds.has(m.orderId));
-    const validMatchIds = new Set(validMatches.map((m) => m.id));
-    const validSettlementLinks = settlementLinksToInsert.filter((s) =>
-      validMatchIds.has(s.reconciliationMatchId)
-    );
-
-    // Insert matches in 5,000-row bulk chunks
-    for (let i = 0; i < validMatches.length; i += BULK_CHUNK_SIZE) {
-      const chunk = validMatches.slice(i, i + BULK_CHUNK_SIZE);
       await prisma.reconciliationMatch.createMany({
-        data: chunk,
+        data: batchMatches,
       });
+
+      if (batchSettlementLinks.length > 0) {
+        await prisma.matchSettlement.createMany({
+          data: batchSettlementLinks,
+        });
+      }
     }
 
-    // Insert settlement links in 5,000-row bulk chunks
-    for (let i = 0; i < validSettlementLinks.length; i += BULK_CHUNK_SIZE) {
-      const chunk = validSettlementLinks.slice(i, i + BULK_CHUNK_SIZE);
-      await prisma.matchSettlement.createMany({
-        data: chunk,
-      });
-    }
-
-    // Mark the run as completed
     await prisma.reconciliationRun.update({
       where: {
         id: run.id,
@@ -422,75 +414,13 @@ export async function runReconciliation() {
       },
     });
 
-    const statusCounts = {
-      TOTAL: results.length,
-      SETTLED: 0,
-      SHORT_PAID: 0,
-      UNPAID_PAST_DUE: 0,
-      FREIGHT_OVERCHARGED: 0,
-      RETURN_NOT_RECEIVED: 0,
-      REVIEW_REQUIRED: 0,
-    };
-
-    for (const item of results) {
-      if (item.settlementResult.status === "SETTLED") statusCounts.SETTLED++;
-      if (item.settlementResult.status === "SHORT_PAID") statusCounts.SHORT_PAID++;
-      if (item.settlementResult.status === "UNPAID_PAST_DUE") statusCounts.UNPAID_PAST_DUE++;
-      if (
-        item.settlementResult.status === "REVIEW_REQUIRED" ||
-        item.freightStatus === "REVIEW_REQUIRED" ||
-        item.returnStatus === "REVIEW_REQUIRED"
-      ) {
-        statusCounts.REVIEW_REQUIRED++;
-      }
-      if (item.freightStatus === "FREIGHT_OVERCHARGED") statusCounts.FREIGHT_OVERCHARGED++;
-      if (item.returnStatus === "RETURN_NOT_RECEIVED") statusCounts.RETURN_NOT_RECEIVED++;
-    }
-
     return {
       runId: run.id,
-      totalOrders: results.length,
+      totalOrders: totalOrdersCount,
       statusCounts,
-      results: results.slice(0, 1000).map((item) => ({
-        orderNumber: item.order.orderNumber,
-        channel: item.order.channel,
-        partnerName: item.order.partner?.name ?? "Unknown",
-        orderDate: item.order.orderDate,
-        orderValue: item.order.orderValue?.toString(),
-        weightKg: item.order.weightKg?.toString() ?? null,
-
-        // Settlement
-        status: item.settlementResult.status,
-        expectedAmount: item.settlementResult.expectedAmount,
-        actualAmount: item.actualAmount,
-        difference: item.settlementResult.difference,
-        settlement: item.settlementResult,
-
-        // Freight
-        freightStatus: item.freightStatus,
-        expectedFreightAmount: item.expectedFreightAmount,
-        actualFreightAmount: item.actualFreightAmount,
-        freightDifference: item.freightDifference,
-        freight: {
-          status: item.freightStatus,
-          expectedAmount: item.expectedFreightAmount,
-          actualAmount: item.actualFreightAmount,
-          difference: item.freightDifference,
-        },
-
-        // Return
-        returnStatus: item.returnStatus,
-        returnRecordId: item.returnRecordId,
-        return: {
-          recordId: item.returnRecordId,
-          status: item.returnStatus,
-        },
-
-        reviewReason: item.reviewReason,
-      })),
+      results: sampleResults,
     };
   } catch (error) {
-    // If saving fails, clean up any partial matches created in this run to keep database consistent
     await prisma.matchSettlement.deleteMany({
       where: {
         reconciliationMatch: {
@@ -505,7 +435,6 @@ export async function runReconciliation() {
       },
     }).catch(() => {});
 
-    // Record the failed run.
     await prisma.reconciliationRun.update({
       where: {
         id: run.id,
