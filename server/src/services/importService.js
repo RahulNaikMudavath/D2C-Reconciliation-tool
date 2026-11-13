@@ -383,6 +383,16 @@ const sourceRecords = records.map((record, index) => {
       },
     });
 
+    // Automatically trigger 3-way reconciliation in background whenever new records are imported
+    // so all dashboard metrics, status breakdowns, and claims update immediately.
+    if (validation.validCount > 0) {
+      import("./reconciliationRepository.js")
+        .then(({ runReconciliation }) => runReconciliation())
+        .catch((err) =>
+          console.error("Auto-reconciliation error after import:", err)
+        );
+    }
+
     return {
       importBatchId: importBatch.id,
       mappingSource,

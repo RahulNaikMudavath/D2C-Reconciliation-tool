@@ -406,29 +406,39 @@ export default function Imports() {
               Batch ID: {result.importBatchId || result.id || "Created"}
             </span>
 
-            {/* If the uploaded batch is SETTLEMENTS, offer immediate processing */}
-            {(importType === "SETTLEMENTS" || result.importType === "SETTLEMENTS") && (
+            <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() =>
-                  handleProcessSettlements(result.importBatchId || result.id)
-                }
-                disabled={processingBatchId === (result.importBatchId || result.id)}
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                onClick={() => navigate("/dashboard")}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 shadow-2xs"
               >
-                {processingBatchId === (result.importBatchId || result.id) ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Processing settlements...
-                  </>
-                ) : (
-                  <>
-                    <Play size={16} />
-                    Process Settlements Pipeline
-                  </>
-                )}
+                View Dashboard <ArrowRight size={15} />
               </button>
-            )}
+
+              {/* If the uploaded batch is SETTLEMENTS, offer immediate processing */}
+              {(importType === "SETTLEMENTS" || result.importType === "SETTLEMENTS") && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleProcessSettlements(result.importBatchId || result.id)
+                  }
+                  disabled={processingBatchId === (result.importBatchId || result.id)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  {processingBatchId === (result.importBatchId || result.id) ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Processing settlements...
+                    </>
+                  ) : (
+                    <>
+                      <Play size={16} />
+                      Process Settlements Pipeline
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
