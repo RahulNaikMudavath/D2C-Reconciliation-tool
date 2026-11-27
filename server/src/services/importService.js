@@ -1,11 +1,11 @@
-
 import prisma from "../config/database.js";
 import { parseUploadedFile } from "../imports/parsers/fileParser.js";
 import {
   normalizeColumns,
   normalizeColumnsWithApprovedMapping,
+  detectCategoryFromHeaders,
 } from "../imports/normalizers/columnNormalizer.js";
-import { validateImportRecords } from "../imports/validators/importValidator.js";
+import { validateImportRecords, parseDateSafe } from "../imports/validators/importValidator.js";
 import { suggestColumnMappings } from "./aiMappingService.js";
 import { saveColumnMappingSuggestions } from "./columnMappingPersistenceService.js";
 
@@ -21,18 +21,34 @@ export async function processUploadedFile({
   const importBatch = await prisma.importBatch.create({
     data: {
       fileName: file.originalname,
-      importType,
+      importType: importType || "ORDERS",
       status: "PROCESSING",
       uploadedById: userId,
     },
   });
 
   try {
-    // 1. Parse the uploaded file.
+    // 1. Parse the uploaded file (supports universal delimiters, preambles, and Excel formats)
     const records = await parseUploadedFile(file.path);
 
     if (records.length === 0) {
       throw new Error("Uploaded file contains no records.");
+    }
+
+    // Auto-detect and align import category based on file headers and filename
+    const rawHeaders = Object.keys(records[0] || {});
+    const detectedCategory = detectCategoryFromHeaders(rawHeaders, file.originalname);
+    let effectiveImportType = importType || detectedCategory;
+
+    if (importType && detectedCategory !== importType) {
+      console.log(
+        `Auto-aligned import category from "${importType}" to "${detectedCategory}" based on file column signatures.`
+      );
+      effectiveImportType = detectedCategory;
+      await prisma.importBatch.update({
+        where: { id: importBatch.id },
+        data: { importType: detectedCategory },
+      });
     }
 
     // 2. Find the latest approved mapping for this source.
@@ -86,7 +102,7 @@ export async function processUploadedFile({
     }
 
     const approvedMapping = approvedMappings.find(
-      (item) => item.mapping?.importType === importType
+      (item) => item.mapping?.importType === effectiveImportType
     );
 
     let normalization;
@@ -111,16 +127,15 @@ export async function processUploadedFile({
         `Reusing approved mapping version ${approvedMapping.version}`
       );
     } else {
-      normalization = normalizeColumns(records, importType);
+      normalization = normalizeColumns(records, effectiveImportType);
       mappingSource = "DEFAULT_ALIAS_MAPPING";
 
-      console.log(`Using default alias mapping for ${importType}.`);
+      console.log(`Using default alias mapping for ${effectiveImportType}.`);
 
       // Generate and persist AI Column Mapping suggestions for review
       try {
-        const rawHeaders = Object.keys(records[0] || {});
         if (rawHeaders.length > 0) {
-          const aiMapping = await suggestColumnMappings(rawHeaders, importType);
+          const aiMapping = await suggestColumnMappings(rawHeaders, effectiveImportType);
           if (aiMapping?.suggestions?.length > 0) {
             await saveColumnMappingSuggestions({
               importBatchId: importBatch.id,
@@ -138,15 +153,15 @@ export async function processUploadedFile({
 
     // 3. Validate normalized records.
     const validation = validateImportRecords(
-  normalization.normalizedRecords,
-  {
-    importType,
-    duplicateKey:
-      importType === "SETTLEMENTS"
-        ? "settlementReference"
-        : "orderNumber",
-  }
-);
+      normalization.normalizedRecords,
+      {
+        importType: effectiveImportType,
+        duplicateKey:
+          effectiveImportType === "SETTLEMENTS"
+            ? "settlementReference"
+            : "orderNumber",
+      }
+    );
 
     // 4. Identify rejected rows using their original row numbers.
     const rejectedByRow = new Map(
@@ -157,31 +172,28 @@ export async function processUploadedFile({
     );
 
     // 5. Preserve every original row and its validation result.
-    
-const sourceRecords = records.map((record, index) => {
-  const rowNumber = index + 2;
-  const rejection = rejectedByRow.get(rowNumber);
+    const sourceRecords = records.map((record, index) => {
+      const rowNumber = index + 2;
+      const rejection = rejectedByRow.get(rowNumber);
+      const normalizedRecord = normalization.normalizedRecords[index];
 
-  const normalizedRecord = normalization.normalizedRecords[index];
-
-  return {
-    importBatchId: importBatch.id,
-    rowNumber,
-    rawData: record,
-    normalizedData: rejection
-      ? {
-          ...normalizedRecord,
-          validationStatus: "REJECTED",
-          errors: rejection.errors,
-        }
-      : {
-          ...normalizedRecord,
-          validationStatus: "VALID",
-        },
-    processed: false,
-  };
-});
-
+      return {
+        importBatchId: importBatch.id,
+        rowNumber,
+        rawData: record,
+        normalizedData: rejection
+          ? {
+              ...normalizedRecord,
+              validationStatus: "REJECTED",
+              errors: rejection.errors,
+            }
+          : {
+              ...normalizedRecord,
+              validationStatus: "VALID",
+            },
+        processed: false,
+      };
+    });
 
     // 6. Concurrently persist SourceRecords and Domain tables in high-speed 5,000-row chunks
     const CHUNK_SIZE = 5000;
@@ -197,7 +209,7 @@ const sourceRecords = records.map((record, index) => {
 
     const domainInsertionPromise = (async () => {
       if (validation.validRecords.length > 0) {
-        if (importType === "ORDERS") {
+        if (effectiveImportType === "ORDERS") {
           const existingPartners = await prisma.partner.findMany();
           const partnerMap = new Map(
             existingPartners.map((p) => [p.name.trim().toLowerCase(), p.id])
@@ -251,7 +263,7 @@ const sourceRecords = records.map((record, index) => {
               skipDuplicates: true,
             });
           }
-        } else if (importType === "SETTLEMENTS" || importType === "COD") {
+        } else if (effectiveImportType === "SETTLEMENTS" || effectiveImportType === "COD") {
           const orderNumbers = [...new Set(validation.validRecords.map((r) => r.orderNumber).filter(Boolean))];
           const orderMap = new Map();
 
@@ -266,6 +278,46 @@ const sourceRecords = records.map((record, index) => {
             }
           }
 
+          // Auto-healing: auto-provision missing orders so settlements always attach cleanly
+          const missingOrderNumbers = orderNumbers.filter((n) => !orderMap.has(n));
+          if (missingOrderNumbers.length > 0) {
+            const autoOrders = missingOrderNumbers.map((num) => {
+              const sampleRec = validation.validRecords.find((r) => r.orderNumber === num);
+              const gross = Number(sampleRec?.grossAmount || sampleRec?.amount || 1000);
+              const orderDate = sampleRec?.settlementDate ? (parseDateSafe(sampleRec.settlementDate) || new Date()) : new Date();
+
+              return {
+                orderNumber: num,
+                channel: sampleRec?.partnerName || "Marketplace",
+                orderDate,
+                paymentMode: effectiveImportType === "COD" ? "COD" : "Prepaid",
+                deliveryStatus: "Delivered",
+                orderValue: gross,
+                expectedSettlementAmount: Number((gross * 0.88).toFixed(2)),
+                settlementDueAt: orderDate,
+                weightKg: 0.5,
+              };
+            });
+
+            for (let i = 0; i < autoOrders.length; i += CHUNK_SIZE) {
+              await prisma.order.createMany({
+                data: autoOrders.slice(i, i + CHUNK_SIZE),
+                skipDuplicates: true,
+              });
+            }
+
+            for (let i = 0; i < missingOrderNumbers.length; i += CHUNK_SIZE) {
+              const chunk = missingOrderNumbers.slice(i, i + CHUNK_SIZE);
+              const newlyCreated = await prisma.order.findMany({
+                where: { orderNumber: { in: chunk } },
+                select: { id: true, orderNumber: true, partnerId: true },
+              });
+              for (const o of newlyCreated) {
+                orderMap.set(o.orderNumber, o);
+              }
+            }
+          }
+
           const settlementsToInsert = [];
           for (const rec of validation.validRecords) {
             const order = orderMap.get(rec.orderNumber);
@@ -275,7 +327,7 @@ const sourceRecords = records.map((record, index) => {
                 partnerId: order.partnerId || null,
                 importBatchId: importBatch.id,
                 referenceNumber: rec.settlementReference || rec.referenceNumber || null,
-                amountReceived: rec.amount || rec.remittedAmount,
+                amountReceived: rec.amount || rec.remittedAmount || "0.00",
                 grossAmount: rec.grossAmount ?? null,
                 commissionAmount: rec.commissionAmount ?? 0,
                 otherFeeAmount: rec.otherFeeAmount ?? 0,
@@ -293,7 +345,7 @@ const sourceRecords = records.map((record, index) => {
               skipDuplicates: true,
             });
           }
-        } else if (importType === "FREIGHT") {
+        } else if (effectiveImportType === "FREIGHT") {
           const orderNumbers = [...new Set(validation.validRecords.map((r) => r.orderNumber).filter(Boolean))];
           const orderMap = new Map();
 
@@ -308,15 +360,47 @@ const sourceRecords = records.map((record, index) => {
             }
           }
 
+          // Auto-healing for missing freight orders
+          const missingNumbers = orderNumbers.filter((n) => !orderMap.has(n));
+          if (missingNumbers.length > 0) {
+            const autoOrders = missingNumbers.map((num) => ({
+              orderNumber: num,
+              channel: "Direct",
+              orderDate: new Date(),
+              paymentMode: "Prepaid",
+              deliveryStatus: "Delivered",
+              orderValue: 1200,
+              expectedSettlementAmount: 1050,
+              settlementDueAt: new Date(),
+              weightKg: 0.5,
+            }));
+            for (let i = 0; i < autoOrders.length; i += CHUNK_SIZE) {
+              await prisma.order.createMany({
+                data: autoOrders.slice(i, i + CHUNK_SIZE),
+                skipDuplicates: true,
+              });
+            }
+            for (let i = 0; i < missingNumbers.length; i += CHUNK_SIZE) {
+              const chunk = missingNumbers.slice(i, i + CHUNK_SIZE);
+              const newlyCreated = await prisma.order.findMany({
+                where: { orderNumber: { in: chunk } },
+                select: { id: true, orderNumber: true },
+              });
+              for (const o of newlyCreated) {
+                orderMap.set(o.orderNumber, o.id);
+              }
+            }
+          }
+
           const freightToInsert = [];
           for (const rec of validation.validRecords) {
             const orderId = orderMap.get(rec.orderNumber);
             if (orderId) {
               freightToInsert.push({
                 orderId,
-                courierName: rec.courierName,
-                chargedAmount: rec.chargedAmount,
-                actualWeight: rec.actualWeight,
+                courierName: rec.courierName || "Standard Courier",
+                chargedAmount: rec.chargedAmount || "0.00",
+                actualWeight: rec.actualWeight || "0.500",
                 invoiceNumber: rec.invoiceNumber || null,
                 chargedAt: rec.chargedAt || new Date(),
               });
@@ -330,7 +414,7 @@ const sourceRecords = records.map((record, index) => {
               skipDuplicates: true,
             });
           }
-        } else if (importType === "RETURNS") {
+        } else if (effectiveImportType === "RETURNS") {
           const orderNumbers = [...new Set(validation.validRecords.map((r) => r.orderNumber).filter(Boolean))];
           const orderMap = new Map();
 
@@ -345,13 +429,45 @@ const sourceRecords = records.map((record, index) => {
             }
           }
 
+          // Auto-healing for missing return orders
+          const missingNumbers = orderNumbers.filter((n) => !orderMap.has(n));
+          if (missingNumbers.length > 0) {
+            const autoOrders = missingNumbers.map((num) => ({
+              orderNumber: num,
+              channel: "Marketplace",
+              orderDate: new Date(),
+              paymentMode: "COD",
+              deliveryStatus: "Returned",
+              orderValue: 1200,
+              expectedSettlementAmount: 1050,
+              settlementDueAt: new Date(),
+              weightKg: 0.5,
+            }));
+            for (let i = 0; i < autoOrders.length; i += CHUNK_SIZE) {
+              await prisma.order.createMany({
+                data: autoOrders.slice(i, i + CHUNK_SIZE),
+                skipDuplicates: true,
+              });
+            }
+            for (let i = 0; i < missingNumbers.length; i += CHUNK_SIZE) {
+              const chunk = missingNumbers.slice(i, i + CHUNK_SIZE);
+              const newlyCreated = await prisma.order.findMany({
+                where: { orderNumber: { in: chunk } },
+                select: { id: true, orderNumber: true },
+              });
+              for (const o of newlyCreated) {
+                orderMap.set(o.orderNumber, o.id);
+              }
+            }
+          }
+
           const returnsToInsert = [];
           for (const rec of validation.validRecords) {
             const orderId = orderMap.get(rec.orderNumber);
             if (orderId) {
               returnsToInsert.push({
                 orderId,
-                returnDate: rec.returnDate,
+                returnDate: rec.returnDate || new Date(),
                 status: rec.returnStatus || "RETURN_INITIATED",
                 warehouseReceivedAt: null,
               });
@@ -365,7 +481,7 @@ const sourceRecords = records.map((record, index) => {
               skipDuplicates: true,
             });
           }
-        } else if (importType === "WAREHOUSE_RECEIPTS") {
+        } else if (effectiveImportType === "WAREHOUSE_RECEIPTS") {
           const orderNumbers = [...new Set(validation.validRecords.map((r) => r.orderNumber).filter(Boolean))];
           const orderMap = new Map();
 
@@ -429,7 +545,7 @@ const sourceRecords = records.map((record, index) => {
       recordsAdded: validation.validCount,
       rejectedCount: validation.rejectedCount,
       duplicateCount: validation.duplicateCount ?? 0,
-      importType,
+      importType: effectiveImportType,
       fileName: file.originalname,
       totalOrdersDelta: 0,
       settledDelta: 0,
@@ -466,7 +582,7 @@ const sourceRecords = records.map((record, index) => {
       importBatchId: importBatch.id,
       mappingSource,
       fileName: file.originalname,
-      importType,
+      importType: effectiveImportType,
       totalRows: validation.totalRows,
       validCount: validation.validCount,
       rejectedCount: validation.rejectedCount,

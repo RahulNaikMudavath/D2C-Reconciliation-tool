@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const allowedExtensions = [".csv", ".xlsx"];
+const allowedExtensions = [".csv", ".xlsx", ".tsv", ".txt"];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadDirectory = path.resolve(__dirname, "../../uploads");
@@ -42,6 +42,6 @@ export const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50 MB limit for large 100k datasets
+    fileSize: 100 * 1024 * 1024, // 100 MB limit for up to 500,000 rows
   },
 });

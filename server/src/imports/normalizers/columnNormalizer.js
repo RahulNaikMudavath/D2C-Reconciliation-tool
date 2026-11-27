@@ -8,16 +8,26 @@ export const COLUMN_ALIASES_BY_TYPE = {
     orderNumber: [
       "order id",
       "order_id",
-      "order id",
+      "order no",
+      "order_no",
+      "order #",
       "order number",
       "order_number",
       "ordernumber",
-      "order no",
-      "order_no",
       "reference id",
       "reference_id",
       "order item id",
+      "suborder id",
+      "sub order id",
+      "po number",
+      "po #",
+      "invoice id",
+      "invoice number",
+      "invoice no",
+      "invoice #",
       "order reference",
+      "booking id",
+      "order",
     ],
     channel: [
       "channel",
@@ -27,6 +37,8 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "store",
       "selling partner",
       "source",
+      "portal",
+      "marketplace",
     ],
     partnerName: [
       "partner",
@@ -36,6 +48,8 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "marketplace",
       "platform name",
       "portal",
+      "vendor",
+      "seller",
     ],
     orderDate: [
       "order date",
@@ -47,6 +61,11 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "ordered_at",
       "creation date",
       "created at",
+      "created date",
+      "booking date",
+      "booking_date",
+      "txn date",
+      "transaction date",
       "date",
     ],
     paymentMode: [
@@ -56,7 +75,9 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "payment_method",
       "payment type",
       "mode of payment",
+      "pay mode",
       "payment",
+      "type",
     ],
     deliveryStatus: [
       "delivery status",
@@ -66,6 +87,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "fulfillment status",
       "shipment status",
       "order status",
+      "current status",
       "status",
     ],
     orderValue: [
@@ -79,8 +101,14 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "total value",
       "order total",
       "invoice value",
+      "grand total",
+      "item total",
+      "selling price",
+      "sale amount",
       "amount",
       "value",
+      "price",
+      "total",
     ],
     expectedSettlementAmount: [
       "expected settlement amount",
@@ -96,6 +124,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "expected payout",
       "net payable",
       "expected amount",
+      "expected net",
     ],
     settlementDueAt: [
       "settlement due at",
@@ -107,6 +136,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "payment due date",
       "payout due date",
       "expected settlement date",
+      "due at",
     ],
     weightKg: [
       "weight kg",
@@ -123,6 +153,8 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "package weight kg",
       "gross weight",
       "gross weight kg",
+      "dead weight",
+      "actual weight",
     ],
   },
 
@@ -130,12 +162,18 @@ export const COLUMN_ALIASES_BY_TYPE = {
     orderNumber: [
       "order id",
       "order_id",
+      "order no",
+      "order_no",
+      "order #",
       "order number",
       "order_number",
       "order reference",
       "order ref",
       "marketplace order id",
+      "merchant order id",
+      "suborder id",
       "reference id",
+      "order",
     ],
     settlementReference: [
       "settlement id",
@@ -145,11 +183,16 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "transaction reference",
       "reference number",
       "ref no",
+      "ref number",
       "utr",
       "utr number",
       "payment reference",
       "payout id",
       "deposit id",
+      "neft ref",
+      "bank ref",
+      "txn id",
+      "txn reference",
     ],
     amount: [
       "amount",
@@ -162,6 +205,10 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "payout amount",
       "transaction amount",
       "net payout",
+      "payout",
+      "net paid",
+      "bank credit",
+      "remitted amount",
     ],
     grossAmount: [
       "gross amount",
@@ -171,6 +218,10 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "sale amount",
       "invoice amount",
       "item price",
+      "gross value",
+      "product charges",
+      "order value",
+      "item total",
     ],
     settlementDate: [
       "settlement date",
@@ -181,6 +232,8 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "remittance date",
       "value date",
       "payout date",
+      "credit date",
+      "deposit date",
       "date",
     ],
     commissionAmount: [
@@ -191,6 +244,8 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "platform fee",
       "selling fee",
       "referral fee",
+      "closing fee",
+      "channel fee",
     ],
     otherFeeAmount: [
       "other fee",
@@ -202,6 +257,10 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "technology fee",
       "handling fee",
       "pick and pack fee",
+      "pick and pack",
+      "shipping fee",
+      "deductions",
+      "logistics charge",
     ],
     tcsAmount: [
       "tcs",
@@ -210,6 +269,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "tcs deducted",
       "gst tcs",
       "igst tcs",
+      "tcs tax",
     ],
     tdsAmount: [
       "tds",
@@ -218,6 +278,8 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "tds deducted",
       "income tax tds",
       "section 194o",
+      "194o tds",
+      "tds tax",
     ],
     partnerName: [
       "partner",
@@ -225,6 +287,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "marketplace",
       "channel",
       "source",
+      "portal",
     ],
   },
 
@@ -232,6 +295,9 @@ export const COLUMN_ALIASES_BY_TYPE = {
     orderNumber: [
       "order id",
       "order_id",
+      "order no",
+      "order_no",
+      "order #",
       "order number",
       "order_number",
       "awb number",
@@ -239,6 +305,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "waybill",
       "consignment number",
       "reference id",
+      "order",
     ],
     amount: [
       "cod amount",
@@ -248,6 +315,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "invoice amount",
       "order value",
       "amount",
+      "total amount",
     ],
     remittedAmount: [
       "remitted amount",
@@ -257,6 +325,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "amount remitted",
       "payout amount",
       "received amount",
+      "net paid",
     ],
     remittanceDate: [
       "remittance date",
@@ -275,6 +344,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "carrier",
       "shipping partner",
       "transporter",
+      "delivery partner",
     ],
     referenceNumber: [
       "reference number",
@@ -284,6 +354,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "transaction id",
       "remittance id",
       "cheque no",
+      "ref no",
     ],
   },
 
@@ -291,6 +362,9 @@ export const COLUMN_ALIASES_BY_TYPE = {
     orderNumber: [
       "order id",
       "order_id",
+      "order no",
+      "order_no",
+      "order #",
       "order number",
       "order_number",
       "shipment id",
@@ -298,7 +372,10 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "awb",
       "waybill",
       "tracking number",
+      "tracking id",
       "consignment no",
+      "consignment number",
+      "order",
     ],
     courierName: [
       "courier",
@@ -308,6 +385,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "shipping partner",
       "delivery partner",
       "transporter",
+      "aggregator",
     ],
     chargedAmount: [
       "charged amount",
@@ -320,6 +398,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "freight cost",
       "billed amount",
       "amount",
+      "cost",
     ],
     actualWeight: [
       "actual weight",
@@ -339,10 +418,12 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "weight",
       "shipment weight",
       "shipment weight (kg)",
+      "package weight",
     ],
     invoiceNumber: [
       "invoice number",
       "invoice no",
+      "invoice #",
       "freight invoice",
       "awb invoice",
       "bill no",
@@ -363,10 +444,14 @@ export const COLUMN_ALIASES_BY_TYPE = {
     orderNumber: [
       "order id",
       "order_id",
+      "order no",
+      "order_no",
+      "order #",
       "order number",
       "order_number",
       "return order id",
       "original order id",
+      "order",
     ],
     returnDate: [
       "return date",
@@ -381,8 +466,8 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "return status",
       "refund status",
       "return stage",
-      "status",
       "disposition",
+      "status",
     ],
     receiptReference: [
       "receipt reference",
@@ -392,6 +477,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "return awb",
       "tracking id",
       "return tracking no",
+      "awb",
     ],
   },
 
@@ -399,10 +485,14 @@ export const COLUMN_ALIASES_BY_TYPE = {
     orderNumber: [
       "order id",
       "order_id",
+      "order no",
+      "order_no",
+      "order #",
       "order number",
       "order_number",
       "reference number",
       "po number",
+      "order",
     ],
     receiptReference: [
       "receipt reference",
@@ -430,6 +520,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
       "qty received",
       "item count",
       "received units",
+      "count",
     ],
     status: [
       "receipt status",
@@ -443,7 +534,7 @@ export const COLUMN_ALIASES_BY_TYPE = {
 };
 
 /**
- * Normalizes a header string for fuzzy/alias comparison:
+ * Normalizes a header string for comparison:
  * - Splits camelCase (e.g. orderNumber -> order number)
  * - Converts to lower case
  * - Replaces non-alphanumeric characters with spaces
@@ -459,8 +550,92 @@ export function normalizeHeader(header) {
 }
 
 /**
- * Normalizes input records based on deterministic alias matching.
- * Scoped by importType to avoid cross-domain collisions.
+ * Strips parenthesized units, currencies, or date formats from a header string.
+ * Example: "Total Amount (₹)" -> "Total Amount"
+ * Example: "Transaction Date (DD/MM/YYYY)" -> "Transaction Date"
+ */
+export function stripHeaderParentheses(header) {
+  return String(header ?? "")
+    .replace(/\s*\(.*?\)\s*/g, " ")
+    .replace(/\s*\[.*?\]\s*/g, " ")
+    .trim();
+}
+
+/**
+ * Automatically detects the best-fitting import category based on raw file headers and filename.
+ * Used to ensure user mistakes in selecting category dropdown don't cause import failure.
+ *
+ * @param {string[]} headers - Raw column headers from uploaded file.
+ * @param {string} [fileName=""] - Original filename.
+ * @returns {string} One of ORDERS, SETTLEMENTS, COD, FREIGHT, RETURNS, WAREHOUSE_RECEIPTS.
+ */
+export function detectCategoryFromHeaders(headers, fileName = "") {
+  if (!Array.isArray(headers) || headers.length === 0) {
+    return "ORDERS";
+  }
+
+  const scores = {
+    ORDERS: 0,
+    SETTLEMENTS: 0,
+    COD: 0,
+    FREIGHT: 0,
+    RETURNS: 0,
+    WAREHOUSE_RECEIPTS: 0,
+  };
+
+  const lowerFileName = String(fileName || "").toLowerCase();
+  if (lowerFileName.includes("settle") || lowerFileName.includes("payout")) scores.SETTLEMENTS += 5;
+  if (lowerFileName.includes("freight") || lowerFileName.includes("courier") || lowerFileName.includes("shipping")) scores.FREIGHT += 5;
+  if (lowerFileName.includes("return") || lowerFileName.includes("rto")) scores.RETURNS += 5;
+  if (lowerFileName.includes("warehouse") || lowerFileName.includes("inward") || lowerFileName.includes("grn")) scores.WAREHOUSE_RECEIPTS += 5;
+  if (lowerFileName.includes("cod") || lowerFileName.includes("remittance")) scores.COD += 5;
+  if (lowerFileName.includes("order")) scores.ORDERS += 2;
+
+  for (const rawHeader of headers) {
+    const norm = normalizeHeader(rawHeader);
+    const stripped = normalizeHeader(stripHeaderParentheses(rawHeader));
+
+    for (const [category, aliasDict] of Object.entries(COLUMN_ALIASES_BY_TYPE)) {
+      for (const [field, aliases] of Object.entries(aliasDict)) {
+        for (const alias of aliases) {
+          const normAlias = normalizeHeader(alias);
+          if (norm === normAlias || stripped === normAlias) {
+            // Highly specific category markers get higher weight
+            if (category === "SETTLEMENTS" && (field === "settlementReference" || field === "tcsAmount" || field === "tdsAmount")) {
+              scores.SETTLEMENTS += 3;
+            } else if (category === "FREIGHT" && (field === "chargedAmount" || field === "actualWeight" || field === "courierName")) {
+              scores.FREIGHT += 3;
+            } else if (category === "RETURNS" && (field === "returnStatus" || field === "returnDate")) {
+              scores.RETURNS += 3;
+            } else if (category === "WAREHOUSE_RECEIPTS" && (field === "warehouseReceivedAt" || field === "receivedQuantity")) {
+              scores.WAREHOUSE_RECEIPTS += 3;
+            } else if (category === "COD" && (field === "remittedAmount" || field === "remittanceDate")) {
+              scores.COD += 3;
+            } else {
+              scores[category] += 1;
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  let bestCategory = "ORDERS";
+  let maxScore = -1;
+  for (const [cat, score] of Object.entries(scores)) {
+    if (score > maxScore) {
+      maxScore = score;
+      bestCategory = cat;
+    }
+  }
+
+  return bestCategory;
+}
+
+/**
+ * Normalizes input records based on multi-tiered deterministic alias matching.
+ * Scoped by importType to avoid cross-domain collisions, with graceful fallbacks.
  *
  * @param {Array<Record<string, any>>} records - Raw parsed records.
  * @param {string} [importType] - One of ORDERS, SETTLEMENTS, COD, FREIGHT, RETURNS, WAREHOUSE_RECEIPTS.
@@ -475,20 +650,46 @@ export function normalizeColumns(records, importType = "ORDERS") {
   const columnMapping = {};
   const mappedSourceHeaders = new Set();
 
-  // Pick category-specific alias dictionary, fallback to ORDERS if unknown
   const aliasDictionary =
     COLUMN_ALIASES_BY_TYPE[importType] || COLUMN_ALIASES_BY_TYPE.ORDERS;
 
+  // Tier 1 & 2: Exact and stripped parenthetical matching
   for (const [standardField, aliases] of Object.entries(aliasDictionary)) {
-    // Find candidate header in source file that matches an alias
     const matchedHeader = headers.find((header) => {
-      if (mappedSourceHeaders.has(header)) return false; // Prevent mapping one source header twice
+      if (mappedSourceHeaders.has(header)) return false;
 
-      const normalizedHeader = normalizeHeader(header);
+      const normHeader = normalizeHeader(header);
+      const strippedHeader = normalizeHeader(stripHeaderParentheses(header));
 
-      return aliases.some(
-        (alias) => normalizeHeader(alias) === normalizedHeader
-      );
+      return aliases.some((alias) => {
+        const normAlias = normalizeHeader(alias);
+        return normAlias === normHeader || normAlias === strippedHeader;
+      });
+    });
+
+    if (matchedHeader) {
+      columnMapping[standardField] = matchedHeader;
+      mappedSourceHeaders.add(matchedHeader);
+    }
+  }
+
+  // Tier 3: Stemmed / Substring keyword fallback for critical required fields
+  for (const [standardField, aliases] of Object.entries(aliasDictionary)) {
+    if (columnMapping[standardField]) continue;
+
+    const matchedHeader = headers.find((header) => {
+      if (mappedSourceHeaders.has(header)) return false;
+
+      const normHeader = normalizeHeader(header);
+
+      return aliases.some((alias) => {
+        const normAlias = normalizeHeader(alias);
+        // Only allow containment when alias has at least 5 letters to avoid short noise
+        if (normAlias.length >= 5) {
+          return normHeader.includes(normAlias) || normAlias.includes(normHeader);
+        }
+        return false;
+      });
     });
 
     if (matchedHeader) {
@@ -504,12 +705,10 @@ export function normalizeColumns(records, importType = "ORDERS") {
   const normalizedRecords = records.map((record) => {
     const normalizedRecord = {};
 
-    // Copy mapped fields
     for (const [standardField, originalHeader] of Object.entries(columnMapping)) {
       normalizedRecord[standardField] = record[originalHeader];
     }
 
-    // Preserve unknown source columns in _unmapped so no information is silently lost
     normalizedRecord._unmapped = {};
     for (const header of unmappedHeaders) {
       normalizedRecord._unmapped[header] = record[header];
