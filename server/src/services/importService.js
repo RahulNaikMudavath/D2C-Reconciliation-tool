@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 import prisma from "../config/database.js";
 import { parseUploadedFile } from "../imports/parsers/fileParser.js";
 import {
