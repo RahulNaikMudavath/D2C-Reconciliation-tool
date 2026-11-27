@@ -133,6 +133,19 @@ export default function Imports() {
     try {
       const data = await uploadImportFile(file, importType);
       setResult(data);
+
+      if (data?.changeDelta) {
+        try {
+          localStorage.setItem(
+            "reconcilex_latest_change_delta",
+            JSON.stringify({
+              ...data.changeDelta,
+              timestamp: Date.now(),
+            })
+          );
+        } catch {}
+      }
+
       setFile(null);
 
       if (fileInputRef.current) {
@@ -362,6 +375,85 @@ export default function Imports() {
               </div>
             ))}
           </div>
+
+          {/* Live Data Impact & Change Delta */}
+          {result.changeDelta && (
+            <div className="mt-5 rounded-xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/60 to-teal-50/40 p-4 shadow-2xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <p className="text-xs font-bold uppercase tracking-wider text-emerald-900">
+                    Live Data Updates & Changes Made
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-white border border-emerald-300 rounded-full px-2.5 py-0.5 shadow-2xs font-mono">
+                  +{result.changeDelta.recordsAdded?.toLocaleString() || result.validCount} records updated
+                </span>
+              </div>
+
+              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl bg-white p-3.5 border border-emerald-100 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-semibold text-slate-500">Records Staged</p>
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 font-mono">
+                      +{result.changeDelta.recordsAdded?.toLocaleString() || result.validCount}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-xl font-bold text-slate-900 font-mono">
+                    {result.validCount}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Linked to {result.importType}</p>
+                </div>
+
+                <div className="rounded-xl bg-white p-3.5 border border-emerald-100 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-semibold text-slate-500">Settled Payouts</p>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold font-mono ${
+                      result.changeDelta.settledDelta > 0
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-slate-100 text-slate-600"
+                    }`}>
+                      {result.changeDelta.settledDelta >= 0 ? `+${result.changeDelta.settledDelta}` : result.changeDelta.settledDelta}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-xl font-bold text-emerald-700 font-mono">
+                    {result.changeDelta.newCounts?.SETTLED ?? "—"}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Orders within ₹10 tolerance</p>
+                </div>
+
+                <div className="rounded-xl bg-white p-3.5 border border-emerald-100 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-semibold text-slate-500">Discrepancies</p>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold font-mono ${
+                      (result.changeDelta.shortPaidDelta > 0 || result.changeDelta.freightOverchargedDelta > 0)
+                        ? "bg-rose-100 text-rose-800"
+                        : "bg-slate-100 text-slate-600"
+                    }`}>
+                      +{result.changeDelta.shortPaidDelta + result.changeDelta.freightOverchargedDelta}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-xl font-bold text-rose-700 font-mono">
+                    {(result.changeDelta.newCounts?.SHORT_PAID ?? 0) + (result.changeDelta.newCounts?.FREIGHT_OVERCHARGED ?? 0)}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Underpaid / freight leakages</p>
+                </div>
+
+                <div className="rounded-xl bg-white p-3.5 border border-emerald-100 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-semibold text-slate-500">Needs Review</p>
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800 font-mono">
+                      {result.changeDelta.reviewRequiredDelta >= 0 ? `+${result.changeDelta.reviewRequiredDelta}` : result.changeDelta.reviewRequiredDelta}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-xl font-bold text-amber-800 font-mono">
+                    {result.changeDelta.newCounts?.REVIEW_REQUIRED ?? "—"}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Pending audit / file upload</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {result.rejectedCount > 0 && (
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
@@ -616,7 +708,14 @@ export default function Imports() {
                         </p>
                       </td>
                       <td className="px-4 py-3.5 font-semibold text-slate-800">
-                        {batch.rowCount ?? batch.totalRows ?? "—"}
+                        <div className="flex items-center gap-1.5 font-mono">
+                          <span>{batch.rowCount ?? batch.totalRows ?? "—"}</span>
+                          {(batch.rowCount ?? 0) > 0 && (
+                            <span className="inline-flex items-center rounded-md bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">
+                              +{batch.rowCount}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3.5">
                         {isSettlementBatch ? (

@@ -68,6 +68,7 @@ const formatDate = (dateString) => {
 
 export default function Reconciliation() {
   const [data, setData] = useState(null);
+  const [latestDelta, setLatestDelta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState("");
@@ -104,6 +105,12 @@ export default function Reconciliation() {
 
   useEffect(() => {
     fetchResults();
+    try {
+      const stored = localStorage.getItem("reconcilex_latest_change_delta");
+      if (stored) {
+        setLatestDelta(JSON.parse(stored));
+      }
+    } catch {}
   }, []);
 
   const handleRun = async () => {
@@ -345,6 +352,17 @@ export default function Reconciliation() {
           const Icon = card.icon;
           const isSelected = statusFilter === card.id;
 
+          let delta = null;
+          if (latestDelta) {
+            if (card.id === "ALL") delta = latestDelta.totalOrdersDelta || latestDelta.recordsAdded || null;
+            else if (card.id === "SETTLED") delta = latestDelta.settledDelta || null;
+            else if (card.id === "SHORT_PAID") {
+              const sp = (latestDelta.shortPaidDelta || 0) + (latestDelta.unpaidPastDueDelta || 0);
+              delta = sp || null;
+            } else if (card.id === "FREIGHT_OVERCHARGED") delta = latestDelta.freightOverchargedDelta || null;
+            else if (card.id === "RETURN_NOT_RECEIVED") delta = latestDelta.returnNotReceivedDelta || null;
+          }
+
           return (
             <button
               key={card.label}
@@ -357,7 +375,14 @@ export default function Reconciliation() {
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                   {card.label}
                 </p>
-                <Icon size={15} className={card.iconColor} />
+                <div className="flex items-center gap-1.5">
+                  {delta !== null && delta !== undefined && delta !== 0 && (
+                    <span className="inline-flex items-center rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 px-1.5 py-0.2 text-[10px] font-bold font-mono shadow-2xs">
+                      {delta > 0 ? `+${delta}` : delta}
+                    </span>
+                  )}
+                  <Icon size={15} className={card.iconColor} />
+                </div>
               </div>
               <p className={`mt-1.5 text-xl font-bold font-mono ${card.textColor}`}>
                 {card.value}

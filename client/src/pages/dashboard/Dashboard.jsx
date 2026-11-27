@@ -113,6 +113,7 @@ const colorStyles = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const [summary, setSummary] = useState(null);
+  const [latestDelta, setLatestDelta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -135,6 +136,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchDashboard();
+    try {
+      const stored = localStorage.getItem("reconcilex_latest_change_delta");
+      if (stored) {
+        setLatestDelta(JSON.parse(stored));
+      }
+    } catch {}
   }, []);
 
   if (loading) {
@@ -222,6 +229,45 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Latest Upload Change Impact Banner */}
+      {(latestDelta || summary?.latestBatch) && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200/90 bg-emerald-50/70 p-3.5 text-xs text-emerald-950 shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div>
+              <p className="font-semibold text-emerald-900">
+                Latest File Upload Impact:
+                <span className="ml-1.5 font-mono font-bold text-slate-800">
+                  {latestDelta?.fileName || summary.latestBatch?.fileName || "Recent Batch"}
+                </span>
+                <span className="ml-2 inline-flex items-center rounded-full bg-emerald-200/70 border border-emerald-300 px-2 py-0.2 text-[10px] font-bold text-emerald-900 font-mono">
+                  +{Number(latestDelta?.recordsAdded || summary.latestBatch?.rowCount || 0).toLocaleString()} records added
+                </span>
+                {latestDelta?.settledDelta > 0 && (
+                  <span className="ml-1.5 inline-flex items-center rounded-full bg-emerald-100 text-emerald-800 px-1.5 py-0.2 text-[10px] font-bold font-mono">
+                    +{latestDelta.settledDelta} settled
+                  </span>
+                )}
+                {(latestDelta?.shortPaidDelta > 0 || latestDelta?.freightOverchargedDelta > 0) && (
+                  <span className="ml-1.5 inline-flex items-center rounded-full bg-rose-100 text-rose-800 px-1.5 py-0.2 text-[10px] font-bold font-mono">
+                    +{latestDelta.shortPaidDelta + latestDelta.freightOverchargedDelta} discrepancies
+                  </span>
+                )}
+              </p>
+              <p className="text-[11px] text-emerald-700/90">
+                All settlement payouts, freight audit rate-cards and financial metrics reflect these updates.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate("/imports")}
+            className="rounded-lg bg-emerald-700 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-800 transition shadow-2xs"
+          >
+            View Import Details
+          </button>
+        </div>
+      )}
+
       {/* Financial Summary Cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((card) => {
@@ -258,9 +304,16 @@ export default function Dashboard() {
       {/* Operational Summary */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-2xs">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Total Matches
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Total Matches
+            </p>
+            {((latestDelta?.recordsAdded ?? 0) > 0 || (summary.latestBatch?.rowCount ?? 0) > 0) && (
+              <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800 font-mono">
+                +{Number(latestDelta?.recordsAdded || summary.latestBatch?.rowCount).toLocaleString()}
+              </span>
+            )}
+          </div>
           <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 font-mono">
             {summary.totalMatches}
           </h2>
