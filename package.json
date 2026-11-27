@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
-    "build:client": "npm --prefix client install --include=dev && npm --prefix client run build",
-    "build:server": "npm --prefix server install --include=dev && cd server && npm run db:generate",
+    "build:client": "npm --prefix client install --prefer-offline --no-audit && npm --prefix client run build",
+    "build:server": "npm --prefix server install --prefer-offline --no-audit && cd server && npm run db:generate",
     "build": "npm run build:client && npm run build:server",
     "db:migrate": "cd server && npm run db:migrate",
     "db:seed": "cd server && npm run db:seed",

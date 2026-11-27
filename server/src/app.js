@@ -69,6 +69,9 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
     message: "ReconcileX API is running!",
+    version: "2.1.0",
+    pipeline: "universal-resilient",
+    node: process.version,
   });
 });
 

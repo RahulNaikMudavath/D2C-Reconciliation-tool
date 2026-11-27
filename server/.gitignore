@@ -9,3 +9,5 @@ yarn-debug.log*
 yarn-error.log*
 uploads/*
 !uploads/.gitkeep
+sample-data/reconcilex_test_100k_orders.csv
+sample-data/reconcilex_test_20k_orders_alt_headers.csv
