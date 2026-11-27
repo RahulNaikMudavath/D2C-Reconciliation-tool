@@ -36,15 +36,54 @@ export async function processUploadedFile({
     }
 
     // 2. Find the latest approved mapping for this source.
-    const approvedMappings = await prisma.columnMapping.findMany({
-      where: {
-        sourceName: file.originalname,
-        approved: true,
-      },
-      orderBy: {
-        version: "desc",
-      },
-    });
+    // Also capture previous reconciliation status counts to compute live change delta
+    const [approvedMappings, prevRun] = await Promise.all([
+      prisma.columnMapping.findMany({
+        where: {
+          sourceName: file.originalname,
+          approved: true,
+        },
+        orderBy: {
+          version: "desc",
+        },
+      }),
+      prisma.reconciliationRun.findFirst({
+        where: { status: "COMPLETED" },
+        orderBy: { completedAt: "desc" },
+      }),
+    ]);
+
+    const prevStatusCounts = {
+      TOTAL: 0,
+      SETTLED: 0,
+      SHORT_PAID: 0,
+      UNPAID_PAST_DUE: 0,
+      FREIGHT_OVERCHARGED: 0,
+      RETURN_NOT_RECEIVED: 0,
+      REVIEW_REQUIRED: 0,
+    };
+
+    if (prevRun) {
+      const matchCounts = await prisma.reconciliationMatch.groupBy({
+        by: ["status"],
+        where: { runId: prevRun.id },
+        _count: { status: true },
+      });
+      for (const m of matchCounts) {
+        if (m.status in prevStatusCounts) {
+          prevStatusCounts[m.status] = m._count.status;
+        }
+      }
+      prevStatusCounts.FREIGHT_OVERCHARGED = await prisma.reconciliationMatch.count({
+        where: { runId: prevRun.id, freightStatus: "FREIGHT_OVERCHARGED" },
+      });
+      prevStatusCounts.RETURN_NOT_RECEIVED = await prisma.reconciliationMatch.count({
+        where: { runId: prevRun.id, returnStatus: "RETURN_NOT_RECEIVED" },
+      });
+      prevStatusCounts.TOTAL = await prisma.reconciliationMatch.count({
+        where: { runId: prevRun.id },
+      });
+    }
 
     const approvedMapping = approvedMappings.find(
       (item) => item.mapping?.importType === importType
@@ -383,14 +422,44 @@ const sourceRecords = records.map((record, index) => {
       },
     });
 
-    // Automatically trigger 3-way reconciliation in background whenever new records are imported
-    // so all dashboard metrics, status breakdowns, and claims update immediately.
+    // Run 3-way reconciliation and compute exact change deltas
+    let reconciliationResult = null;
+    const changeDelta = {
+      recordsProcessed: validation.totalRows,
+      recordsAdded: validation.validCount,
+      rejectedCount: validation.rejectedCount,
+      duplicateCount: validation.duplicateCount ?? 0,
+      importType,
+      fileName: file.originalname,
+      totalOrdersDelta: 0,
+      settledDelta: 0,
+      shortPaidDelta: 0,
+      unpaidPastDueDelta: 0,
+      freightOverchargedDelta: 0,
+      returnNotReceivedDelta: 0,
+      reviewRequiredDelta: 0,
+      previousCounts: prevStatusCounts,
+      newCounts: null,
+    };
+
     if (validation.validCount > 0) {
-      import("./reconciliationRepository.js")
-        .then(({ runReconciliation }) => runReconciliation())
-        .catch((err) =>
-          console.error("Auto-reconciliation error after import:", err)
-        );
+      try {
+        const { runReconciliation } = await import("./reconciliationRepository.js");
+        reconciliationResult = await runReconciliation();
+        if (reconciliationResult?.statusCounts) {
+          const cur = reconciliationResult.statusCounts;
+          changeDelta.newCounts = cur;
+          changeDelta.totalOrdersDelta = (cur.TOTAL || 0) - (prevStatusCounts.TOTAL || 0);
+          changeDelta.settledDelta = (cur.SETTLED || 0) - (prevStatusCounts.SETTLED || 0);
+          changeDelta.shortPaidDelta = (cur.SHORT_PAID || 0) - (prevStatusCounts.SHORT_PAID || 0);
+          changeDelta.unpaidPastDueDelta = (cur.UNPAID_PAST_DUE || 0) - (prevStatusCounts.UNPAID_PAST_DUE || 0);
+          changeDelta.freightOverchargedDelta = (cur.FREIGHT_OVERCHARGED || 0) - (prevStatusCounts.FREIGHT_OVERCHARGED || 0);
+          changeDelta.returnNotReceivedDelta = (cur.RETURN_NOT_RECEIVED || 0) - (prevStatusCounts.RETURN_NOT_RECEIVED || 0);
+          changeDelta.reviewRequiredDelta = (cur.REVIEW_REQUIRED || 0) - (prevStatusCounts.REVIEW_REQUIRED || 0);
+        }
+      } catch (err) {
+        console.error("Auto-reconciliation error after import:", err);
+      }
     }
 
     return {
@@ -407,6 +476,7 @@ const sourceRecords = records.map((record, index) => {
       columnMapping: normalization.columnMapping,
       unmappedHeaders: normalization.unmappedHeaders,
       rejectedRecords: validation.rejectedRecords.slice(0, 50),
+      changeDelta,
     };
   } catch (error) {
     await prisma.importBatch.update({

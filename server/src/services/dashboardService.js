@@ -53,10 +53,21 @@ export async function getDashboardSummary() {
     };
   }
 
-  // 3. Fetch reconciliation matches, orders, and total source records.
-  const [totalOrders, totalImportedRecords, matches] = await Promise.all([
+  // 3. Fetch reconciliation matches, orders, total source records, and latest import batch.
+  const [totalOrders, totalImportedRecords, latestBatch, matches] = await Promise.all([
     prisma.order.count(),
     prisma.sourceRecord.count(),
+    prisma.importBatch.findFirst({
+      where: { status: "COMPLETED" },
+      orderBy: { uploadedAt: "desc" },
+      select: {
+        id: true,
+        fileName: true,
+        importType: true,
+        rowCount: true,
+        uploadedAt: true,
+      },
+    }),
 
     prisma.reconciliationMatch.findMany({
       where: {
@@ -447,6 +458,16 @@ export async function getDashboardSummary() {
 
     openClaims: openClaims.length,
     totalClaimValue: totalClaimValue.toFixed(2),
+
+    latestBatch: latestBatch
+      ? {
+          id: latestBatch.id,
+          fileName: latestBatch.fileName,
+          importType: latestBatch.importType,
+          rowCount: latestBatch.rowCount,
+          uploadedAt: latestBatch.uploadedAt,
+        }
+      : null,
 
     statusBreakdown,
     freightStatusBreakdown,
