@@ -469,6 +469,18 @@ export async function getDashboardSummary() {
         }
       : null,
 
+    latestDelta: latestBatch
+      ? {
+          fileName: latestBatch.fileName,
+          importType: latestBatch.importType,
+          recordsAdded: latestBatch.rowCount,
+          totalOrdersDelta: latestBatch.importType === "ORDERS" ? latestBatch.rowCount : 0,
+          settledDelta: latestBatch.importType === "SETTLEMENTS" ? latestBatch.rowCount : 0,
+          shortPaidDelta: 0,
+          freightOverchargedDelta: 0,
+        }
+      : null,
+
     statusBreakdown,
     freightStatusBreakdown,
     partnerLeakage,

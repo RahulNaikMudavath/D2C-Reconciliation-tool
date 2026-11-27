@@ -538,6 +538,21 @@ export async function processUploadedFile({
       },
     });
 
+    // Calculate financial amounts added in this batch
+    let totalExpectedAmountAdded = new Decimal(0);
+    let totalReceivedAmountAdded = new Decimal(0);
+    let totalTcsAmountAdded = new Decimal(0);
+    let totalTdsAmountAdded = new Decimal(0);
+    let totalFreightAmountAdded = new Decimal(0);
+
+    for (const rec of (validation.validRecords || [])) {
+      if (rec.expectedSettlementAmount) totalExpectedAmountAdded = totalExpectedAmountAdded.plus(rec.expectedSettlementAmount);
+      if (rec.amount) totalReceivedAmountAdded = totalReceivedAmountAdded.plus(rec.amount);
+      if (rec.tcsAmount) totalTcsAmountAdded = totalTcsAmountAdded.plus(rec.tcsAmount);
+      if (rec.tdsAmount) totalTdsAmountAdded = totalTdsAmountAdded.plus(rec.tdsAmount);
+      if (rec.freightAmount) totalFreightAmountAdded = totalFreightAmountAdded.plus(rec.freightAmount);
+    }
+
     // Run 3-way reconciliation and compute exact change deltas
     let reconciliationResult = null;
     const changeDelta = {
@@ -554,6 +569,11 @@ export async function processUploadedFile({
       freightOverchargedDelta: 0,
       returnNotReceivedDelta: 0,
       reviewRequiredDelta: 0,
+      totalExpectedAmountAdded: totalExpectedAmountAdded.toFixed(2),
+      totalReceivedAmountAdded: totalReceivedAmountAdded.toFixed(2),
+      totalTcsAmountAdded: totalTcsAmountAdded.toFixed(2),
+      totalTdsAmountAdded: totalTdsAmountAdded.toFixed(2),
+      totalFreightAmountAdded: totalFreightAmountAdded.toFixed(2),
       previousCounts: prevStatusCounts,
       newCounts: null,
     };

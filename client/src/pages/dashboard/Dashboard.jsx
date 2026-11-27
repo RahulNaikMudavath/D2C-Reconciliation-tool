@@ -117,6 +117,79 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const effectiveDelta = latestDelta || summary?.latestDelta;
+
+  const getCardDelta = (key) => {
+    if (!effectiveDelta && !summary?.latestBatch) return null;
+    const d = effectiveDelta || {};
+    const bType = d.importType || summary?.latestBatch?.importType;
+    const count = d.recordsAdded || summary?.latestBatch?.rowCount || 0;
+    if (!count && !d.totalOrdersDelta && !d.settledDelta) return null;
+
+    switch (key) {
+      case "totalOrders":
+        if (d.totalOrdersDelta > 0) return `+${d.totalOrdersDelta}`;
+        if (bType === "ORDERS") return `+${count}`;
+        if (d.recordsAdded > 0 && d.totalOrdersDelta !== 0) return `+${d.recordsAdded}`;
+        return null;
+
+      case "totalExpected":
+        if (d.totalExpectedAmountAdded && Number(d.totalExpectedAmountAdded) > 0) {
+          return `+${formatCurrency(d.totalExpectedAmountAdded)}`;
+        }
+        if (bType === "ORDERS") return `+${count}`;
+        return null;
+
+      case "totalReceived":
+        if (d.totalReceivedAmountAdded && Number(d.totalReceivedAmountAdded) > 0) {
+          return `+${formatCurrency(d.totalReceivedAmountAdded)}`;
+        }
+        if (bType === "SETTLEMENTS") return `+${count}`;
+        return null;
+
+      case "totalTCS":
+        if (d.totalTcsAmountAdded && Number(d.totalTcsAmountAdded) > 0) {
+          return `+${formatCurrency(d.totalTcsAmountAdded)}`;
+        }
+        if (bType === "SETTLEMENTS") return `+${count}`;
+        return null;
+
+      case "totalTDS":
+        if (d.totalTdsAmountAdded && Number(d.totalTdsAmountAdded) > 0) {
+          return `+${formatCurrency(d.totalTdsAmountAdded)}`;
+        }
+        if (bType === "SETTLEMENTS") return `+${count}`;
+        return null;
+
+      case "totalActualFreight":
+        if (d.totalFreightAmountAdded && Number(d.totalFreightAmountAdded) > 0) {
+          return `+${formatCurrency(d.totalFreightAmountAdded)}`;
+        }
+        if (bType === "FREIGHT") return `+${count}`;
+        return null;
+
+      case "totalExpectedFreight":
+        if (bType === "FREIGHT" || bType === "ORDERS") return `+${count}`;
+        return null;
+
+      case "freightMoneyAtRisk":
+        if (d.freightOverchargedDelta > 0) return `+${d.freightOverchargedDelta}`;
+        return null;
+
+      case "moneyAtRisk": {
+        const riskDelta =
+          (d.shortPaidDelta || 0) +
+          (d.freightOverchargedDelta || 0) +
+          (d.returnNotReceivedDelta || 0);
+        if (riskDelta > 0) return `+${riskDelta}`;
+        return null;
+      }
+
+      default:
+        return null;
+    }
+  };
+
   const fetchDashboard = async () => {
     setLoading(true);
     setError("");
@@ -272,6 +345,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((card) => {
           const Icon = card.icon;
+          const deltaBadge = getCardDelta(card.key);
 
           return (
             <div
@@ -279,11 +353,21 @@ export default function Dashboard() {
               className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-slate-300 transition-colors"
             >
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold text-slate-500">
-                  {card.label}
-                </p>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <p className="text-xs font-semibold text-slate-500">
+                    {card.label}
+                  </p>
+                  {deltaBadge && (
+                    <span
+                      title={`Updated by latest upload: ${effectiveDelta?.fileName || summary?.latestBatch?.fileName || "Recent Batch"}`}
+                      className="inline-flex items-center rounded-full bg-emerald-100 border border-emerald-200 px-1.5 py-0.2 text-[10px] font-bold text-emerald-800 font-mono shadow-2xs"
+                    >
+                      {deltaBadge}
+                    </span>
+                  )}
+                </div>
 
-                <div className={`rounded-lg p-1.5 ${colorStyles[card.color]}`}>
+                <div className={`shrink-0 rounded-lg p-1.5 ${colorStyles[card.color]}`}>
                   <Icon size={15} />
                 </div>
               </div>
@@ -305,14 +389,16 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-2xs">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              Total Matches
-            </p>
-            {((latestDelta?.recordsAdded ?? 0) > 0 || (summary.latestBatch?.rowCount ?? 0) > 0) && (
-              <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800 font-mono">
-                +{Number(latestDelta?.recordsAdded || summary.latestBatch?.rowCount).toLocaleString()}
-              </span>
-            )}
+            <div className="flex items-center gap-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Total Matches
+              </p>
+              {((effectiveDelta?.recordsAdded ?? 0) > 0 || (summary.latestBatch?.rowCount ?? 0) > 0) && (
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800 font-mono">
+                  +{Number(effectiveDelta?.recordsAdded || summary.latestBatch?.rowCount).toLocaleString()}
+                </span>
+              )}
+            </div>
           </div>
           <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 font-mono">
             {summary.totalMatches}
@@ -323,9 +409,18 @@ export default function Dashboard() {
         </div>
 
         <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-2xs">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Open Claims
-          </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Open Claims
+              </p>
+              {((effectiveDelta?.claimsDelta ?? 0) > 0 || (effectiveDelta?.shortPaidDelta ?? 0) + (effectiveDelta?.freightOverchargedDelta ?? 0) > 0) && (
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800 font-mono">
+                  +{effectiveDelta.claimsDelta || (effectiveDelta.shortPaidDelta || 0) + (effectiveDelta.freightOverchargedDelta || 0)}
+                </span>
+              )}
+            </div>
+          </div>
           <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 font-mono">
             {summary.openClaims}
           </h2>
@@ -335,9 +430,18 @@ export default function Dashboard() {
         </div>
 
         <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-2xs">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Open Claim Value
-          </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Open Claim Value
+              </p>
+              {effectiveDelta?.claimValueDelta && Number(effectiveDelta.claimValueDelta) > 0 && (
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800 font-mono">
+                  +{formatCurrency(effectiveDelta.claimValueDelta)}
+                </span>
+              )}
+            </div>
+          </div>
           <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 font-mono">
             {formatCurrency(summary.totalClaimValue)}
           </h2>
