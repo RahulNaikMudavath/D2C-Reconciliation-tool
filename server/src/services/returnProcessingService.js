@@ -1,4 +1,5 @@
 import prisma from "../config/database.js";
+import { parseDateSafe } from "../imports/validators/importValidator.js";
 
 export async function processReturnImport(importBatchId) {
   const batch = await prisma.importBatch.findUnique({
@@ -43,9 +44,10 @@ export async function processReturnImport(importBatchId) {
 
     const isReceipt = batch.importType === "WAREHOUSE_RECEIPTS";
 
-    const eventDate = isReceipt
-      ? new Date(normalized.warehouseReceivedAt)
-      : new Date(normalized.returnDate);
+    const rawEventDate = isReceipt
+      ? normalized.warehouseReceivedAt
+      : normalized.returnDate;
+    const eventDate = parseDateSafe(rawEventDate);
 
     const returnStatus = String(
       normalized.returnStatus ?? "RETURN_INITIATED"

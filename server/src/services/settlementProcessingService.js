@@ -1,4 +1,6 @@
+import Decimal from "decimal.js";
 import prisma from "../config/database.js";
+import { parseDateSafe, parseDecimalSafe } from "../imports/validators/importValidator.js";
 
 /**
  * High-speed batch processing for settlement import records.
@@ -15,11 +17,15 @@ export async function processSettlementImport(importBatchId) {
   });
 
   if (!batch) {
-    throw new Error("Import batch not found.");
+    const error = new Error("Import batch not found.");
+    error.statusCode = 404;
+    throw error;
   }
 
   if (batch.importType !== "SETTLEMENTS" && batch.importType !== "COD") {
-    throw new Error("This import batch is not a settlement or COD file.");
+    const error = new Error("This import batch is not a settlement or COD file.");
+    error.statusCode = 400;
+    throw error;
   }
 
   // 2. Check if settlements were already created during initial ingestion
@@ -32,6 +38,14 @@ export async function processSettlementImport(importBatchId) {
       where: { importBatchId, processed: false },
       data: { processed: true },
     });
+
+    // Run reconciliation in background to ensure matches stay up to date
+    try {
+      const { runReconciliation } = await import("./reconciliationRepository.js");
+      await runReconciliation();
+    } catch (reconErr) {
+      console.warn("Reconciliation notice during reprocess check:", reconErr.message);
+    }
 
     return {
       totalRecords: existingSettlementsCount,
@@ -81,9 +95,9 @@ export async function processSettlementImport(importBatchId) {
     return summary;
   }
 
-  // 3. Batch lookup matching orders
+  // 3. Batch lookup matching orders and partners
   const CHUNK_SIZE = 5000;
-  const allOrderNumbers = [...new Set(validSources.map((s) => String(s.normalizedData.orderNumber ?? "").trim()))];
+  const allOrderNumbers = [...new Set(validSources.map((s) => String(s.normalizedData?.orderNumber ?? "").trim()))];
   const orderMap = new Map();
 
   for (let i = 0; i < allOrderNumbers.length; i += CHUNK_SIZE) {
@@ -100,6 +114,12 @@ export async function processSettlementImport(importBatchId) {
       orderMap.set(o.orderNumber, o);
     }
   }
+
+  // Partner fallback map for records where order.partnerId might be missing
+  const allPartners = await prisma.partner.findMany();
+  const partnerNameMap = new Map(
+    allPartners.map((p) => [p.name.trim().toLowerCase(), p.id])
+  );
 
   const settlementsToInsert = [];
   const processedSourceIds = [];
@@ -122,21 +142,33 @@ export async function processSettlementImport(importBatchId) {
       continue;
     }
 
-    const tcsAmount = Number(normalized.tcsAmount ?? 0);
-    const tdsAmount = Number(normalized.tdsAmount ?? 0);
+    const partnerId =
+      order.partnerId ||
+      (normalized.partnerName ? partnerNameMap.get(String(normalized.partnerName).trim().toLowerCase()) : null) ||
+      null;
+
+    const parsedDate = parseDateSafe(transactionDate);
+    const settlementDate = parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate : new Date();
+
+    const parsedAmount = parseDecimalSafe(amount) || new Decimal(0);
+    const parsedGross = parseDecimalSafe(normalized.grossAmount);
+    const parsedCommission = parseDecimalSafe(normalized.commissionAmount) || new Decimal(0);
+    const parsedOtherFee = parseDecimalSafe(normalized.otherFeeAmount) || new Decimal(0);
+    const parsedTcs = parseDecimalSafe(normalized.tcsAmount) || new Decimal(0);
+    const parsedTds = parseDecimalSafe(normalized.tdsAmount) || new Decimal(0);
 
     settlementsToInsert.push({
       orderId: order.id,
-      partnerId: order.partnerId || null,
+      partnerId,
       importBatchId: batch.id,
       referenceNumber: referenceNumber || null,
-      amountReceived: amount,
-      grossAmount: normalized.grossAmount ?? null,
-      commissionAmount: normalized.commissionAmount ?? 0,
-      otherFeeAmount: normalized.otherFeeAmount ?? 0,
-      tcsAmount: Number.isFinite(tcsAmount) && tcsAmount >= 0 ? tcsAmount : 0,
-      tdsAmount: Number.isFinite(tdsAmount) && tdsAmount >= 0 ? tdsAmount : 0,
-      settlementDate: transactionDate ? new Date(transactionDate) : new Date(),
+      amountReceived: parsedAmount.toFixed(2),
+      grossAmount: parsedGross ? parsedGross.toFixed(2) : null,
+      commissionAmount: parsedCommission.toFixed(2),
+      otherFeeAmount: parsedOtherFee.toFixed(2),
+      tcsAmount: parsedTcs.isNegative() ? "0.00" : parsedTcs.toFixed(2),
+      tdsAmount: parsedTds.isNegative() ? "0.00" : parsedTds.toFixed(2),
+      settlementDate,
     });
 
     processedSourceIds.push(source.id);
@@ -160,19 +192,42 @@ export async function processSettlementImport(importBatchId) {
     });
   }
 
-  // 6. Update rejected source records
-  for (const rej of rejectedSources) {
-    await prisma.sourceRecord.update({
-      where: { id: rej.id },
-      data: {
-        normalizedData: {
-          ...rej.normalized,
-          validationStatus: "REJECTED",
-          errors: [rej.error],
-        },
-      },
-    });
+  // 6. Update rejected source records in parallel batches to prevent timeouts
+  const REJECT_BATCH_SIZE = 50;
+  for (let i = 0; i < rejectedSources.length; i += REJECT_BATCH_SIZE) {
+    const chunk = rejectedSources.slice(i, i + REJECT_BATCH_SIZE);
+    await Promise.all(
+      chunk.map((rej) =>
+        prisma.sourceRecord.update({
+          where: { id: rej.id },
+          data: {
+            normalizedData: {
+              ...rej.normalized,
+              validationStatus: "REJECTED",
+              errors: [rej.error],
+            },
+          },
+        })
+      )
+    );
   }
+
+  // 7. Auto-run reconciliation if settlements were added, and update batch status
+  if (settlementsToInsert.length > 0) {
+    try {
+      const { runReconciliation } = await import("./reconciliationRepository.js");
+      await runReconciliation();
+    } catch (reconErr) {
+      console.warn("Reconciliation notice after settlement processing:", reconErr.message);
+    }
+  }
+
+  await prisma.importBatch.update({
+    where: { id: importBatchId },
+    data: {
+      status: "COMPLETED",
+    },
+  });
 
   summary.processedCount = processedSourceIds.length;
   return summary;

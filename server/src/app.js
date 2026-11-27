@@ -120,7 +120,7 @@ app.use((error, req, res, next) => {
 
   res.status(statusCode).json({
     success: false,
-    message: statusCode >= 500 ? "Internal server error" : error.message,
+    message: error.message || (statusCode >= 500 ? "Internal server error" : "An unexpected error occurred"),
   });
 });
 

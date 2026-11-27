@@ -1,4 +1,5 @@
 import prisma from "../config/database.js";
+import { parseDateSafe } from "../imports/validators/importValidator.js";
 
 export async function processFreightImport(importBatchId) {
   // 1. Verify that the import batch exists.
@@ -48,8 +49,9 @@ export async function processFreightImport(importBatchId) {
     const actualWeight = normalized.actualWeight;
     const invoiceNumber = String(normalized.invoiceNumber ?? "").trim();
 
-    const chargedAt = normalized.chargedAt
-      ? new Date(normalized.chargedAt)
+    const parsedChargedDate = parseDateSafe(normalized.chargedAt);
+    const chargedAt = parsedChargedDate && !Number.isNaN(parsedChargedDate.getTime())
+      ? parsedChargedDate
       : (batch.uploadedAt || batch.createdAt || new Date());
 
     // 4. Verify required freight fields.
